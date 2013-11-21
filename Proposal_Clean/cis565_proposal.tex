@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{natbib}
+\usepackage{hyperref}
+\begin{document}
+\title{PointMan: A Pointcloud Renderer}
+\author{Nathan Marshak, Uriah Baalke}
+\maketitle
+\section{Motivation}
+Data from 3D range scanners is often represented as a point cloud. Point clouds are used in robotics, geospatial visualization, architecture, and industrial CAD [\citenum{Bentley:2009:Online}]. While point clouds are often converted into a triangular mesh or NURBS, it is often desirable to render raw point data. This is due to several reasons. First, reconstruction algorithms take time, and are notoriously tricky to work with. Second, data sets (especially outdoor data) often must be cleaned by hand before a mesh can be obtained. Cleaning a large data set by hand may require several man-months of time [\citenum{Wimmer:2006}]. Finally, a point representation does not require extra memory to store mesh topology information [\citenum{Pfister:2000}]. See full list of point cloud papers and sites that we found \href{https://docs.google.com/document/d/1H8QUlHV6Eg2A3o9CJMlEzgLDtrJm5CMsjRKsSs9GT_0/edit?usp=sharing}{by clicking on this link}.
+\section{Project Description}
+Implement EITHER a point cloud renderer on top of WebGL, OR a from-scratch, alternative rendering pipeline in CUDA. Implement the following features:
+\begin{enumerate}
+\item Load real range scan / LiDAR data files.
+\item Fill in the gaps between points with splatting (AKA surfels).
+\item Support for color (this allows for ``texture'').
+\item Implement an optimization to allow for rendering of LARGE point sets. Common optimizations are out-of-core storage [\citenum{Botsch_interactiveediting}], and octrees [\citenum{Wimmer:2006}]. One very complicated scheme in [\citenum{HiDOF:2013:Online}] uses JavaScript for the user interface and camera control, while offloading more expensive operations to the GPU. We would probably want to do an octree, then if there is time,
+extend it to be an out-of-core octree. 
+\end{enumerate}
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+\end{document}	
