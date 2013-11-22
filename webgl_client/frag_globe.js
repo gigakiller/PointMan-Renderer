@@ -570,7 +570,8 @@
         gl.uniform1f(u_timeLocation, time);
 
         function draw1(){
-            gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+            //gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+            gl.drawElements(gl.POINTS, numberOfIndices, gl.UNSIGNED_SHORT,0);
         }
         draw1();
 
