@@ -35,9 +35,8 @@
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    //gl.disable(gl.BACKFACE_CULL);
-    //gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    gl.enable(gl.BLEND);
+    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     var persp = mat4.create();
     mat4.perspective(45.0, canvas.width/canvas.height, 0.1, 100.0, persp);
@@ -57,13 +56,7 @@
     var normalLocation;
     var texCoordLocation;
 
-    var positionLocation_ISS;
-    var normalLocation_ISS;
-    var texCoordLocation_ISS;
-
-    var positionLocation_trail;
-    var normalLocation_trail;
-    var texCoordLocation_trail;
+ 
 
     var u_InvTransLocation;
     var u_ModelLocation;
@@ -78,54 +71,10 @@
     var u_BumpLocation;
     var u_timeLocation;
 
-    var u_InvTransLocation2;
-    var u_ModelLocation2;
-    var u_ViewLocation2;
-    var u_PerspLocation2;
-    var u_CameraSpaceDirLightLocation2;
-    var u_DayDiffuseLocation2;
-    var u_NightLocation2;
-    var u_CloudLocation2;
-    var u_CloudTransLocation2;
-    var u_EarthSpecLocation2;
-    var u_BumpLocation2;
-    var u_timeLocation2;
-
-    var u_InvTransLocation3;
-    var u_ModelLocation3;
-    var u_ViewLocation3;
-    var u_PerspLocation3;
-    var u_CameraSpaceDirLightLocation3;
-    var u_DayDiffuseLocation3;
-    var u_NightLocation3;
-    var u_CloudLocation3;
-    var u_CloudTransLocation3;
-    var u_EarthSpecLocation3;
-    var u_BumpLocation3;
-    var u_timeLocation3;
 
     var globe_program;
-    var iss_program;
-    var trail_program;
 
-    var trail_array = new Array();
-    //trail_array[0] = 0.0;
-    //trail_array[1] = 0.0;
-    //trail_array[2] = 0.0;
-    //trail_array[3] = 1.5;
-    //trail_array[4] = 1.5;
-    //trail_array[5] = 1.5;
-    //trail_array[6] = 1.5;
-    //trail_array[7] = 3.0;
-    //trail_array[8] = 1.5;
-    //trail_array[9] = 0.0;
-    //trail_array[10] = 0.0;
-    //trail_array[11] = 0.0;
-    //trail_array[9] = -1.2;
-    //trail_array[10] = -1.2;
-    //trail_array[11] = -1.2;
-
-    function initializeShader() {
+    (function initializeShader() {
         var vs = getShaderSource(document.getElementById("vs"));
         var fs = getShaderSource(document.getElementById("fs"));
 
@@ -147,55 +96,7 @@
         u_CameraSpaceDirLightLocation = gl.getUniformLocation(globe_program,"u_CameraSpaceDirLight");
 
         gl.useProgram(globe_program);
-    }
-
-    function initializeShader2() {
-        var vs = getShaderSource(document.getElementById("vs"));
-        var fs = getShaderSource(document.getElementById("iss-fs"));
-
-        iss_program = createProgram(gl, vs, fs, message);
-        positionLocation_ISS = gl.getAttribLocation(iss_program, "Position");
-        normalLocation_ISS = gl.getAttribLocation(iss_program, "Normal");
-        texCoordLocation_ISS = gl.getAttribLocation(iss_program, "Texcoord");
-        u_ModelLocation2 = gl.getUniformLocation(iss_program,"u_Model");
-        u_ViewLocation2 = gl.getUniformLocation(iss_program,"u_View");
-        u_PerspLocation2 = gl.getUniformLocation(iss_program,"u_Persp");
-        u_InvTransLocation2 = gl.getUniformLocation(iss_program,"u_InvTrans");
-        u_DayDiffuseLocation2 = gl.getUniformLocation(iss_program,"u_DayDiffuse");
-        u_NightLocation2 = gl.getUniformLocation(iss_program,"u_Night");
-        u_CloudLocation2 = gl.getUniformLocation(iss_program,"u_Cloud");
-        u_CloudTransLocation2 = gl.getUniformLocation(iss_program,"u_CloudTrans");
-        u_EarthSpecLocation2 = gl.getUniformLocation(iss_program,"u_EarthSpec");
-        u_BumpLocation2 = gl.getUniformLocation(iss_program,"u_Bump");
-        u_timeLocation2 = gl.getUniformLocation(iss_program,"u_time");
-        u_CameraSpaceDirLightLocation2 = gl.getUniformLocation(iss_program,"u_CameraSpaceDirLight");
-
-        gl.useProgram(iss_program);
-    }
-
-    function initializeShader3() {
-        var vs = getShaderSource(document.getElementById("vs"));
-        var fs = getShaderSource(document.getElementById("trail-fs"));
-
-        trail_program = createProgram(gl, vs, fs, message);
-        positionLocation_trail = gl.getAttribLocation(trail_program, "Position");
-        normalLocation_trail = gl.getAttribLocation(trail_program, "Normal");
-        texCoordLocation_trail = gl.getAttribLocation(trail_program, "Texcoord");
-        u_ModelLocation3 = gl.getUniformLocation(trail_program,"u_Model");
-        u_ViewLocation3 = gl.getUniformLocation(trail_program,"u_View");
-        u_PerspLocation3 = gl.getUniformLocation(trail_program,"u_Persp");
-        u_InvTransLocation3 = gl.getUniformLocation(trail_program,"u_InvTrans");
-        u_DayDiffuseLocation3 = gl.getUniformLocation(trail_program,"u_DayDiffuse");
-        u_NightLocation3 = gl.getUniformLocation(trail_program,"u_Night");
-        u_CloudLocation3 = gl.getUniformLocation(trail_program,"u_Cloud");
-        u_CloudTransLocation3 = gl.getUniformLocation(trail_program,"u_CloudTrans");
-        u_EarthSpecLocation3 = gl.getUniformLocation(trail_program,"u_EarthSpec");
-        u_BumpLocation3 = gl.getUniformLocation(trail_program,"u_Bump");
-        u_timeLocation3 = gl.getUniformLocation(trail_program,"u_time");
-        u_CameraSpaceDirLightLocation3 = gl.getUniformLocation(trail_program,"u_CameraSpaceDirLight");
-
-        gl.useProgram(trail_program);
-    }
+    })();
 
     var dayTex   = gl.createTexture();
     var logoTex   = gl.createTexture();
@@ -217,8 +118,6 @@
     }
 
     var numberOfIndices;
-    var numberOfIndices2;
-    var numberOfIndices3;
 
     function initializeSphere() {
         function uploadMesh(positions, texCoords, indices) {
@@ -295,141 +194,6 @@
         numberOfIndices = indicesIndex;
     }
 
-    function initializeSphere2() {
-        function uploadMesh(positions, texCoords, indices) {
-            // Positions
-            var positionsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(positionLocation_ISS);
-            
-            // Normals
-            var normalsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, normalsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(normalLocation_ISS);
-            
-            // TextureCoords
-            var texCoordsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(texCoordLocation_ISS);
-
-            // Indices
-            var indicesNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesNameISS);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-        }
-
-        //var WIDTH_DIVISIONS = NUM_WIDTH_PTS - 1;
-        //var HEIGHT_DIVISIONS = NUM_HEIGHT_PTS - 1;
-
-        //var numberOfPositions = NUM_WIDTH_PTS * NUM_HEIGHT_PT;
-        var numVerts = 4;
-
-        var positions = new Float32Array(3 * numVerts);
-        var texCoords = new Float32Array(2 * numVerts);
-        var indices = new Uint16Array(6);
-
-        var positionsIndex = 0;
-        var texCoordsIndex = 0;
-        var indicesIndex = 0;
-        var length;
-
-        //lower left corner
-        positions[0] = -0.1;
-        positions[1] = -0.1;
-        positions[2] = 0.0;
-        //lower right corner
-        positions[3] = 0.1;
-        positions[4] = -0.1;
-        positions[5] = 0.0;
-        //upper left corner
-        positions[6] = -0.1;
-        positions[7] = 0.1;
-        positions[8] = 0.0;
-        //upper right corner
-        positions[9] = 0.1;
-        positions[10] = 0.1;
-        positions[11] = 0.0;
-
-        //lower left texCoords[0] = 0.0;
-        texCoords[1] = 0.0;
-        //lower right
-        texCoords[2] = 1.0;
-        texCoords[3] = 0.0;
-        //upper left
-        texCoords[4] = 0.0;
-        texCoords[5] = 1.0;
-        //upper right
-        texCoords[6] = 1.0;
-        texCoords[7] = 1.0;
-
-        indices[0] = 0;
-        indices[1] = 1;
-        indices[2] = 2;
-        indices[3] = 1;
-        indices[4] = 3;
-        indices[5] = 2;
-        
-        uploadMesh(positions, texCoords, indices);
-        numberOfIndices2 = 6;
-    }
-
-    function initializeSphere3() {
-        function uploadMesh(positions, texCoords, indices) {
-            // Positions
-            var positionsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(positionLocation_trail);
-            
-            // Normals
-            var normalsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, normalsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(normalLocation_trail);
-            
-            // TextureCoords
-            var texCoordsNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsNameISS);
-            gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(texCoordLocation_trail);
-
-            // Indices
-            var indicesNameISS = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesNameISS);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-        }
-
-        //var WIDTH_DIVISIONS = NUM_WIDTH_PTS - 1;
-        //var HEIGHT_DIVISIONS = NUM_HEIGHT_PTS - 1;
-
-        //var numberOfPositions = NUM_WIDTH_PTS * NUM_HEIGHT_PT;
-        var numVerts = trail_array.length/3;
-
-        var positions = new Float32Array(3 * numVerts);
-        var texCoords = new Float32Array(2 * numVerts);
-        var indices = new Uint16Array(2*numVerts);
-        var i;
-        for(i=0; i < numVerts; i++){
-            positions[3*i] = trail_array[3*i];
-            positions[3*i+1] = trail_array[3*i+1];
-            positions[3*i+2] = trail_array[3*i+2];
-            indices[2*i] = i;
-            indices[2*i + 1] = i + 1;
-        }
- 
-        uploadMesh(positions, texCoords, indices);
-        numberOfIndices3 = (numVerts-1)*2;
-    }
-
     var time = 0;
     var mouseLeftDown = false;
     var mouseRightDown = false;
@@ -492,15 +256,9 @@
     
     var elapsedTime = 5000;
 
-    //cross-platform point size settings
-    //http://asalga.wordpress.com/2010/05/06/smoothing-and-changing-point-sizes-in-webgl/
-    gl.enable(0x8642); //enable points
-    gl.enable(0x0B10); //smooth points
-    gl.enable(gl.POINT_SMOOTH); 
-    initializeShader();
-    initializeShader2();
-    initializeShader3();
-    (function animate(){
+    //initializeShader();
+
+    function animate(){
         var currTime = new Date().getTime();
         var dt = currTime - prevTime;
         elapsedTime += dt;
@@ -575,11 +333,11 @@
         gl.uniform1i(u_EarthSpecLocation, 5);
         gl.uniform1f(u_timeLocation, time);
 
-        function draw1(){
+        function draw_points(){
             //gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
             gl.drawElements(gl.POINTS, numberOfIndices, gl.UNSIGNED_SHORT,0);
         }
-        draw1();
+        draw_points();
 
         var degN = iss_lat;
         var degE = iss_lon;
@@ -590,6 +348,7 @@
         var currY = curr_rad*Math.cos(inclination);
         var currZ = curr_rad*Math.sin(inclination)*Math.sin(azimuth);
 
+	/*	
         function set_lat_lon( lat, lon ){
             iss_lat = lat;
             iss_lon = lon;
@@ -608,7 +367,8 @@
             trail_array.push(currY);
             trail_array.push(currZ);
         }
-
+	*/
+	
 
         //the offsets PI and PI/2 on the azimuth and inclination are used to get my spherical
         //coordinates to match the standard (lat, lon) coordinate system.
@@ -616,9 +376,6 @@
         //var degN = -46.59929004639757; //degrees north
         //var degE = -64.76256280430778; //degrees east
         
-        gl.useProgram(trail_program);
-        //initializeShader3();
-        initializeSphere3();
 
         model = mat4.create();
         mat4.identity(model);
@@ -638,46 +395,8 @@
         lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
         vec3.normalize(lightdir);
 
-        ///////////////////////////////////////////////////////////////////////////
-        // Render
 
-        //initializeSphere2();
 
-        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.uniformMatrix4fv(u_ModelLocation3, false, model);
-        gl.uniformMatrix4fv(u_ViewLocation3, false, view);
-        gl.uniformMatrix4fv(u_PerspLocation3, false, persp);
-        gl.uniformMatrix4fv(u_InvTransLocation3, false, invTrans);
-
-        gl.uniform3fv(u_CameraSpaceDirLightLocation3, lightdir);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, logoTex);
-        gl.uniform1i(u_DayDiffuseLocation3, 0);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, bumpTex);
-        gl.uniform1i(u_BumpLocation3, 1);
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, cloudTex);
-        gl.uniform1i(u_CloudLocation3, 2);
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D, transTex);
-        gl.uniform1i(u_CloudTransLocation3, 3);
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D, lightTex);
-        gl.uniform1i(u_NightLocation3, 4);
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, specTex);
-        gl.uniform1i(u_EarthSpecLocation3, 5);
-        gl.uniform1f(u_timeLocation3, time);
-
-        //gl.disable(gl.DEPTH_TEST);
-        gl.drawElements(gl.LINES, numberOfIndices3, gl.UNSIGNED_SHORT,0);
-        //gl.enable(gl.DEPTH_TEST);
-
-        gl.useProgram(iss_program); 
-        initializeSphere2();
 
         var modelForward = vec3.create([0.0, 0.0, 1.0]);
         var desiredDir = vec3.subtract(eye, center);
@@ -712,50 +431,10 @@
         lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
         vec3.normalize(lightdir);
 
-        ///////////////////////////////////////////////////////////////////////////
-        // Render
-
-        //initializeSphere2();
-
-        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.uniformMatrix4fv(u_ModelLocation2, false, model);
-        gl.uniformMatrix4fv(u_ViewLocation2, false, view);
-        gl.uniformMatrix4fv(u_PerspLocation2, false, persp);
-        gl.uniformMatrix4fv(u_InvTransLocation2, false, invTrans);
-
-        gl.uniform3fv(u_CameraSpaceDirLightLocation2, lightdir);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, logoTex);
-        gl.uniform1i(u_DayDiffuseLocation2, 0);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, bumpTex);
-        gl.uniform1i(u_BumpLocation2, 1);
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, cloudTex);
-        gl.uniform1i(u_CloudLocation2, 2);
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D, transTex);
-        gl.uniform1i(u_CloudTransLocation2, 3);
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D, lightTex);
-        gl.uniform1i(u_NightLocation2, 4);
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, specTex);
-        gl.uniform1i(u_EarthSpecLocation2, 5);
-        gl.uniform1f(u_timeLocation2, time);
-
-        gl.enable(gl.BLEND);
-        //gl.disable(gl.DEPTH_TEST);
-        gl.drawElements(gl.TRIANGLES, numberOfIndices2, gl.UNSIGNED_SHORT,0);
-        //gl.enable(gl.DEPTH_TEST);
-        gl.disable(gl.BLEND);
-
-
+    
         time += 0.001;
-		window.requestAnimFrame(animate);
-    })();
+	window.requestAnimFrame(animate);
+    };
 
     var textureCount = 0;
         
