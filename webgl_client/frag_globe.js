@@ -35,6 +35,7 @@
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
+    //gl.disable(gl.BACKFACE_CULL);
     //gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
@@ -491,6 +492,11 @@
     
     var elapsedTime = 5000;
 
+    //cross-platform point size settings
+    //http://asalga.wordpress.com/2010/05/06/smoothing-and-changing-point-sizes-in-webgl/
+    gl.enable(0x8642); //enable points
+    gl.enable(0x0B10); //smooth points
+    gl.enable(gl.POINT_SMOOTH); 
     initializeShader();
     initializeShader2();
     initializeShader3();

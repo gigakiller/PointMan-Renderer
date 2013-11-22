@@ -44,10 +44,12 @@
         v_Position = camera.xyz;
         v_positionMC = Position;
         gl_Position = u_Persp * camera;
+        gl_PointSize = 10.0;
     }
 </script>
 
 <script id="fs" type="x-shader/x-fragment">
+
     precision highp float;
 
     //View-Space directional light
