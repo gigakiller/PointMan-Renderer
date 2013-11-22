@@ -56,19 +56,6 @@
     precision highp float;
 
     //Diffuse texture map for the day
-    uniform sampler2D u_DayDiffuse;
-    //Ambient texture map for the night side
-    uniform sampler2D u_Night;
-    //Color map for the clouds
-    uniform sampler2D u_Cloud;
-    //Transparency map for the clouds.  Note that light areas are where clouds are NOT
-    //Dark areas are where clouds are present
-    uniform sampler2D u_CloudTrans;
-    //Mask of which areas of the earth have specularity
-    //Oceans are specular, landmasses are not
-    uniform sampler2D u_EarthSpec;
-    //Bump map
-    uniform sampler2D u_Bump;
 
     uniform float u_time;
     uniform mat4 u_InvTrans;

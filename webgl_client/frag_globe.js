@@ -62,13 +62,6 @@
     var u_ModelLocation;
     var u_ViewLocation;
     var u_PerspLocation;
-    var u_CameraSpaceDirLightLocation;
-    var u_DayDiffuseLocation;
-    var u_NightLocation;
-    var u_CloudLocation;
-    var u_CloudTransLocation;
-    var u_EarthSpecLocation;
-    var u_BumpLocation;
     var u_timeLocation;
 
     var globe_program;
@@ -86,14 +79,7 @@
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
-        u_DayDiffuseLocation = gl.getUniformLocation(globe_program,"u_DayDiffuse");
-        u_NightLocation = gl.getUniformLocation(globe_program,"u_Night");
-        u_CloudLocation = gl.getUniformLocation(globe_program,"u_Cloud");
-        u_CloudTransLocation = gl.getUniformLocation(globe_program,"u_CloudTrans");
-        u_EarthSpecLocation = gl.getUniformLocation(globe_program,"u_EarthSpec");
-        u_BumpLocation = gl.getUniformLocation(globe_program,"u_Bump");
         u_timeLocation = gl.getUniformLocation(globe_program,"u_time");
-        u_CameraSpaceDirLightLocation = gl.getUniformLocation(globe_program,"u_CameraSpaceDirLight");
 
         gl.useProgram(globe_program);
     })();
@@ -223,6 +209,7 @@
 	  }
 	  console.log( positions );
 	  console.log( colors );
+          animate();
 
       })
     }
@@ -362,26 +349,6 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
-        //gl.uniform3fv(u_CameraSpaceDirLightLocation, lightdir);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, dayTex);
-        gl.uniform1i(u_DayDiffuseLocation, 0);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, bumpTex);
-        gl.uniform1i(u_BumpLocation, 1);
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, cloudTex);
-        gl.uniform1i(u_CloudLocation, 2);
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D, transTex);
-        gl.uniform1i(u_CloudTransLocation, 3);
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D, lightTex);
-        gl.uniform1i(u_NightLocation, 4);
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, specTex);
-        gl.uniform1i(u_EarthSpecLocation, 5);
         gl.uniform1f(u_timeLocation, time);
 
         function draw_points(){
@@ -400,35 +367,6 @@
         var currY = curr_rad*Math.cos(inclination);
         var currZ = curr_rad*Math.sin(inclination)*Math.sin(azimuth);
 
-	/*	
-        function set_lat_lon( lat, lon ){
-            iss_lat = lat;
-            iss_lon = lon;
-        }
-       
-        if(elapsedTime > 5000) { //poll once every 5 seconds
-            $.getJSON('http://api.open-notify.org/iss-now.json?callback=?', function(data) {
-                    var lat = data['iss_position']['latitude'];
-                    var lon = data['iss_position']['longitude'];
-                    //console.log(lat);
-                    //console.log(lon);
-                    set_lat_lon( lat, lon );
-                });
-            elapsedTime = 0;
-            trail_array.push(currX);
-            trail_array.push(currY);
-            trail_array.push(currZ);
-        }
-	*/
-	
-
-        //the offsets PI and PI/2 on the azimuth and inclination are used to get my spherical
-        //coordinates to match the standard (lat, lon) coordinate system.
-
-        //var degN = -46.59929004639757; //degrees north
-        //var degE = -64.76256280430778; //degrees east
-        
-
         model = mat4.create();
         mat4.identity(model);
         //mat4.translate(model, [currX, currY, currZ]);
@@ -440,24 +378,11 @@
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
         
-        /*
-        lightdir = vec3.create([1.0, 0.0, 1.0]);
-        lightdest = vec4.create();
-        vec3.normalize(lightdir);
-        mat4.multiplyVec4(view, [lightdir[0], lightdir[1], lightdir[2], 0.0], lightdest);
-        lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
-        vec3.normalize(lightdir);
-        */
-
-
-
-
         var modelForward = vec3.create([0.0, 0.0, 1.0]);
         var desiredDir = vec3.subtract(eye, center);
         vec3.normalize(desiredDir);
         var rotAngle = Math.acos(vec3.dot(modelForward, desiredDir));
         var rotAxis = vec3.cross(modelForward, desiredDir);
-
 
         model = mat4.create();
         mat4.identity(model);
@@ -482,6 +407,7 @@
 	window.requestAnimFrame(animate);
     };
 
+    /*
     var textureCount = 0;
         
     function initializeTexture(texture, src) {
@@ -496,8 +422,9 @@
         }
         texture.image.src = src;
     }
+    */
 
-
+    /*
     initializeTexture(dayTex, "earthmap1024.png");
     initializeTexture(logoTex, "iss_icon.png");
     initializeTexture(bumpTex, "earthbump1024.png");
@@ -505,4 +432,6 @@
     initializeTexture(transTex, "earthtrans1024.png");
     initializeTexture(lightTex, "earthlight1024.png");
     initializeTexture(specTex, "earthspec1024.png");
+    */
+    //animate();
 }());
