@@ -33,6 +33,10 @@
     var radius = 5.0;
     var azimuth = Math.PI;
     var elevation = 0.0001;
+    
+    // Initialize camera
+    var cam = mat4.create();
+    mat4.identity(cam);
 
     var eye = sphericalToCartesian(radius, azimuth, elevation);
     var center = [0.0, 0.0, 0.0];
@@ -74,8 +78,8 @@
     var positions;
     var colors;
     function loadPointCloud() { 
-      $.getJSON("data/test.json", function( pointCloud ) {
-      //$.getJSON("data/chappes.json", function( pointCloud ) {
+      //$.getJSON("data/test.json", function( pointCloud ) {
+      $.getJSON("data/chappes.json", function( pointCloud ) {
 	  //console.log( pointCloud );
 	  numberOfPoints = pointCloud.positions.length;
 	  // positions = new Float32Array(3 * numberOfPoints);
@@ -154,18 +158,28 @@
         
         if( mouseLeftDown )
         {
+            mat4.rotate( cam, 0.01*deltaX, [0,1,0] ) 
+            mat4.rotate( cam, 0.01*deltaY, [1,0,0] ) 
+
+            /*
             azimuth += 0.01 * deltaX;
             elevation += 0.01 * deltaY;
             elevation = Math.min(Math.max(elevation, -Math.PI/2+0.001), Math.PI/2-0.001);
+            */
         }
         else
         {
             radius += 0.01 * deltaY;
             radius = Math.min(Math.max(radius, 2.0), 10.0);
         }
+        /*
         eye = sphericalToCartesian(radius, azimuth, elevation);
         view = mat4.create();
         mat4.lookAt(eye, center, up, view);
+        */
+        console.log(cam);
+        view = mat4.create();
+        mat4.inverse( cam, view );
 
         lastMouseX = newX;
         lastMouseY = newY;
