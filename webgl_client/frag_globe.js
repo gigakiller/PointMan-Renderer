@@ -24,13 +24,6 @@
         return;
     }
 
-    //$.getJSON('http://api.open-notify.org/iss-now.json?callback=?', function(data) {
-            //var lat = data['iss_position']['latitude'];
-            //var lon = data['iss_position']['longitude'];
-            //console.log(lat);
-            //console.log(lon);
-        //});
-
     ///////////////////////////////////////////////////////////////////////////
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -74,113 +67,14 @@
         positionLocation = gl.getAttribLocation(globe_program, "Position");
         colorLocation = gl.getAttribLocation(globe_program, "Color");
         normalLocation = gl.getAttribLocation(globe_program, "Normal");
-        texCoordLocation = gl.getAttribLocation(globe_program, "Texcoord");
         u_ModelLocation = gl.getUniformLocation(globe_program,"u_Model");
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
-        u_timeLocation = gl.getUniformLocation(globe_program,"u_time");
 
         gl.useProgram(globe_program);
     })();
 
-    var dayTex   = gl.createTexture();
-    var logoTex   = gl.createTexture();
-    var bumpTex  = gl.createTexture();
-    var cloudTex = gl.createTexture();
-    var transTex = gl.createTexture();
-    var lightTex = gl.createTexture();
-    var specTex  = gl.createTexture();
-
-    function initLoadedTexture(texture){
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-    }
-
-    /* 
-    var numberOfIndices;
-    function initializeSphere() {
-        function uploadMesh(positions, texCoords, indices) {
-            // Positions
-            var positionsName = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(positionLocation);
-            
-            // Normals
-            var normalsName = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, normalsName);
-            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(normalLocation);
-            
-            // TextureCoords
-            var texCoordsName = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsName);
-            gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(texCoordLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(texCoordLocation);
-
-            // Indices
-            var indicesName = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-        }
-
-        var WIDTH_DIVISIONS = NUM_WIDTH_PTS - 1;
-        var HEIGHT_DIVISIONS = NUM_HEIGHT_PTS - 1;
-
-        var numberOfPositions = NUM_WIDTH_PTS * NUM_HEIGHT_PTS;
-
-        var positions = new Float32Array(3 * numberOfPositions);
-        var texCoords = new Float32Array(2 * numberOfPositions);
-        var indices = new Uint16Array(6 * (WIDTH_DIVISIONS * HEIGHT_DIVISIONS));
-
-        var positionsIndex = 0;
-        var texCoordsIndex = 0;
-        var indicesIndex = 0;
-        var length;
-
-        for( var j = 0; j < NUM_HEIGHT_PTS; ++j )
-        {
-            var inclination = Math.PI * (j / HEIGHT_DIVISIONS);
-            for( var i = 0; i < NUM_WIDTH_PTS; ++i )
-            {
-                var azimuth = 2 * Math.PI * (i / WIDTH_DIVISIONS);
-                positions[positionsIndex++] = Math.sin(inclination)*Math.cos(azimuth);
-                positions[positionsIndex++] = Math.cos(inclination);
-                positions[positionsIndex++] = Math.sin(inclination)*Math.sin(azimuth);
-                texCoords[texCoordsIndex++] = i / WIDTH_DIVISIONS;
-                texCoords[texCoordsIndex++] = j / HEIGHT_DIVISIONS;
-            } 
-        }
-
-        for( var j = 0; j < HEIGHT_DIVISIONS; ++j )
-        {
-            var index = j*NUM_WIDTH_PTS;
-            for( var i = 0; i < WIDTH_DIVISIONS; ++i )
-            {
-                    indices[indicesIndex++] = index + i;
-                    indices[indicesIndex++] = index + i+1;
-                    indices[indicesIndex++] = index + i+NUM_WIDTH_PTS;
-                    indices[indicesIndex++] = index + i+NUM_WIDTH_PTS;
-                    indices[indicesIndex++] = index + i+1;
-                    indices[indicesIndex++] = index + i+NUM_WIDTH_PTS+1;
-            }
-        }
-
-        uploadMesh(positions, texCoords, indices);
-        numberOfIndices = indicesIndex;
-    }
-    */
-     
     var numberOfPoints;
     var positions;
     var colors;
@@ -305,24 +199,6 @@
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
 
-        /*
-        var myDate = new Date();
-        var hour = myDate.getUTCHours();
-        var minutes = myDate.getUTCMinutes() / 60.0;
-        var seconds = myDate.getUTCSeconds() / 3600.0;
-        hour = hour + minutes + seconds;
-        //var hour = 16;
-        //Math.PI is used to offset because we are using GMT time. 
-        var lightAngle = ((12.0 - hour)/24.0) * 2.0 * Math.PI + -Math.PI/2.0;
-        //var lightdir = vec3.create([-1.0, 0.0, 0.0]);
-        var lightdir = vec3.create([Math.sin(lightAngle), 0.0, Math.cos(lightAngle)]);
-        var lightdest = vec4.create();
-        vec3.normalize(lightdir);
-        mat4.multiplyVec4(view, [lightdir[0], lightdir[1], lightdir[2], 0.0], lightdest);
-        lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
-        vec3.normalize(lightdir);
-        */
-
         ///////////////////////////////////////////////////////////////////////////
         // Render
         //gl.useProgram(globe_program);
@@ -406,32 +282,4 @@
         time += 0.001;
 	window.requestAnimFrame(animate);
     };
-
-    /*
-    var textureCount = 0;
-        
-    function initializeTexture(texture, src) {
-        texture.image = new Image();
-        texture.image.onload = function() {
-            initLoadedTexture(texture);
-
-            // Animate once textures load.
-            if (++textureCount === 6) {
-                animate();
-            }
-        }
-        texture.image.src = src;
-    }
-    */
-
-    /*
-    initializeTexture(dayTex, "earthmap1024.png");
-    initializeTexture(logoTex, "iss_icon.png");
-    initializeTexture(bumpTex, "earthbump1024.png");
-    initializeTexture(cloudTex, "earthcloud1024.png");
-    initializeTexture(transTex, "earthtrans1024.png");
-    initializeTexture(lightTex, "earthlight1024.png");
-    initializeTexture(specTex, "earthspec1024.png");
-    */
-    //animate();
 }());
