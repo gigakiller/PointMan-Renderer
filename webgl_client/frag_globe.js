@@ -24,51 +24,6 @@
         return;
     }
 
-
-    // Load in pointcloud data 
-  
-    /* 
-    var request = new XMLHttpRequest();
-    //request.open("GET", "data/chappes.json");
-    request.open("GET", "data/test.json");
-    request.onreadystatechange = function() {
-      if (request.readyState == 4) {
-	handleLoadedPoints(request.responseText);
-      }
-    }
-    request.send();
-
-    function handleLoadedPoints( json_data ) { 
-      var pointCloud = JSON.parse( json_data );
-      console.log( pointCloud );
-      //var positions = new Float32Array(3 * pointCloud.positions.length );
-    } 
-    */
-    /*
-    var numberOfPoints;
-    $.getJSON("data/test.json", function( pointCloud ) {
- 	console.log( pointCloud );
-	var numberOfPoints = pointCloud.positions.length;
-	var positionsIndex = 0;
-        var positions = new Float32Array(3 * num_points );
-	console.log( pointCloud.positions.length );
-	for ( var i=0; i<numberOfPoints; i++ ) {
-	  console.log( pointCloud.positions[i] );
-	  positions[positionsIndex++] = pointCloud.positions[i][0];
-	  positions[positionsIndex++] = pointCloud.positions[i][0];
-	  positions[positionsIndex++] = pointCloud.positions[i][0];
-	}
-        console.log( positions );
-
-	// Positions
-	var positionsName = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-	gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-	gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(positionLocation);
-    })
-    */
-
     //$.getJSON('http://api.open-notify.org/iss-now.json?callback=?', function(data) {
             //var lat = data['iss_position']['latitude'];
             //var lon = data['iss_position']['longitude'];
@@ -244,8 +199,8 @@
     var positions;
     var colors;
     function loadPointCloud() { 
-      //$.getJSON("data/test.json", function( pointCloud ) {
-      $.getJSON("data/chappes.json", function( pointCloud ) {
+      $.getJSON("data/test.json", function( pointCloud ) {
+      //$.getJSON("data/chappes.json", function( pointCloud ) {
 	  console.log( pointCloud );
 	  numberOfPoints = pointCloud.positions.length;
 	  // positions = new Float32Array(3 * numberOfPoints);
@@ -363,6 +318,7 @@
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
 
+        /*
         var myDate = new Date();
         var hour = myDate.getUTCHours();
         var minutes = myDate.getUTCMinutes() / 60.0;
@@ -378,6 +334,7 @@
         mat4.multiplyVec4(view, [lightdir[0], lightdir[1], lightdir[2], 0.0], lightdest);
         lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
         vec3.normalize(lightdir);
+        */
 
         ///////////////////////////////////////////////////////////////////////////
         // Render
@@ -405,7 +362,7 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
-        gl.uniform3fv(u_CameraSpaceDirLightLocation, lightdir);
+        //gl.uniform3fv(u_CameraSpaceDirLightLocation, lightdir);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, dayTex);
@@ -482,13 +439,15 @@
         invTrans = mat4.create();
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
-
+        
+        /*
         lightdir = vec3.create([1.0, 0.0, 1.0]);
         lightdest = vec4.create();
         vec3.normalize(lightdir);
         mat4.multiplyVec4(view, [lightdir[0], lightdir[1], lightdir[2], 0.0], lightdest);
         lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
         vec3.normalize(lightdir);
+        */
 
 
 
@@ -518,14 +477,6 @@
         invTrans = mat4.create();
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
-
-        lightdir = vec3.create([1.0, 0.0, 1.0]);
-        lightdest = vec4.create();
-        vec3.normalize(lightdir);
-        mat4.multiplyVec4(view, [lightdir[0], lightdir[1], lightdir[2], 0.0], lightdest);
-        lightdir = vec3.createFrom(lightdest[0],lightdest[1],lightdest[2]);
-        vec3.normalize(lightdir);
-
     
         time += 0.001;
 	window.requestAnimFrame(animate);
