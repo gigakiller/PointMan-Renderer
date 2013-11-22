@@ -19,9 +19,55 @@
     var message = document.getElementById("message");
     var canvas = document.getElementById("canvas");
     var gl = createWebGLContext(canvas, message);
+    // Check for GL features
     if (!gl) {
         return;
     }
+
+
+    // Load in pointcloud data 
+  
+    /* 
+    var request = new XMLHttpRequest();
+    //request.open("GET", "data/chappes.json");
+    request.open("GET", "data/test.json");
+    request.onreadystatechange = function() {
+      if (request.readyState == 4) {
+	handleLoadedPoints(request.responseText);
+      }
+    }
+    request.send();
+
+    function handleLoadedPoints( json_data ) { 
+      var pointCloud = JSON.parse( json_data );
+      console.log( pointCloud );
+      //var positions = new Float32Array(3 * pointCloud.positions.length );
+    } 
+    */
+    /*
+    var numberOfPoints;
+    $.getJSON("data/test.json", function( pointCloud ) {
+ 	console.log( pointCloud );
+	var numberOfPoints = pointCloud.positions.length;
+	var positionsIndex = 0;
+        var positions = new Float32Array(3 * num_points );
+	console.log( pointCloud.positions.length );
+	for ( var i=0; i<numberOfPoints; i++ ) {
+	  console.log( pointCloud.positions[i] );
+	  positions[positionsIndex++] = pointCloud.positions[i][0];
+	  positions[positionsIndex++] = pointCloud.positions[i][0];
+	  positions[positionsIndex++] = pointCloud.positions[i][0];
+	}
+        console.log( positions );
+
+	// Positions
+	var positionsName = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+	gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+	gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(positionLocation);
+    })
+    */
 
     //$.getJSON('http://api.open-notify.org/iss-now.json?callback=?', function(data) {
             //var lat = data['iss_position']['latitude'];
@@ -56,8 +102,6 @@
     var normalLocation;
     var texCoordLocation;
 
- 
-
     var u_InvTransLocation;
     var u_ModelLocation;
     var u_ViewLocation;
@@ -70,7 +114,6 @@
     var u_EarthSpecLocation;
     var u_BumpLocation;
     var u_timeLocation;
-
 
     var globe_program;
 
@@ -117,8 +160,8 @@
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
+    /* 
     var numberOfIndices;
-
     function initializeSphere() {
         function uploadMesh(positions, texCoords, indices) {
             // Positions
@@ -193,6 +236,31 @@
         uploadMesh(positions, texCoords, indices);
         numberOfIndices = indicesIndex;
     }
+    */
+     
+    var numberOfPoints;
+    var positions;
+    function loadPointCloud() { 
+      //$.getJSON("data/test.json", function( pointCloud ) {
+      $.getJSON("data/chappes.json", function( pointCloud ) {
+	  console.log( pointCloud );
+	  numberOfPoints = pointCloud.positions.length;
+	  // positions = new Float32Array(3 * numberOfPoints);
+	  //var numberOfPoints = pointCloud.positions.length;
+	  var positionsIndex = 0;
+	  positions = new Float32Array(3 * numberOfPoints);
+	  console.log( pointCloud.positions.length );
+	  for ( var i=0; i<numberOfPoints; i++ ) {
+	    console.log( pointCloud.positions[i] );
+	    positions[positionsIndex++] = pointCloud.positions[i][0];
+	    positions[positionsIndex++] = pointCloud.positions[i][1];
+	    positions[positionsIndex++] = pointCloud.positions[i][2];
+	  }
+	  console.log( positions );
+
+      })
+    }
+    
 
     var time = 0;
     var mouseLeftDown = false;
@@ -258,6 +326,8 @@
 
     //initializeShader();
 
+    loadPointCloud();
+
     function animate(){
         var currTime = new Date().getTime();
         var dt = currTime - prevTime;
@@ -270,7 +340,7 @@
         //gl.useProgram(globe_program);
         //initializeShader();
         gl.useProgram(globe_program);
-        initializeSphere();
+        //initializeSphere();
         var model = mat4.create();
         mat4.identity(model);
         //mat4.translate(model, [0.0, 0.0, 1.0]);
@@ -303,6 +373,14 @@
         // Render
         //gl.useProgram(globe_program);
         //initializeSphere2();
+	// Draw points
+	// Positions
+	var positionsName = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+	gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+	gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(positionLocation);
+	// end draw points
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -335,7 +413,8 @@
 
         function draw_points(){
             //gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
-            gl.drawElements(gl.POINTS, numberOfIndices, gl.UNSIGNED_SHORT,0);
+            //gl.drawElements(gl.POINTS, numberOfIndices, gl.UNSIGNED_SHORT,0);
+	    gl.drawArrays( gl.POINTS, 0, numberOfPoints);
         }
         draw_points();
 
@@ -450,6 +529,7 @@
         }
         texture.image.src = src;
     }
+
 
     initializeTexture(dayTex, "earthmap1024.png");
     initializeTexture(logoTex, "iss_icon.png");
