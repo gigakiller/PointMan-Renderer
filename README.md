@@ -1,4 +1,4 @@
 PointMan-Renderer
 =================
 
-A massive point cloud renderer by Nathan Marshak and Uriah Baalke.
+A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke.
