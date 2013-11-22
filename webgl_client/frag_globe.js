@@ -11,11 +11,6 @@
         return [x,y,z];
     }
 
-    var NUM_WIDTH_PTS = 64;
-    var NUM_HEIGHT_PTS = 64;
-    var iss_lat; 
-    var iss_lon;
-
     var message = document.getElementById("message");
     var canvas = document.getElementById("canvas");
     var gl = createWebGLContext(canvas, message);
@@ -81,16 +76,16 @@
     function loadPointCloud() { 
       $.getJSON("data/test.json", function( pointCloud ) {
       //$.getJSON("data/chappes.json", function( pointCloud ) {
-	  console.log( pointCloud );
+	  //console.log( pointCloud );
 	  numberOfPoints = pointCloud.positions.length;
 	  // positions = new Float32Array(3 * numberOfPoints);
 	  //var numberOfPoints = pointCloud.positions.length;
 	  var pointsIndex = 0;
 	  positions = new Float32Array(3 * numberOfPoints);
 	  colors = new Float32Array(3 * numberOfPoints);
-	  console.log( pointCloud.positions.length );
+	  //console.log( pointCloud.positions.length );
 	  for ( var i=0; i<numberOfPoints; i++ ) {
-	    console.log( pointCloud.positions[i] );
+	    //console.log( pointCloud.positions[i] );
 	    positions[pointsIndex] = pointCloud.positions[i][0];
 	    colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
             pointsIndex++;
@@ -101,8 +96,23 @@
 	    colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
             pointsIndex++;
 	  }
-	  console.log( positions );
-	  console.log( colors );
+	  //console.log( positions );
+	  //console.log( colors );
+          // Set up Points
+          // Positions
+          var positionsName = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+          gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+          gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+          gl.enableVertexAttribArray(positionLocation);
+          // Colors
+          var colorsName = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+          gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+          gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+          gl.enableVertexAttribArray(colorLocation);
+          // end draw points
+
           animate();
 
       })
@@ -183,15 +193,9 @@
         ///////////////////////////////////////////////////////////////////////////
         // Update
 
-        //gl.useProgram(globe_program);
-        //initializeShader();
         gl.useProgram(globe_program);
-        //initializeSphere();
         var model = mat4.create();
         mat4.identity(model);
-        //mat4.translate(model, [0.0, 0.0, 1.0]);
-        //mat4.rotate(model, 23.4/180*Math.PI, [0.0, 0.0, 1.0]);
-        mat4.rotate(model, Math.PI, [1.0, 0.0, 0.0]);
         var mv = mat4.create();
         mat4.multiply(view, model, mv);
 
@@ -201,22 +205,6 @@
 
         ///////////////////////////////////////////////////////////////////////////
         // Render
-        //gl.useProgram(globe_program);
-        //initializeSphere2();
-	// Draw points
-	// Positions
-	var positionsName = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-	gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-	gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(positionLocation);
-        // Colors
-	var colorsName = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-	gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-	gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(colorLocation);
-	// end draw points
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -225,59 +213,7 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
-        gl.uniform1f(u_timeLocation, time);
-
-        function draw_points(){
-            //gl.drawElements(gl.TRIANGLES, numberOfIndices, gl.UNSIGNED_SHORT,0);
-            //gl.drawElements(gl.POINTS, numberOfIndices, gl.UNSIGNED_SHORT,0);
-	    gl.drawArrays( gl.POINTS, 0, numberOfPoints);
-        }
-        draw_points();
-
-        var degN = iss_lat;
-        var degE = iss_lon;
-        var azimuth = -degE * (Math.PI / 180.0) + Math.PI;
-        var inclination = -degN * (Math.PI / 180.0)  + Math.PI/2.0;
-        var curr_rad = 1.5;
-        var currX = curr_rad*Math.sin(inclination)*Math.cos(azimuth);
-        var currY = curr_rad*Math.cos(inclination);
-        var currZ = curr_rad*Math.sin(inclination)*Math.sin(azimuth);
-
-        model = mat4.create();
-        mat4.identity(model);
-        //mat4.translate(model, [currX, currY, currZ]);
-
-        mv = mat4.create();
-        mat4.multiply(view, model, mv);
-
-        invTrans = mat4.create();
-        mat4.inverse(mv, invTrans);
-        mat4.transpose(invTrans);
-        
-        var modelForward = vec3.create([0.0, 0.0, 1.0]);
-        var desiredDir = vec3.subtract(eye, center);
-        vec3.normalize(desiredDir);
-        var rotAngle = Math.acos(vec3.dot(modelForward, desiredDir));
-        var rotAxis = vec3.cross(modelForward, desiredDir);
-
-        model = mat4.create();
-        mat4.identity(model);
-        mat4.translate(model, [currX, currY, currZ]);
-        mat4.rotate(model, rotAngle, rotAxis);
-        //mat4.rotate(model, 23.4/180*Math.PI, [0.0, 0.0, 1.0]);
-        //mat4.rotate(model, Math.PI, [1.0, 0.0, 0.0]);
-        var newUp = vec4.create();
-        mat4.multiplyVec4(model, [up[0], up[1], up[2], 0.0], newUp);
-        var modelUp = vec3.create([newUp[0], newUp[1], newUp[2]]);
-        var upRAngle = Math.acos(vec3.dot(modelUp, desiredDir));
-        var upRotAxis = vec3.cross(modelForward, desiredDir);
-
-        mv = mat4.create();
-        mat4.multiply(view, model, mv);
-
-        invTrans = mat4.create();
-        mat4.inverse(mv, invTrans);
-        mat4.transpose(invTrans);
+        gl.drawArrays( gl.POINTS, 0, numberOfPoints);
     
         time += 0.001;
 	window.requestAnimFrame(animate);
