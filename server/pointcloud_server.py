@@ -19,9 +19,6 @@ for file in files:
 
 print "PointClouds Available: ", [k for k in loaded_clouds.iterkeys()]
 
-#print "Loading data"
-#pointcloud = load(open('data/chappes.json', 'r'))
-
 class PointCloudReqWS(websocket.WebSocketHandler):
     def open(self):
         print "WebSocket opened"
