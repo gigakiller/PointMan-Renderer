@@ -35,9 +35,12 @@
     var azimuth = Math.PI;
     var elevation = 0.0001;
 
-
     var camera_yaw = 0;
     var camera_pitch = 0;
+
+    var camera_x = 0;
+    var camera_y = 0; 
+    var camera_z = 0;
     
     // Initialize camera
     var cam_vel = 0.25;
@@ -146,27 +149,43 @@
     function handleKeyUp(event) {
       currentKeys[event.keyCode] = false;
     }
-    
+
     function handleUserInput(event) {
+        var delTrans = handleMovement();
+        var dTransLocal = vec3.create();
+        mat4.multiply(cam, delTrans, dTransLocal);
+    }
+    
+    function handleMovement(event) {
+      
+        //dTrans is how much we are translating at this instant 
+        var dTrans = vec3.create(); 
+        dTrans = [0, 0, 0];
       // 'w'
       if ( currentKeys[87] ) {
         console.log("moving forward\n");
-        mat4.translate( cam, [0,0,-cam_vel] );
+        //mat4.translate( cam, [0,0,-cam_vel] );
+        dTrans.z -= cam_vel;
       }
       // 's'
       if ( currentKeys[83] ) {
         console.log("moving backwards\n");
-        mat4.translate( cam, [0,0,cam_vel] );
+        //mat4.translate( cam, [0,0,cam_vel] );
+        dTrans.z += cam_vel;
       }
 
       // 'a'
       if ( currentKeys[65] ) {
-        mat4.translate( cam, [-cam_vel,0,0] );
+        //mat4.translate( cam, [-cam_vel,0,0] );
+        dTrans.x -= cam_vel;
       }
       // 'd'
       if ( currentKeys[68] ) {
-        mat4.translate( cam, [cam_vel,0,0] );
+        //mat4.translate( cam, [cam_vel,0,0] );
+        dtrans.x += cam_vel;
       }
+
+        return dTrans;
       
     }
 
@@ -204,6 +223,7 @@
         mat4.identity(cam);
         var identity = mat4.create();
         mat4.identity(identity);
+
          
         if( mouseLeftDown )
         {
@@ -212,7 +232,6 @@
             //LOCAL pitch
             var yaw_mat = mat4.create(); 
             mat4.rotate(identity, camera_pitch, [1,0,0], yaw_mat);
-            //mat4.multiply(yaw_mat, cam, cam); 
             mat4.multiply(cam, yaw_mat); 
         }
         else
@@ -223,8 +242,9 @@
             */
         }
 
-        console.log(cam);
-
+        mat4.translate(cam, [camera_x, camera_y, camera_z]);
+        //console.log(cam);
+        
         lastMouseX = newX;
         lastMouseY = newY;
     }
