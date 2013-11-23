@@ -34,6 +34,10 @@
     var radius = 5.0;
     var azimuth = Math.PI;
     var elevation = 0.0001;
+
+
+    var camera_yaw = 0;
+    var camera_pitch = 0;
     
     // Initialize camera
     var cam_vel = 0.25;
@@ -195,10 +199,16 @@
         var deltaX = newX - lastMouseX;
         var deltaY = newY - lastMouseY;
         
+        camera_yaw = camera_yaw - 0.01*deltaX;
+        camera_pitch = camera_pitch - 0.01*deltaY;
+        mat4.identity(cam);
+        
+        
         if( mouseLeftDown )
         {
-            mat4.rotate( cam, 0.01*deltaX, [0,1,0] ) 
-            mat4.rotate( cam, 0.01*deltaY, [1,0,0] ) 
+            mat4.rotate( cam, camera_yaw, [0,1,0] );
+            //mat4.rotate( cam, -0.01*deltaX, [0,1,0] );
+            //mat4.rotate( cam, -0.01*deltaY, [1,0,0] );
         }
         else
         {
