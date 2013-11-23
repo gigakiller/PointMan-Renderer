@@ -84,9 +84,9 @@
     var positions;
     var colors;
     function loadPointCloud() { 
-      //$.getJSON("data/test.json", function( pointCloud ) {
-      $.getJSON("data/chappes.json", function( pointCloud ) {
+      $.getJSON("http://localhost:8000/chappes.json", function( pointCloud ) {
 	  //console.log( pointCloud );
+          //pointCloud = JSON.parse( data );
 	  numberOfPoints = pointCloud.positions.length;
 	  // positions = new Float32Array(3 * numberOfPoints);
 	  //var numberOfPoints = pointCloud.positions.length;
