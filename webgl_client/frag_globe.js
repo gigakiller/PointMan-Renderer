@@ -152,32 +152,6 @@
 
     function handleUserInput(event) {
         handleMovement();
-        //get the LOCAL camera translation for the current frame
-        //var dTransLocal= handleMovement(); 
-        ////transform to global space
-        //var dTransGlobal = vec4.create();
-        //dTransGlobal[0]= 0;
-        //dTransGlobal[1] = 0;
-        //dTransGlobal[2] = 0;
-        //dTransGlobal[3] = 0;
-        ////mat4.multiplyVec4(cam, dTransLocal, dTransGlobal);
-        ////mat4.multiplyVec4(view, dTransLocal, dTransGlobal);
-        //var leet = 1337;
-        ////camera_x = dTransGlobal[0]; 
-        ////camera_y = dTransGlobal[1];
-        ////camera_z = dTransGlobal[2];
-        //camera_x = dTransLocal[0];
-        //camera_y = dTransLocal[1];
-        //camera_z = dTransLocal[2];
-        ////if(dTransGlobal[0] > 0 || dTransGlobal[1] > 0 || dTransGlobal[2] > 0){
-        //if(dTransLocal[0] > 0 || dTransLocal[1] > 0 || dTransLocal[2] > 0){
-            ////move camera
-            //var camTrans = vec3.create();
-            //camTrans[0] = camera_x;
-            //camTrans[1] = camera_y;
-            //camTrans[2] = camera_z;
-            //mat4.translate(cam, camTrans);
-        //}
     }
     
     function handleMovement(event) {
@@ -201,11 +175,9 @@
       if ( currentKeys[68] ) {
         mat4.translate( cam, [cam_vel,0,0] );
       }
-
         //'q' OR 'e' 
         if( currentKeys[81] || currentKeys[69] ) {
            //roll camera 
-            
         var camera_roll = 0;
         var roll_vel = 0.025;
         currentKeys[81] ? camera_roll = roll_vel : camera_roll = -roll_vel;
@@ -249,30 +221,23 @@
         var deltaX = newX - lastMouseX;
         var deltaY = newY - lastMouseY;
         
-        //camera_yaw = camera_yaw - 0.01*deltaX;
-        //camera_pitch = camera_pitch - 0.01*deltaY;
-        camera_yaw = -0.01*deltaX;
-        camera_pitch = -0.01*deltaY;
-        //mat4.identity(cam);
+        camera_pitch = -0.01*deltaX;
+        camera_yaw = -0.01*deltaY;
         var identity = mat4.create();
         mat4.identity(identity);
 
          
         if( mouseLeftDown )
         {
-            //GLOBAL yaw
-            //mat4.rotate( cam, camera_yaw, [0,1,0] );
-            ////LOCAL pitch
+            //LOCAL yaw
             var yaw_mat = mat4.create(); 
-            mat4.rotate(identity, camera_pitch, [1,0,0], yaw_mat);
+            mat4.rotate(identity, camera_yaw, [1,0,0], yaw_mat);
             mat4.multiply(cam, yaw_mat); 
 
+            //LOCAL pitch
             var pitch_mat = mat4.create(); 
-            mat4.rotate(identity, camera_yaw, [0,1,0], pitch_mat);
+            mat4.rotate(identity, camera_pitch, [0,1,0], pitch_mat);
             mat4.multiply(cam, pitch_mat); 
-            
-            //mat4.rotate(cam, -0.01*deltaX, [1, 0, 0]);
-            //mat4.rotate(cam, -0.01*deltaY, [0, 1, 0]);
         }
         else
         {
