@@ -13,6 +13,7 @@
 
     var message = document.getElementById("message");
     var canvas = document.getElementById("canvas");
+
     var gl = createWebGLContext(canvas, message);
     // Check for GL features
     if (!gl) {
@@ -35,6 +36,7 @@
     var elevation = 0.0001;
     
     // Initialize camera
+    var cam_vel = 0.25;
     var cam = mat4.create();
     mat4.identity(cam);
 
@@ -123,11 +125,48 @@
     }
 
     var time = 0;
+
+
     var mouseLeftDown = false;
     var mouseRightDown = false;
     var lastMouseX = null;
     var lastMouseY = null;
 
+    var currentKeys = {};
+    // Handle Keyboard Events
+    function handleKeyDown(event) {
+      console.log( "keycode: " + event.keyCode + "\n" );
+      currentKeys[event.keyCode] = true; 
+    }
+
+    function handleKeyUp(event) {
+      currentKeys[event.keyCode] = false;
+    }
+    
+    function handleUserInput(event) {
+      // 'w'
+      if ( currentKeys[87] ) {
+        console.log("moving forward\n");
+        mat4.translate( cam, [0,0,-cam_vel] );
+      }
+      // 's'
+      if ( currentKeys[83] ) {
+        console.log("moving backwards\n");
+        mat4.translate( cam, [0,0,cam_vel] );
+      }
+
+      // 'a'
+      if ( currentKeys[65] ) {
+        mat4.translate( cam, [-cam_vel,0,0] );
+      }
+      // 'd'
+      if ( currentKeys[68] ) {
+        mat4.translate( cam, [cam_vel,0,0] );
+      }
+      
+    }
+
+    // Handle Mouse Events
     function handleMouseDown(event) {
         if( event.button == 2 ) {
             mouseLeftDown = false;
@@ -160,26 +199,16 @@
         {
             mat4.rotate( cam, 0.01*deltaX, [0,1,0] ) 
             mat4.rotate( cam, 0.01*deltaY, [1,0,0] ) 
-
-            /*
-            azimuth += 0.01 * deltaX;
-            elevation += 0.01 * deltaY;
-            elevation = Math.min(Math.max(elevation, -Math.PI/2+0.001), Math.PI/2-0.001);
-            */
         }
         else
         {
+            /*
             radius += 0.01 * deltaY;
             radius = Math.min(Math.max(radius, 2.0), 10.0);
+            */
         }
-        /*
-        eye = sphericalToCartesian(radius, azimuth, elevation);
-        view = mat4.create();
-        mat4.lookAt(eye, center, up, view);
-        */
+
         console.log(cam);
-        view = mat4.create();
-        mat4.inverse( cam, view );
 
         lastMouseX = newX;
         lastMouseY = newY;
@@ -189,6 +218,9 @@
     canvas.oncontextmenu = function(ev) {return false;};
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
+    document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;
+
 
     var prevTime = new Date().getTime();
     
@@ -203,10 +235,15 @@
         var dt = currTime - prevTime;
         elapsedTime += dt;
         prevTime = currTime;
-        
-        ///////////////////////////////////////////////////////////////////////////
-        // Update
 
+        // Handle user keyboard inputs
+        handleUserInput();
+        
+        // Invert camera pose to get view matrix
+        view = mat4.create();
+        mat4.inverse( cam, view );
+
+        // Update Transforms
         gl.useProgram(globe_program);
         var model = mat4.create();
         mat4.identity(model);
@@ -217,7 +254,6 @@
         mat4.inverse(mv, invTrans);
         mat4.transpose(invTrans);
 
-        ///////////////////////////////////////////////////////////////////////////
         // Render
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
