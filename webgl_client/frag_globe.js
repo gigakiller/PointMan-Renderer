@@ -151,16 +151,22 @@
     }
 
     function handleUserInput(event) {
-        var delTrans = handleMovement();
-        var dTransLocal = vec3.create();
-        mat4.multiply(cam, delTrans, dTransLocal);
+        //get the LOCAL camera translation for the current frame
+        var dTransLocal= handleMovement(); 
+        //transform to global space
+        var dTransGlobal = vec4.create();
+        mat4.multiplyVec4(cam, dTransLocal, dTransGlobal);
+        var leet = 1337;
+        camera_x += dTransGlobal.x; 
+        camera_y += dTransGlobal.y;
+        camera_z += dTransGlobal.z;
     }
     
     function handleMovement(event) {
       
         //dTrans is how much we are translating at this instant 
-        var dTrans = vec3.create(); 
-        dTrans = [0, 0, 0];
+        var dTrans = vec4.create(); 
+        dTrans = [0, 0, 0, 0];
       // 'w'
       if ( currentKeys[87] ) {
         console.log("moving forward\n");
@@ -242,8 +248,12 @@
             */
         }
 
-        mat4.translate(cam, [camera_x, camera_y, camera_z]);
-        //console.log(cam);
+        //translate the camera in GLOBAL space
+        var camTrans = vec3.create();
+        camTrans.x = camera_x;
+        camTrans.y = camera_y;
+        camTrans.z = camera_z;
+        mat4.translate(cam, camTrans);
         
         lastMouseX = newX;
         lastMouseY = newY;
