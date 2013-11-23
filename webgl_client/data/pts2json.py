@@ -3,8 +3,9 @@ from json import dump
 '''
 Read in .pts file, subsample and convert to json 
 '''
-fname = 'chappes'
-fh = open(fname+'.pts', 'r')
+input_fname = 'chappes'
+fname = 'chappes_full'
+fh = open(input_fname+'.pts', 'r')
 
 # Skip first line
 fh.readline()
@@ -23,9 +24,15 @@ while True:
     break
   cnt += 1
   num_lines += 1
-  if cnt < 500:
+  if cnt < 1:
     continue
-  dat = map( float, l.strip('\n\r').split(' ') )
+  # Bad hack
+  try: 
+    dat = map( float, l.strip('\n\r').split(' ') )
+  except:
+    cnt = 0
+    continue
+  
   positions.append( dat[0:3] )
   colors.append( dat[-3:] )
   cnt = 0
