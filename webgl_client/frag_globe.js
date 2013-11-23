@@ -155,11 +155,15 @@
         var dTransLocal= handleMovement(); 
         //transform to global space
         var dTransGlobal = vec4.create();
+        dTransGlobal[0]= 0;
+        dTransGlobal[1] = 0;
+        dTransGlobal[2] = 0;
+        dTransGlobal[3] = 0;
         mat4.multiplyVec4(cam, dTransLocal, dTransGlobal);
         var leet = 1337;
-        camera_x += dTransGlobal.x; 
-        camera_y += dTransGlobal.y;
-        camera_z += dTransGlobal.z;
+        camera_x += dTransGlobal[0]; 
+        camera_y += dTransGlobal[1];
+        camera_z += dTransGlobal[2];
     }
     
     function handleMovement(event) {
@@ -171,24 +175,24 @@
       if ( currentKeys[87] ) {
         console.log("moving forward\n");
         //mat4.translate( cam, [0,0,-cam_vel] );
-        dTrans.z -= cam_vel;
+        dTrans[2] -= cam_vel;
       }
       // 's'
       if ( currentKeys[83] ) {
         console.log("moving backwards\n");
         //mat4.translate( cam, [0,0,cam_vel] );
-        dTrans.z += cam_vel;
+        dTrans[2] += cam_vel;
       }
 
       // 'a'
       if ( currentKeys[65] ) {
         //mat4.translate( cam, [-cam_vel,0,0] );
-        dTrans.x -= cam_vel;
+        dTrans[0] -= cam_vel;
       }
       // 'd'
       if ( currentKeys[68] ) {
         //mat4.translate( cam, [cam_vel,0,0] );
-        dtrans.x += cam_vel;
+        dtrans[0] += cam_vel;
       }
 
         return dTrans;
@@ -249,11 +253,6 @@
         }
 
         //translate the camera in GLOBAL space
-        var camTrans = vec3.create();
-        camTrans.x = camera_x;
-        camTrans.y = camera_y;
-        camTrans.z = camera_z;
-        mat4.translate(cam, camTrans);
         
         lastMouseX = newX;
         lastMouseY = newY;
@@ -283,6 +282,13 @@
 
         // Handle user keyboard inputs
         handleUserInput();
+
+        //move camera
+        var camTrans = vec3.create();
+        camTrans[0] = camera_x;
+        camTrans[1] = camera_y;
+        camTrans[2] = camera_z;
+        mat4.translate(cam, camTrans);
         
         // Invert camera pose to get view matrix
         view = mat4.create();
