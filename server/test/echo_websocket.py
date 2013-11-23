@@ -1,11 +1,15 @@
 from tornado import websocket, web, ioloop
+from json import loads, dumps
 
 class EchoWebSocket(websocket.WebSocketHandler):
     def open(self):
         print "WebSocket opened"
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message)
+        msg = loads(message)
+        print "request", msg
+        self.write_message( dumps(msg) )
+        #self.write_message(u"You said: " + message)
 
     def on_close(self):
         print "WebSocket closed"
