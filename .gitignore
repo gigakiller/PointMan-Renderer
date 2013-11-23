@@ -17,3 +17,4 @@
 
 # Ignore pts files because they are big
 *.pts
+*.json
