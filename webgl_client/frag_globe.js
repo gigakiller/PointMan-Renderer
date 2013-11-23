@@ -201,6 +201,23 @@
       if ( currentKeys[68] ) {
         mat4.translate( cam, [cam_vel,0,0] );
       }
+
+        //'q' OR 'e' 
+        if( currentKeys[81] || currentKeys[69] ) {
+           //roll camera 
+            
+        var camera_roll = 0;
+        var roll_vel = 0.025;
+        currentKeys[81] ? camera_roll = roll_vel : camera_roll = -roll_vel;
+        //mat4.identity(cam);
+        var identity = mat4.create();
+        mat4.identity(identity);
+         
+        var roll_mat = mat4.create(); 
+        mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
+        mat4.multiply(cam, roll_mat); 
+        }
+
     }
 
     // Handle Mouse Events
