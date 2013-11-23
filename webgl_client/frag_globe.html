@@ -44,7 +44,8 @@
         v_positionMC = Position;
         v_Color = Color;
         gl_Position = u_Persp * camera;
-        gl_PointSize = 5.0;
+  
+        gl_PointSize = max( 50.0/gl_Position.z, 2.0 );
     }
 </script>
 
