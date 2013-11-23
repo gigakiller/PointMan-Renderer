@@ -161,9 +161,17 @@
         dTransGlobal[3] = 0;
         mat4.multiplyVec4(cam, dTransLocal, dTransGlobal);
         var leet = 1337;
-        camera_x += dTransGlobal[0]; 
-        camera_y += dTransGlobal[1];
-        camera_z += dTransGlobal[2];
+        camera_x = dTransGlobal[0]; 
+        camera_y = dTransGlobal[1];
+        camera_z = dTransGlobal[2];
+        if(dTransGlobal[0] > 0 || dTransGlobal[1] > 0 || dTransGlobal[2] > 0){
+            //move camera
+            var camTrans = vec3.create();
+            camTrans[0] = camera_x;
+            camTrans[1] = camera_y;
+            camTrans[2] = camera_z;
+            mat4.translate(cam, camTrans);
+        }
     }
     
     function handleMovement(event) {
@@ -282,14 +290,8 @@
 
         // Handle user keyboard inputs
         handleUserInput();
-
-        //move camera
-        var camTrans = vec3.create();
-        camTrans[0] = camera_x;
-        camTrans[1] = camera_y;
-        camTrans[2] = camera_z;
-        mat4.translate(cam, camTrans);
-        
+        //handleMouseMove();
+ 
         // Invert camera pose to get view matrix
         view = mat4.create();
         mat4.inverse( cam, view );
@@ -317,6 +319,7 @@
         gl.drawArrays( gl.POINTS, 0, numberOfPoints);
     
         time += 0.001;
+        //mat4.identity(cam);
 	window.requestAnimFrame(animate);
     };
 }());
