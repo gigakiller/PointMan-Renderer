@@ -163,13 +163,18 @@
         camera_yaw = camera_yaw - 0.01*deltaX;
         camera_pitch = camera_pitch - 0.01*deltaY;
         mat4.identity(cam);
-        
-        
+        var identity = mat4.create();
+        mat4.identity(identity);
+         
         if( mouseLeftDown )
         {
+            //GLOBAL yaw
             mat4.rotate( cam, camera_yaw, [0,1,0] );
-            //mat4.rotate( cam, -0.01*deltaX, [0,1,0] );
-            //mat4.rotate( cam, -0.01*deltaY, [1,0,0] );
+            //LOCAL pitch
+            var yaw_mat = mat4.create(); 
+            mat4.rotate(identity, camera_pitch, [1,0,0], yaw_mat);
+            //mat4.multiply(yaw_mat, cam, cam); 
+            mat4.multiply(cam, yaw_mat); 
         }
         else
         {
