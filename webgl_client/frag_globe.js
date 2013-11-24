@@ -66,6 +66,7 @@
     var u_ViewLocation;
     var u_PerspLocation;
     var u_timeLocation;
+    var u_CentroidLocation;
 
     var globe_program;
 
@@ -81,6 +82,7 @@
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
+        u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
 
         gl.useProgram(globe_program);
     })();
@@ -128,6 +130,22 @@
         centroid[0] = centroid[0]/numberOfPoints;
         centroid[1] = centroid[1]/numberOfPoints;
         centroid[2] = centroid[2]/numberOfPoints;
+        gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
+
+        //assuming the camera starts at the origin, the desired view direction is 
+        //the coordinates of the centroid itself
+        
+        //I am assuming that we peer down the "+z" axis of camera space. We're going
+        //to have to rotate the +z axis onto the desired view direction (i.e. the 
+        //direction of the centroid).
+        
+        var plusZ = [0, 0, 1];
+        var centroidDir = centroid;
+        var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
+        var desiredRotation = vec3.rotationTo(centroidDir, plusZ); 
+        var startingRot3 = quat4.toMat3(desiredRotation);
+        var startingRot4 = mat3.toMat4(startingRot3);
+        mat4.multiply(cam, startingRot4); 
 
         //console.log("Centroid position:");
         //console.log(centroid[0]);
