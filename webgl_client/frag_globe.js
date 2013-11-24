@@ -246,8 +246,6 @@
             radius = Math.min(Math.max(radius, 2.0), 10.0);
             */
         }
-
-        //translate the camera in GLOBAL space
         
         lastMouseX = newX;
         lastMouseY = newY;
@@ -306,7 +304,6 @@
         gl.drawArrays( gl.POINTS, 0, numberOfPoints);
     
         time += 0.001;
-        //mat4.identity(cam);
 	window.requestAnimFrame(animate);
     };
 }());
