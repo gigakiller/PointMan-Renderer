@@ -37,11 +37,7 @@
 
     var camera_yaw = 0;
     var camera_pitch = 0;
-
-    var camera_x = 0;
-    var camera_y = 0; 
-    var camera_z = 0;
-    
+ 
     // Initialize camera
     var cam_vel = 0.25;
     var cam = mat4.create();
@@ -132,10 +128,11 @@
         centroid[0] = centroid[0]/numberOfPoints;
         centroid[1] = centroid[1]/numberOfPoints;
         centroid[2] = centroid[2]/numberOfPoints;
-        console.log("Centroid position:");
-        console.log(centroid[0]);
-        console.log(centroid[1]);
-        console.log(centroid[2]);
+
+        //console.log("Centroid position:");
+        //console.log(centroid[0]);
+        //console.log(centroid[1]);
+        //console.log(centroid[2]);
         //console.log( positions );
         //console.log( colors );
         // Set up Points
