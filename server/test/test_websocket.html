@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+var ws = new WebSocket("ws://localhost:8888/websocket");
+ws.onopen = function() {
+   var req = '{ "dataset": "chappes" }'
+   ws.send( JSON.stringify(req) );
+   //ws.send("Hello, world");
+};
+ws.onmessage = function (evt) {
+   console.log( JSON.parse( evt.data ) )
+};
+
+</script>
+</head>
+<body>
+
+<h1>WebSocket Test</h1>
+
+</body>
+</html> 
+

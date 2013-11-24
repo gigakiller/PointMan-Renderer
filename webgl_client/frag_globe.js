@@ -87,48 +87,58 @@
     var positions;
     var colors;
     function loadPointCloud() { 
-      //$.getJSON("data/test.json", function( pointCloud ) {
-      $.getJSON("data/chappes.json", function( pointCloud ) {
-	  //console.log( pointCloud );
-	  numberOfPoints = pointCloud.positions.length;
-	  // positions = new Float32Array(3 * numberOfPoints);
-	  //var numberOfPoints = pointCloud.positions.length;
-	  var pointsIndex = 0;
-	  positions = new Float32Array(3 * numberOfPoints);
-	  colors = new Float32Array(3 * numberOfPoints);
-	  //console.log( pointCloud.positions.length );
-	  for ( var i=0; i<numberOfPoints; i++ ) {
-	    //console.log( pointCloud.positions[i] );
-	    positions[pointsIndex] = pointCloud.positions[i][0];
-	    colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
-            pointsIndex++;
-	    positions[pointsIndex] = pointCloud.positions[i][1];
-	    colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
-            pointsIndex++;
-	    positions[pointsIndex] = pointCloud.positions[i][2];
-	    colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
-            pointsIndex++;
-	  }
-	  //console.log( positions );
-	  //console.log( colors );
-          // Set up Points
-          // Positions
-          var positionsName = gl.createBuffer();
-          gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-          gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-          gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-          gl.enableVertexAttribArray(positionLocation);
-          // Colors
-          var colorsName = gl.createBuffer();
-          gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-          gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-          gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-          gl.enableVertexAttribArray(colorLocation);
-          // end draw points
+      //$.getJSON("data/chappes.json", function( pointCloud ) {
 
-          animate();
-
-      })
+      // PointCloud Websocket
+      var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
+      ws.onopen = function() {
+       var req = {"pointcloud":"chappes"};
+       ws.send( JSON.stringify(req) );
+      };
+      
+      ws.onmessage = function (evt) {
+        var pointCloud = JSON.parse(evt.data);
+        console.log( pointCloud );
+        //pointCloud = JSON.parse( data );
+        numberOfPoints = pointCloud.positions.length;
+        // positions = new Float32Array(3 * numberOfPoints);
+        //var numberOfPoints = pointCloud.positions.length;
+        var pointsIndex = 0;
+        positions = new Float32Array(3 * numberOfPoints);
+        colors = new Float32Array(3 * numberOfPoints);
+        //console.log( pointCloud.positions.length );
+        for ( var i=0; i<numberOfPoints; i++ ) {
+          //console.log( pointCloud.positions[i] );
+          positions[pointsIndex] = pointCloud.positions[i][0];
+          colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
+          pointsIndex++;
+          positions[pointsIndex] = pointCloud.positions[i][1];
+          colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
+          pointsIndex++;
+          positions[pointsIndex] = pointCloud.positions[i][2];
+          colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
+          pointsIndex++;
+        }
+        //console.log( positions );
+        //console.log( colors );
+        // Set up Points
+        // Positions
+        var positionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLocation);
+        // Colors
+        var colorsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(colorLocation);
+        // end draw points
+        
+        // Kickoff animation cycle
+        animate();
+      }
     }
 
     var time = 0;
