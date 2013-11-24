@@ -55,6 +55,10 @@
     centroid[1] = 0.0;
     centroid[2] = 0.0;
 
+
+    // Drawing mode, toggle between squares and circles
+    var drawMode = 0;
+
     //position, normal, texCoord location for the earth
     var positionLocation;
     var colorLocation;
@@ -66,6 +70,8 @@
     var u_ViewLocation;
     var u_PerspLocation;
     var u_timeLocation;
+
+    var u_drawMode;
 
     var globe_program;
 
@@ -94,7 +100,7 @@
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
-        
+        u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
 
         gl.useProgram(globe_program);
     })();
@@ -182,6 +188,17 @@
     function handleKeyDown(event) {
       console.log( "keycode: " + event.keyCode + "\n" );
       currentKeys[event.keyCode] = true; 
+
+      // For events that update once
+      // 't' for toggling drawing mode
+      if ( currentKeys[84] ) {
+        if ( drawMode == 0 ) {
+          drawMode = 1;
+        } else {
+          drawMode = 0;
+        }
+        console.log(drawMode);
+      }
     }
 
     function handleKeyUp(event) {
@@ -193,7 +210,7 @@
     }
     
     function handleMovement(event) {
-      
+     
       // 'w'
       if ( currentKeys[87] ) {
         //console.log("moving forward\n");
@@ -227,6 +244,7 @@
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
         }
+
 
     }
 
