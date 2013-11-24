@@ -74,6 +74,19 @@
         var fs = getShaderSource(document.getElementById("fs"));
 
         globe_program = createProgram(gl, vs, fs, message);
+
+
+        // Optional binding ( mostly for performance on MAC and opengl-es devices
+        gl.bindAttribLocation(globe_program, 0, "Position");
+        gl.bindAttribLocation(globe_program, 1, "Color");
+        gl.bindAttribLocation(globe_program, 2, "Normal");
+        
+        gl.linkProgram(globe_program);
+        if (!gl.getProgramParameter(globe_program, gl.LINK_STATUS)) {
+            alert(gl.getProgramInfoLog(globe_program));
+            return;
+        } 
+
         positionLocation = gl.getAttribLocation(globe_program, "Position");
         colorLocation = gl.getAttribLocation(globe_program, "Color");
         normalLocation = gl.getAttribLocation(globe_program, "Normal");
@@ -81,6 +94,7 @@
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
+        
 
         gl.useProgram(globe_program);
     })();
