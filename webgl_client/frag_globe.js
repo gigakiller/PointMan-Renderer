@@ -52,6 +52,12 @@
     var up = [0.0, 1.0, 0.0];
     var view = mat4.create();
     mat4.lookAt(eye, center, up, view);
+    
+    //centroid
+    var centroid = vec3.create();
+    centroid[0] = 0.0;
+    centroid[1] = 0.0;
+    centroid[2] = 0.0;
 
     //position, normal, texCoord location for the earth
     var positionLocation;
@@ -110,15 +116,26 @@
         for ( var i=0; i<numberOfPoints; i++ ) {
           //console.log( pointCloud.positions[i] );
           positions[pointsIndex] = pointCloud.positions[i][0];
+            centroid[0] += pointCloud.positions[i][0];
           colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
           pointsIndex++;
           positions[pointsIndex] = pointCloud.positions[i][1];
+            centroid[1] += pointCloud.positions[i][1];
           colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
           pointsIndex++;
           positions[pointsIndex] = pointCloud.positions[i][2];
+            centroid[2] += pointCloud.positions[i][1];
           colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
           pointsIndex++;
         }
+        //centroid = (1.0/numberOfPoints) * centroid;
+        centroid[0] = centroid[0]/numberOfPoints;
+        centroid[1] = centroid[1]/numberOfPoints;
+        centroid[2] = centroid[2]/numberOfPoints;
+        console.log("Centroid position:");
+        console.log(centroid[0]);
+        console.log(centroid[1]);
+        console.log(centroid[2]);
         //console.log( positions );
         //console.log( colors );
         // Set up Points
