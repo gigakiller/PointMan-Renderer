@@ -65,7 +65,14 @@
 
     void main(void)
     {
-        gl_FragColor = vec4(v_Color, 1.0);
+
+        //got the following trick from http://mmmovania.blogspot.com/2010/12/circular-point-sprites-in-opengl-33.html
+        //TODO: evaluate the performance impact of the "discard" statement, and the if statement. 
+        if(dot(gl_PointCoord-0.5,gl_PointCoord-0.5)>0.25) 
+           discard;
+         else
+            gl_FragColor = vec4(v_Color, 1.0);
+        //gl_FragColor = vec4(v_Color, 1.0);
     }
 
 </script>
