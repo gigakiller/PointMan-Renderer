@@ -3,6 +3,10 @@ PointMan-Renderer
 
 A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke.
 
+Streaming
+================
+Branch focused on enabling pointcloud streaming between server and client
+
 
 ##Usage:
 
