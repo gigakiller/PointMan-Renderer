@@ -45,6 +45,8 @@
         v_Position = camera.xyz;
         v_positionMC = Position;
         
+        //debug code to visualize where the centroid is        
+        /*
         float distToCentroid = length(Position - u_Centroid);
         if(distToCentroid < 10.0){
             v_Color = vec3(1.0, 0.0, 0.0);
@@ -52,7 +54,8 @@
             //v_Color = Color;
             v_Color = vec3(0.0, 1.0, 0.0);
         }
-        //v_Color = Color;
+        */
+        v_Color = Color;
         gl_Position = u_Persp * camera;
   
         gl_PointSize = max( 50.0/gl_Position.z, 2.0 );

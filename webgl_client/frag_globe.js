@@ -139,10 +139,10 @@
         //to have to rotate the +z axis onto the desired view direction (i.e. the 
         //direction of the centroid).
         
-        var plusZ = [0, 0, 1];
+        var plusZ = [0, 0, -1];
         var centroidDir = centroid;
         var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
-        var desiredRotation = vec3.rotationTo(centroidDir, plusZ); 
+        var desiredRotation = vec3.rotationTo(plusZ, centroidDir); 
         var startingRot3 = quat4.toMat3(desiredRotation);
         var startingRot4 = mat3.toMat4(startingRot3);
         mat4.multiply(cam, startingRot4); 
