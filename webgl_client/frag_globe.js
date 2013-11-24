@@ -50,6 +50,12 @@
     var view = mat4.create();
     mat4.lookAt(eye, center, up, view);
 
+    // Positions, Colors, and number of points
+    var numberOfPoints = 0;
+    var pointsSent = 0;
+    var positions;
+    var colors;
+
     //position, normal, texCoord location for the earth
     var positionLocation;
     var colorLocation;
@@ -80,9 +86,8 @@
         gl.useProgram(globe_program);
     })();
 
-    var numberOfPoints;
-    var positions;
-    var colors;
+
+
     function loadPointCloud() { 
       //$.getJSON("data/chappes.json", function( pointCloud ) {
 
@@ -94,18 +99,27 @@
       };
       
       ws.onmessage = function (evt) {
-        var pointCloud = JSON.parse(evt.data);
+        var msg = JSON.parse(evt.data);
+        console.log(msg)
+        var pointCloud = msg["data"];
         console.log( pointCloud );
         //pointCloud = JSON.parse( data );
-        numberOfPoints = pointCloud.positions.length;
+        var len = pointCloud.positions.length;
+        pointsSent += len;
+        numberOfPoints = msg["numberOfPoints"];
+        var start = msg["pointsSent"];
+        console.log( numberOfPoints );
+        console.log( pointsSent );
+        
         // positions = new Float32Array(3 * numberOfPoints);
         //var numberOfPoints = pointCloud.positions.length;
-        var pointsIndex = 0;
-        positions = new Float32Array(3 * numberOfPoints);
-        colors = new Float32Array(3 * numberOfPoints);
+        var pointsIndex = 3*pointsSent;
+        if (start == 0) {
+          positions = new Float32Array(3 * numberOfPoints);
+          colors = new Float32Array(3 * numberOfPoints);
+        }
         //console.log( pointCloud.positions.length );
-        for ( var i=0; i<numberOfPoints; i++ ) {
-          //console.log( pointCloud.positions[i] );
+        for ( var i=0; i<len; i++ ) {
           positions[pointsIndex] = pointCloud.positions[i][0];
           colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
           pointsIndex++;
@@ -132,9 +146,17 @@
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
         // end draw points
+        //
+        if ( pointsSent > numberOfPoints ) {
+          return;
+        }
+        
+        // Request more data 
+        var req = {"pointcloud":"chappes"};
+        ws.send( JSON.stringify(req) );
         
         // Kickoff animation cycle
-        animate();
+        //animate();
       }
     }
 
@@ -247,7 +269,7 @@
     var elapsedTime = 5000;
 
     //initializeShader();
-
+    animate();
     loadPointCloud();
 
     function animate(){
@@ -283,7 +305,8 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
-        gl.drawArrays( gl.POINTS, 0, numberOfPoints);
+        //gl.drawArrays( gl.POINTS, 0, numberOfPoints);
+        gl.drawArrays( gl.POINTS, 0, pointsSent);
     
         time += 0.001;
 	window.requestAnimFrame(animate);
