@@ -74,9 +74,17 @@
 	var u_drawMode;
     var globe_program;
 
-    (function initializeShader() {
+    var use_RoundPoints = true;
+
+    function initializeShader() {
         var vs = getShaderSource(document.getElementById("vs"));
-        var fs = getShaderSource(document.getElementById("fs"));
+        var fs;
+
+        if( use_RoundPoints ){
+            fs = getShaderSource(document.getElementById("fs"));
+        } else {
+            fs = getShaderSource(document.getElementById("square-fs"));
+        }
 
         globe_program = createProgram(gl, vs, fs, message);
 
@@ -102,7 +110,9 @@
         u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
 		u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
         gl.useProgram(globe_program);
-    })();
+    }
+    
+    initializeShader();
 
     // Message passing globals
     var pointsIndex=0;
@@ -276,6 +286,11 @@
         var roll_mat = mat4.create(); 
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
+        }
+
+        if ( currentKeys[82] ) {
+           use_RoundPoints = !use_RoundPoints;  
+            initializeShader();
         }
 
     }
