@@ -115,6 +115,7 @@
       var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
       ws.onopen = function() {
        var req = {"pointcloud":"chappes_sml"};
+       //var req = {"pointcloud":"chappes"};
        ws.send( JSON.stringify(req) );
       };
       

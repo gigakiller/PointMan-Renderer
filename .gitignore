@@ -18,3 +18,6 @@
 # Ignore pts files because they are big
 *.pts
 *.json
+
+#data directory (too big to include)
+data/
