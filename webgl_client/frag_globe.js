@@ -242,6 +242,12 @@
         }
         console.log(drawMode);
       }
+
+        //toggle between round and square points
+        if ( currentKeys[82] ) {
+           use_RoundPoints = !use_RoundPoints;  
+            initializeShader();
+        }
     }
 
     function handleKeyUp(event) {
@@ -288,10 +294,6 @@
         mat4.multiply(cam, roll_mat); 
         }
 
-        if ( currentKeys[82] ) {
-           use_RoundPoints = !use_RoundPoints;  
-            initializeShader();
-        }
 
     }
 
