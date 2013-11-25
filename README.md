@@ -9,7 +9,12 @@ A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke.
 In terminal:
   * $ python server/pointcloud_server.py
 
-Then start html application
+Then start html application.
+
+Controls:
+* Click and drag mouse to look.
+* WASD to fly.
+* Q and E to roll.
   
 Credits
 =================

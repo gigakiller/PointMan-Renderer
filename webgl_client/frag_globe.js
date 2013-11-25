@@ -70,9 +70,8 @@
     var u_ViewLocation;
     var u_PerspLocation;
     var u_timeLocation;
-
-    var u_drawMode;
-
+    var u_CentroidLocation;
+	var u_drawMode;
     var globe_program;
 
     (function initializeShader() {
@@ -100,8 +99,8 @@
         u_ViewLocation = gl.getUniformLocation(globe_program,"u_View");
         u_PerspLocation = gl.getUniformLocation(globe_program,"u_Persp");
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
-        u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
-
+        u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
+		u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
         gl.useProgram(globe_program);
     })();
 
@@ -129,11 +128,30 @@
       
       // Upon first message allocate memory for entire cloud
       if ( pointsIndex == 0 ) {
+        // Initialize pointcloud memory
         positions = new Float32Array(3 * numberOfPoints);
         colors = new Float32Array(3 * numberOfPoints);
+
+        // Set up camera pointing towareds centroid 
+        gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
+
+        //assuming the camera starts at the origin, the desired view direction is 
+        //the coordinates of the centroid itself
+        
+        //I am assuming that we peer down the "+z" axis of camera space. We're going
+        //to have to rotate the +z axis onto the desired view direction (i.e. the 
+        //direction of the centroid).
+        
+        var plusZ = [0, 0, -1];
+        var centroidDir = centroid;
+        var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
+        var desiredRotation = vec3.rotationTo(plusZ, centroidDir); 
+        var startingRot3 = quat4.toMat3(desiredRotation);
+        var startingRot4 = mat3.toMat4(startingRot3);
+        mat4.multiply(cam, startingRot4); 
       }
 
-      // Copy over most recent data
+        //console.log( pointCloud.positions.length );
       for ( var i=0; i<fragLen; i++ ) {
         //console.log( pointCloud.positions[i] );
         positions[pointsIndex] = pointCloud.positions[i][0];
@@ -150,6 +168,10 @@
         pointsIndex++;
       }
 
+      //centroid = (1.0/numberOfPoints) * centroid;
+      //centroid[0] = centroid[0]/numberOfPoints;
+      //centroid[1] = centroid[1]/numberOfPoints;
+      //centroid[2] = centroid[2]/numberOfPoints;
       // Set up Points
       // Positions
       var positionsName = gl.createBuffer();
@@ -221,7 +243,7 @@
     }
     
     function handleMovement(event) {
-     
+      
       // 'w'
       if ( currentKeys[87] ) {
         //console.log("moving forward\n");
@@ -255,6 +277,7 @@
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
         }
+
     }
 
     // Handle Mouse Events

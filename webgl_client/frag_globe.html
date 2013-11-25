@@ -25,6 +25,7 @@
     uniform mat4 u_View;
     uniform mat4 u_Persp;
     uniform mat4 u_InvTrans;
+    uniform vec3 u_Centroid;
 
     attribute vec3 Position;
     attribute vec3 Normal;
@@ -43,6 +44,17 @@
         vec4 camera = u_View * world;
         v_Position = camera.xyz;
         v_positionMC = Position;
+        
+        //debug code to visualize where the centroid is        
+        /*
+        float distToCentroid = length(Position - u_Centroid);
+        if(distToCentroid < 10.0){
+            v_Color = vec3(1.0, 0.0, 0.0);
+        } else {
+            //v_Color = Color;
+            v_Color = vec3(0.0, 1.0, 0.0);
+        }
+        */
         v_Color = Color;
         gl_Position = u_Persp * camera;
   
