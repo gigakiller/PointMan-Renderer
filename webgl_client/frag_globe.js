@@ -355,10 +355,12 @@
     animate();
 
     // PointCloud Websocket ... refactored with lighter callbacks
-    var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
+    //var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
+    var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
-     var req = {"pointcloud":"chappes"};
+     //var req = {"pointcloud":"chappes"};
+     var req = {"pointcloud":"chappes_sml"};
      ws.send( JSON.stringify(req) );
     };
     
