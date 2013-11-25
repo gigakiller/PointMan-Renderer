@@ -73,20 +73,19 @@
     var u_CentroidLocation;
 	var u_drawMode;
     var globe_program;
-        
-    //toggle between drwaing round points (looks better, slower) and drawing square points
-    //(looks worse, faster).
-    var drawRoundPoints = true;
 
-    (function initializeShader() {
+    var use_RoundPoints = true;
+
+    function initializeShader() {
         var vs = getShaderSource(document.getElementById("vs"));
-        var fs; 
-        if(drawRoundPoints){
+        var fs;
+
+        if( use_RoundPoints ){
             fs = getShaderSource(document.getElementById("fs"));
-        }else{
+        } else {
             fs = getShaderSource(document.getElementById("square-fs"));
         }
-            
+
         globe_program = createProgram(gl, vs, fs, message);
 
 
@@ -111,53 +110,39 @@
         u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
 		u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
         gl.useProgram(globe_program);
-    })();
+    }
+    
+    initializeShader();
 
-    var numberOfPoints;
+    // Message passing globals
+    var pointsIndex=0;
+    var numberOfPoints=0;
+    var pointsCount=0;
     var positions;
     var colors;
+    var msg;
+    var new_msg=false;
+
     function loadPointCloud() { 
       //$.getJSON("data/chappes.json", function( pointCloud ) {
 
-      // PointCloud Websocket
-      //var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
-      var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
-      ws.onopen = function() {
-       var req = {"pointcloud":"chappes_sml"};
-       //var req = {"pointcloud":"chappes"};
-       ws.send( JSON.stringify(req) );
-      };
+      // Unpack message
+      var pointCloud = msg["data"];
+      numberOfPoints = msg["numberOfPoints"];
+      centroid = msg["centroid"];
+
+      //console.log( numberOfPoints );
+      var fragLen = pointCloud.positions.length;
+      pointsCount += fragLen;
+      //console.log( pointsCount );
       
-      ws.onmessage = function (evt) {
-        var pointCloud = JSON.parse(evt.data);
-        console.log( pointCloud );
-        //pointCloud = JSON.parse( data );
-        numberOfPoints = pointCloud.positions.length;
-        // positions = new Float32Array(3 * numberOfPoints);
-        //var numberOfPoints = pointCloud.positions.length;
-        var pointsIndex = 0;
+      // Upon first message allocate memory for entire cloud
+      if ( pointsIndex == 0 ) {
+        // Initialize pointcloud memory
         positions = new Float32Array(3 * numberOfPoints);
         colors = new Float32Array(3 * numberOfPoints);
-        //console.log( pointCloud.positions.length );
-        for ( var i=0; i<numberOfPoints; i++ ) {
-          //console.log( pointCloud.positions[i] );
-          positions[pointsIndex] = pointCloud.positions[i][0];
-            centroid[0] += pointCloud.positions[i][0];
-          colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
-          pointsIndex++;
-          positions[pointsIndex] = pointCloud.positions[i][1];
-            centroid[1] += pointCloud.positions[i][1];
-          colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
-          pointsIndex++;
-          positions[pointsIndex] = pointCloud.positions[i][2];
-            centroid[2] += pointCloud.positions[i][1];
-          colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
-          pointsIndex++;
-        }
-        //centroid = (1.0/numberOfPoints) * centroid;
-        centroid[0] = centroid[0]/numberOfPoints;
-        centroid[1] = centroid[1]/numberOfPoints;
-        centroid[2] = centroid[2]/numberOfPoints;
+
+        // Set up camera pointing towareds centroid 
         gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
 
         //assuming the camera starts at the origin, the desired view direction is 
@@ -174,31 +159,63 @@
         var startingRot3 = quat4.toMat3(desiredRotation);
         var startingRot4 = mat3.toMat4(startingRot3);
         mat4.multiply(cam, startingRot4); 
-
-        //console.log("Centroid position:");
-        //console.log(centroid[0]);
-        //console.log(centroid[1]);
-        //console.log(centroid[2]);
-        //console.log( positions );
-        //console.log( colors );
-        // Set up Points
-        // Positions
-        var positionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(positionLocation);
-        // Colors
-        var colorsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colorLocation);
-        // end draw points
-        
-        // Kickoff animation cycle
-        animate();
       }
+
+        //console.log( pointCloud.positions.length );
+      for ( var i=0; i<fragLen; i++ ) {
+        //console.log( pointCloud.positions[i] );
+        positions[pointsIndex] = pointCloud.positions[i][0];
+        //  centroid[0] += pointCloud.positions[i][0];
+        colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
+        pointsIndex++;
+        positions[pointsIndex] = pointCloud.positions[i][1];
+        //  centroid[1] += pointCloud.positions[i][1];
+        colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
+        pointsIndex++;
+        positions[pointsIndex] = pointCloud.positions[i][2];
+        //  centroid[2] += pointCloud.positions[i][1];
+        colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
+        pointsIndex++;
+      }
+
+      //centroid = (1.0/numberOfPoints) * centroid;
+      //centroid[0] = centroid[0]/numberOfPoints;
+      //centroid[1] = centroid[1]/numberOfPoints;
+      //centroid[2] = centroid[2]/numberOfPoints;
+      // Set up Points
+      // Positions
+      var positionsName = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+      gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(positionLocation);
+      // Colors
+      var colorsName = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+      gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+      gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(colorLocation);
+
+      //centroid = (1.0/numberOfPoints) * centroid;
+      /*
+      centroid[0] = centroid[0]/numberOfPoints;
+      centroid[1] = centroid[1]/numberOfPoints;
+      centroid[2] = centroid[2]/numberOfPoints;
+      */
+
+      //console.log("Centroid position:");
+      //console.log(centroid[0]);
+      //console.log(centroid[1]);
+      //console.log(centroid[2]);
+      //console.log( positions );
+      //console.log( colors );
+      
+      // Kickoff animation cycle
+      //animate();
+      console.log(pointsIndex);
+
+      // Indicate that the message has been handled 
+      new_msg = false;
     }
 
     var time = 0;
@@ -225,6 +242,12 @@
         }
         console.log(drawMode);
       }
+
+        //toggle between round and square points
+        if ( currentKeys[82] ) {
+           use_RoundPoints = !use_RoundPoints;  
+            initializeShader();
+        }
     }
 
     function handleKeyUp(event) {
@@ -270,10 +293,7 @@
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
         }
-      if ( currentKeys[82] ) {
-        drawROundPoints = !drawRoundPoints; 
-        initializeShader();
-      }
+
 
     }
 
@@ -349,14 +369,40 @@
     var elapsedTime = 5000;
 
     //initializeShader();
+    animate();
 
-    loadPointCloud();
+    // PointCloud Websocket ... refactored with lighter callbacks
+    //var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
+    var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
+
+    ws.onopen = function() {
+     //var req = {"pointcloud":"chappes"};
+     var req = {"pointcloud":"chappes_sml"};
+     ws.send( JSON.stringify(req) );
+    };
+    
+    ws.onmessage = function (evt) {
+      // If we haven't yet handled the previous message then ignore current one
+      // Note: A better thing would be to queue 
+      if ( new_msg ) 
+        return;
+      msg = JSON.parse(evt.data);
+      new_msg = true; 
+    }
+
+    //loadPointCloud();
+    //animate();
 
     function animate(){
         var currTime = new Date().getTime();
         var dt = currTime - prevTime;
         elapsedTime += dt;
         prevTime = currTime;
+
+        // If we have a new message then update the pointcloud data
+        if ( new_msg ) {
+          loadPointCloud();
+        }
 
         // Handle user keyboard inputs
         handleUserInput();
@@ -386,7 +432,8 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
-        gl.drawArrays( gl.POINTS, 0, numberOfPoints);
+        //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
+        gl.drawArrays( gl.POINTS, 0, pointsCount );
     
         time += 0.001;
 	window.requestAnimFrame(animate);
