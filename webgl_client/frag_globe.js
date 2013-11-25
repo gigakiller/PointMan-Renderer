@@ -73,11 +73,20 @@
     var u_CentroidLocation;
 	var u_drawMode;
     var globe_program;
+        
+    //toggle between drwaing round points (looks better, slower) and drawing square points
+    //(looks worse, faster).
+    var drawRoundPoints = true;
 
     (function initializeShader() {
         var vs = getShaderSource(document.getElementById("vs"));
-        var fs = getShaderSource(document.getElementById("fs"));
-
+        var fs; 
+        if(drawRoundPoints){
+            fs = getShaderSource(document.getElementById("fs"));
+        }else{
+            fs = getShaderSource(document.getElementById("square-fs"));
+        }
+            
         globe_program = createProgram(gl, vs, fs, message);
 
 
@@ -277,6 +286,10 @@
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
         }
+      if ( currentKeys[82] ) {
+        drawROundPoints = !drawRoundPoints; 
+        initializeShader();
+      }
 
     }
 
