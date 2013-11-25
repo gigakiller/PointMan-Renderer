@@ -9,14 +9,18 @@ from tornado import websocket, web, ioloop
 from json import load, loads, dumps
 from os import listdir
 from time import sleep
+from numpy import array
 
 # Get list of .json files in data
 files = listdir('data')
 loaded_clouds = {}
+centroids = {}
 for file in files:
   if file.find('.json') == -1:
     continue
-  loaded_clouds[file.strip('json')[:-1]] = None
+  cloud_name = file.strip('json')[:-1]
+  loaded_clouds[cloud_name] = None
+  centroids[cloud_name] = None
 
 print "PointClouds Available: ", [k for k in loaded_clouds.iterkeys()]
 
@@ -52,29 +56,29 @@ class PointCloudReqWS(websocket.WebSocketHandler):
         # Check if we have loaded it into RAM, if not load it
         if loaded_clouds[cloud] is None:
           print "Loading ..."
-          loaded_clouds[cloud] = load(open('data/'+cloud+'.json', 'r'))
+          data = load(open('data/'+cloud+'.json', 'r'))
+          loaded_clouds[cloud] = data
+          positions = array(data['positions'])
+          centroids[cloud] = (sum(positions)/len(positions)).tolist()
         # And respond 
         print "Sending pointcloud"
         #self.write_message( dumps(loaded_clouds[cloud]) )
         numberOfPoints = len(loaded_clouds[cloud]['positions'])
-        
+         
         start = 0
         fragLen = 10000
         while start+fragLen < numberOfPoints:
-          self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], start, int(fragLen))) )
+          self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(fragLen))) )
           start += fragLen
           print "sending data:", start
           sleep(0.1)
         remainder = numberOfPoints - start
-        self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], start, int(remainder))) )
+        self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(remainder))) )
         
-
-
-
-    def pack_msg( self, cloud, start, fragLen ):
+    def pack_msg( self, cloud, centroid, start, fragLen ):
       positions = cloud['positions'][start:start+fragLen]
       colors = cloud['colors'][start:start+fragLen]
-      return {"data":{'positions':positions, 'colors':colors}, "numberOfPoints":len(cloud['positions'])}
+      return {"data":{'positions':positions, 'colors':colors}, "numberOfPoints":len(cloud['positions']), "centroid":centroid}
 
     def on_close(self):
         print "WebSocket closed"

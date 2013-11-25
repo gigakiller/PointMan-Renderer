@@ -120,10 +120,12 @@
       // Unpack message
       var pointCloud = msg["data"];
       numberOfPoints = msg["numberOfPoints"];
-      console.log( numberOfPoints );
+      centroid = msg["centroid"];
+
+      //console.log( numberOfPoints );
       var fragLen = pointCloud.positions.length;
       pointsCount += fragLen;
-      console.log( pointsCount );
+      //console.log( pointsCount );
       
       // Upon first message allocate memory for entire cloud
       if ( pointsIndex == 0 ) {
@@ -135,15 +137,15 @@
       for ( var i=0; i<fragLen; i++ ) {
         //console.log( pointCloud.positions[i] );
         positions[pointsIndex] = pointCloud.positions[i][0];
-          centroid[0] += pointCloud.positions[i][0];
+        //  centroid[0] += pointCloud.positions[i][0];
         colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
         pointsIndex++;
         positions[pointsIndex] = pointCloud.positions[i][1];
-          centroid[1] += pointCloud.positions[i][1];
+        //  centroid[1] += pointCloud.positions[i][1];
         colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
         pointsIndex++;
         positions[pointsIndex] = pointCloud.positions[i][2];
-          centroid[2] += pointCloud.positions[i][1];
+        //  centroid[2] += pointCloud.positions[i][1];
         colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
         pointsIndex++;
       }
@@ -163,9 +165,11 @@
       gl.enableVertexAttribArray(colorLocation);
 
       //centroid = (1.0/numberOfPoints) * centroid;
+      /*
       centroid[0] = centroid[0]/numberOfPoints;
       centroid[1] = centroid[1]/numberOfPoints;
       centroid[2] = centroid[2]/numberOfPoints;
+      */
 
       //console.log("Centroid position:");
       //console.log(centroid[0]);
@@ -251,8 +255,6 @@
         mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
         mat4.multiply(cam, roll_mat); 
         }
-
-
     }
 
     // Handle Mouse Events
