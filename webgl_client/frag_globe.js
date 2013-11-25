@@ -373,7 +373,8 @@
 
     ws.onopen = function() {
      //var req = {"pointcloud":"chappes"};
-     var req = {"pointcloud":"chappes_sml"};
+     //var req = {"pointcloud":"chappes_sml"};
+     var req = {"pointcloud":"chappes_med"};
      ws.send( JSON.stringify(req) );
     };
     
