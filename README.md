@@ -1,7 +1,7 @@
 PointMan-Renderer
 =================
 
-A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke. [See LIVE online demo here! (Wait a few moments to allow points to load)](http://nmarshak1337.github.io/PointMan-Renderer/webgl_client/frag_globe.html)
+A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke. [See LIVE online demo here! (Wait a few moments to allow points to load.)](http://nmarshak1337.github.io/PointMan-Renderer/webgl_client/frag_globe.html)
 
 
 ##Usage:
