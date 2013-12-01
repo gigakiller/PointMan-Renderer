@@ -1,6 +1,11 @@
+Requires glm (On Ubuntu: sudo apt-get install libglm-dev)
+Requires libjsoncpp (On Ubuntu: sudo apt-get install libjsoncpp-dev)
+
+Currently this doesn't do anything with an octree. It just visualizes four 
+points that I made up, then reads the JSON file from ../data/chappes_sml.json.
+
 WASD: move in X and Z direction
 Q, E: Move in Y direction
 
-Requires glm (On Ubuntu: sudo apt-get install libglm-dev)
-Requires libjsoncpp (On Ubuntu: sudo apt-get install libjsoncpp-dev)
+
 

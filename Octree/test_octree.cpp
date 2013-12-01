@@ -251,7 +251,7 @@ int json_pointcloud_test(){
       
      // Let's extract the array contained 
      // in the root object
-     const Json::Value array = root["array"];
+     const Json::Value array = root["positions"];
      
      // Iterate over sequence elements and 
      // print its values
@@ -261,28 +261,10 @@ int json_pointcloud_test(){
        cout<<"Element " 
            <<index 
            <<" in array: "
-           <<array[index].asString()
+           <<array[index]
            <<endl;
      }
       
-     // Lets extract the not array element 
-     // contained in the root object and 
-     // print its value
-     const Json::Value notAnArray = 
-                   root["not an array"];
-     
-     if(not notAnArray.isNull())
-     {
-       cout<<"Not an array: "
-           <<notAnArray.asString()
-           <<endl;
-     }
-     
-     // If we want to print JSON is as easy as doing:
-     cout<<"Json Example pretty print: "
-         <<endl<<root.toStyledString()
-         <<endl;
-
     curr_file.close();
      
      return 0;
@@ -291,6 +273,7 @@ int json_pointcloud_test(){
 int main(int argc, char **argv) 
 {
     //json_cpp_test();
+    json_pointcloud_test();
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;

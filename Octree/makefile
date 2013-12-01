@@ -5,7 +5,7 @@ CC = clang++
 CFLAGS = -O3 $(INCDIRS)
 LIBS = -lX11 -lXi -lXmu -lglut -lGL -lGLU -lm -ljsoncpp
 
-test_octree:
+test_octree: test_octree.cpp
 	$(CC) $(CFLAGS) -o test_octree $(LIBDIRS) test_octree.cpp $(LIBS)  
 
 clean:
