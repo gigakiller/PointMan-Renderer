@@ -1,1 +1,6 @@
+WASD: move in X and Z direction
+Q, E: Move in Y direction
+
 Requires glm (On Ubuntu: sudo apt-get install libglm-dev)
+Requires libjsoncpp (On Ubuntu: sudo apt-get install libjsoncpp-dev)
+
