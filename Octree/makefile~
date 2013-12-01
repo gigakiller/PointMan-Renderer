@@ -1,0 +1,12 @@
+
+INCDIRS = -I/usr/openwin/include -I/usr/local/include
+LIBDIRS = -L/usr/openwin/lib -L/usr/local/lib      
+
+CC = gcc
+CFLAGS = -g $(INCDIRS)
+LIBS = -lX11 -lXi -lXmu -lglut -lGL -lGLU -lm 
+
+
+SimpleDraw: SimpleDraw.o
+	$(CC) $(CFLAGS) -o SimpleDraw $(LIBDIRS) SimpleDraw.c $(LIBS)  
+

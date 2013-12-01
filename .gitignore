@@ -21,3 +21,9 @@
 
 #data directory (too big to include)
 data/
+
+#backup file
+*~
+
+#executable file
+test_octree
