@@ -261,7 +261,7 @@ int json_pointcloud_test(){
        cout<<"Element " 
            <<index 
            <<" in array: "
-           <<array[index]
+           <<array[index][0]
            <<endl;
      }
       
