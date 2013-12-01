@@ -25,6 +25,9 @@
 using namespace std;
 #define KEY_ESCAPE 27
 
+//ignore the warning that we need to pad to align to 4 bytes
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 typedef struct {
     int width;
 	int height;
@@ -34,13 +37,19 @@ typedef struct {
 	float z_near;
 	float z_far;
 } glutWindow;
+#pragma clang diagnostic pop
+
 glutWindow win;
 float Rotation;
-glm::vec3 eyePos(8, 3, 0); 
-glm::vec3 vdir(-8,-3,0);
+//glm::vec3 eyePos(8, 3, 0); 
+//glm::vec3 vdir(-8,-3,0);
+float eyePosArray[] = {8.0f, 3.0f, 0.0f};
+float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 
 void display() 
 {
+    glm::vec3 eyePos( eyePosArray[0], eyePosArray[1], eyePosArray[2] );
+    glm::vec3 vdir( vdirArray[0], vdirArray[1], vdirArray[2] );
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		     // Clear Screen and Depth Buffer
 	glLoadIdentity();
     vdir = glm::normalize(vdir);
@@ -142,22 +151,22 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
       exit ( 0 );   
       break;      
     case 119: //w
-        eyePos.x -= 1;
+        eyePosArray[0] -= 1;
         break;
     case 115: //s
-        eyePos.x += 1;
+        eyePosArray[0] += 1;
         break;
     case 97: //a
-        eyePos.z += 1;
+        eyePosArray[2] += 1;
         break;
     case 100: //d
-        eyePos.z -= 1;
+        eyePosArray[2] -= 1;
         break;
     case 113: //a
-        eyePos.y += 1;
+        eyePosArray[1] += 1;
         break;
     case 101: //d
-        eyePos.y -= 1;
+        eyePosArray[1] -= 1;
         break;
 
     default:      
@@ -282,6 +291,7 @@ int main(int argc, char **argv)
 	win.field_of_view_angle = 45;
 	win.z_near = 1.0f;
 	win.z_far = 500.0f;
+
 
 	// initialize and run program
 	glutInit(&argc, argv);                                      // GLUT initialization
