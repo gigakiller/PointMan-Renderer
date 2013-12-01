@@ -36,7 +36,7 @@ $(CPPODIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
 #$(BINDIR)/libnaray.a: $(OBJ) $(CPPOBJ)
 	#ar -cvur $@ $^
 
-$(BINDIR)/test_octree: $(OBJ) $(CPPOBJ) $(DEPS) 
+$(BINDIR)/test_octree: $(OBJ) $(CPPOBJ) 
 		$(CC) -o $@ $^ $(CFLAGS) $(LIBDIR) $(LIBRARIES)	
 
 .PHONY: clean
