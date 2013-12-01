@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <cstring>
 #include <jsoncpp/json/json.h>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 #define KEY_ESCAPE 27
@@ -225,14 +227,75 @@ int json_cpp_test(){
      return 0;
 }
 
+int json_pointcloud_test(){
+
+    //open our file
+    ifstream curr_file("../data/chappes_sml.json"); 
+
+     // Let's parse it  
+     Json::Value root;
+     Json::Reader reader;
+     bool parsedSuccess = reader.parse(curr_file, 
+                                       root, 
+                                       false);
+      
+     if(not parsedSuccess)
+     {
+       // Report failures and their locations 
+       // in the document.
+       cout<<"Failed to parse JSON"<<endl 
+           <<reader.getFormatedErrorMessages()
+           <<endl;
+       return 1;
+     }
+      
+     // Let's extract the array contained 
+     // in the root object
+     const Json::Value array = root["array"];
+     
+     // Iterate over sequence elements and 
+     // print its values
+     for(unsigned int index=0; index<array.size(); 
+         ++index)  
+     {  
+       cout<<"Element " 
+           <<index 
+           <<" in array: "
+           <<array[index].asString()
+           <<endl;
+     }
+      
+     // Lets extract the not array element 
+     // contained in the root object and 
+     // print its value
+     const Json::Value notAnArray = 
+                   root["not an array"];
+     
+     if(not notAnArray.isNull())
+     {
+       cout<<"Not an array: "
+           <<notAnArray.asString()
+           <<endl;
+     }
+     
+     // If we want to print JSON is as easy as doing:
+     cout<<"Json Example pretty print: "
+         <<endl<<root.toStyledString()
+         <<endl;
+
+    curr_file.close();
+     
+     return 0;
+} 
+
 int main(int argc, char **argv) 
 {
-    json_cpp_test();
+    //json_cpp_test();
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
 	win.height = 480;
-	win.title = "OpenGL/GLUT Window.";
+	//win.title = "OpenGL/GLUT Window.";
 	win.field_of_view_angle = 45;
 	win.z_near = 1.0f;
 	win.z_far = 500.0f;
