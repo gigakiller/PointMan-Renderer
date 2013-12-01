@@ -25,6 +25,14 @@
 using namespace std;
 #define KEY_ESCAPE 27
 
+//forward declarations:
+void display();
+void initialize();
+//void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
+void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
+int json_pointcloud_test();
+int json_cpp_test();
+
 //ignore the warning that we need to pad to align to 4 bytes
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
@@ -124,9 +132,9 @@ void initialize ()
     glDepthFunc( GL_LEQUAL );
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );						// specify implementation-specific hints
 
-	GLfloat amb_light[] = { 0.1, 0.1, 0.1, 1.0 };
-    GLfloat diffuse[] = { 0.6, 0.6, 0.6, 1 };
-    GLfloat specular[] = { 0.7, 0.7, 0.3, 1 };
+	GLfloat amb_light[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    GLfloat diffuse[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+    GLfloat specular[] = { 0.7f, 0.7f, 0.3f, 1.0f };
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, amb_light );
     glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuse );
     glLightfv( GL_LIGHT0, GL_SPECULAR, specular );
@@ -138,18 +146,20 @@ void initialize ()
     glEnable( GL_DEPTH_TEST );
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0); 
-	glClearColor(0.0, 0.0, 1.0, 1.0);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 
 }
 
 
+//we are required to read mousePositionX and mousePositionY, but we don't use them
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )		
 { 
   switch ( key ) 
   {
     case KEY_ESCAPE:        
       exit ( 0 );   
-      break;      
     case 119: //w
         eyePosArray[0] -= 1;
         break;
@@ -173,6 +183,7 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
       break;
   }
 }
+#pragma clang diagnostic pop
 
 int json_cpp_test(){
     string json_example = "{\"array\": \
