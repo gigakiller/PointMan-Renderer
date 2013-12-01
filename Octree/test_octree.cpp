@@ -41,6 +41,7 @@ void display()
     glm::vec3 center = eyePos + vdir;
 	gluLookAt( eyePos.x,eyePos.y,eyePos.z, center.x,center.y,center.z, 0,1,0);					  // Define a viewing transformation
 
+    /*
 	
 	glPushMatrix();										  // Push the current matrix stack
 		glColor3f(1,0,0);
@@ -73,6 +74,19 @@ void display()
 		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix 
 		glutSolidSphere  (1 , 32 , 32 ); 	
 	glPopMatrix();									      // Pop the current matrix stack
+
+    */
+
+    glPushMatrix();
+        glEnable(GL_POINT_SMOOTH);
+        glPointSize(10.0);
+        glBegin(GL_POINTS);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 1.0, 0.0);
+        glVertex3f(1.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, 1.0);
+        glEnd();
+    glPopMatrix();
 	
 	Rotation++;
 
@@ -132,6 +146,12 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
         break;
     case 100: //d
         eyePos.z -= 1;
+        break;
+    case 113: //a
+        eyePos.y += 1;
+        break;
+    case 101: //d
+        eyePos.y -= 1;
         break;
 
     default:      
