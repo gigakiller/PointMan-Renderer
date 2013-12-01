@@ -227,7 +227,7 @@ int json_cpp_test(){
 
 int main(int argc, char **argv) 
 {
-
+    json_cpp_test();
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
