@@ -30,18 +30,22 @@ typedef struct {
 } glutWindow;
 glutWindow win;
 float Rotation;
+glm::vec3 eyePos(8, 3, 0); 
+glm::vec3 vdir(-8,-3,0);
 
 void display() 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		     // Clear Screen and Depth Buffer
 	glLoadIdentity();
-	gluLookAt( 10,3,0, 0,0,0, 0,1,0);					  // Define a viewing transformation
+    vdir = glm::normalize(vdir);
+    glm::vec3 center = eyePos + vdir;
+	gluLookAt( eyePos.x,eyePos.y,eyePos.z, center.x,center.y,center.z, 0,1,0);					  // Define a viewing transformation
 
 	
 	glPushMatrix();										  // Push the current matrix stack
 		glColor3f(1,0,0);
 		glTranslatef(0,0,-2);							  // Multiply the current matrix by a translation matrix
-		glRotatef(Rotation,0,1,0);						  // Multiply the current matrix by a rotation matrix 
+		//glRotatef(Rotation,0,1,0);						  // Multiply the current matrix by a rotation matrix 
 		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix
 	    glutWireTeapot(1);								  // render a wire­frame teapot respectively. 
 	glPopMatrix();										  // Pop the current matrix stack
@@ -49,14 +53,14 @@ void display()
 	glPushMatrix();										  // Push the current matrix stack	
 		glColor3f(0,1,0);
 		glTranslatef(0,0,2);							  // Multiply the current matrix by a translation matrix
-		glRotatef(Rotation,0,1,0);
+		//glRotatef(Rotation,0,1,0);
 		glRotatef(90,0,1,0);
 	    glutSolidTeapot(1);
 	glPopMatrix();										  // Pop the current matrix stack
 
 	glPushMatrix();										  // Push the current matrix stack
 		glColor3f(0,0,1);
-		glRotatef(-Rotation,0,1,0);
+		//glRotatef(-Rotation,0,1,0);
 		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix 
 		glTranslatef(0,2,0);							  // Multiply the current matrix by a translation matrix
 		glutSolidCube  (1.3); 
@@ -65,7 +69,7 @@ void display()
 	glPushMatrix();									      // Push the current matrix stack
 		glColor3f(1,1,1);
 		glTranslatef(0,-2.5,0);							  // Multiply the current matrix by a translation matrix
-		glRotatef(-Rotation,1,1,0);					 	  // Multiply the current matrix by a rotation matrix 
+		//glRotatef(-Rotation,1,1,0);					 	  // Multiply the current matrix by a rotation matrix 
 		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix 
 		glutSolidSphere  (1 , 32 , 32 ); 	
 	glPopMatrix();									      // Pop the current matrix stack
@@ -117,6 +121,18 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
     case KEY_ESCAPE:        
       exit ( 0 );   
       break;      
+    case 119: //w
+        eyePos.x -= 1;
+        break;
+    case 115: //s
+        eyePos.x += 1;
+        break;
+    case 97: //a
+        eyePos.z += 1;
+        break;
+    case 100: //d
+        eyePos.z -= 1;
+        break;
 
     default:      
       break;
