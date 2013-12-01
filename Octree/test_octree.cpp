@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <GL/gl.h>		   // Open Graphics Library (OpenGL) header
 #include <GL/glut.h>	   // The GL Utility Toolkit (GLUT) Header
+#include <glm/glm.hpp>
 
 #define KEY_ESCAPE 27
 
@@ -124,6 +125,8 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 
 int main(int argc, char **argv) 
 {
+
+    glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
 	win.height = 480;
