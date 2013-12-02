@@ -5,14 +5,26 @@
 #include "Point.h"
 #include <vector>
 
+struct AABB
+{
+    glm::vec3 aabbLowCorner;  
+    glm::vec3 aabbHighCorner;  
+};
+
 class OctreeNode 
 {
 public:
-    OctreeNode();
+    OctreeNode(AABB boundingBox);
     ~OctreeNode();
+    bool getIsLeaf();
+    void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
     std::vector<Point> data; 
     OctreeNode** children; //octree has eight children
+private:
+    glm::vec3 nodePosition; //center of the AABB
+    AABB aabb;
+    bool isLeaf; 
 };
 
 class Octree

@@ -369,7 +369,7 @@ int main(int argc, char **argv)
     //json_pointcloud_test();
 
     //Load points as unstructured data
-    OctreeNode o;
+    //OctreeNode o;
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
     pts = parseJSONData( const_cast<char*>(file_loc) );
