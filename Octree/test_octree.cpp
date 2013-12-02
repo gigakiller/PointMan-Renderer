@@ -296,9 +296,10 @@ int main(int argc, char **argv)
 {
     //json_cpp_test();
     //json_pointcloud_test();
-    std::vector<glm::vec3>* pts = parseJSONPositions("../data/chappes_sml.json");
+    const char* file_loc = "../data/chappes_sml.json";
+    std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
 
-    for(int i = 0; i < pts->size(); i++){
+    for(unsigned long i = 0; i < pts->size(); i++){
         glm::vec3 currPt = pts->at(i);
         cout << currPt.x << " " << currPt.y << " " << currPt.z << endl;
     }
