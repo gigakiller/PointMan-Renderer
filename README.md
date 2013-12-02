@@ -20,4 +20,5 @@ Credits
 =================
 * Some base code from the [CIS565 WebGL assignment](https://github.com/CIS565-Fall-2013).
 * Trick for drawing circular points from [Movania Muhammad Mobeen](http://mmmovania.blogspot.com/2010/12/circular-point-sprites-in-opengl-33.html).
-
+* Octree based on notes from http://www.brandonpelfrey.com/blog/coding-a-simple-octree/
+* Server-side visualizer based on "OpenGL GLUT Shapes" sample from http://openglsamples.sourceforge.net/
