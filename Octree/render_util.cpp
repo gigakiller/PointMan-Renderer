@@ -2,6 +2,12 @@
 
 void drawOctree(OctreeNode* root){
     drawAABB(root->getAABB());
+    if( !root->getIsLeaf() ){ //if we have children
+        for(int i = 0; i < 8; i++){
+            OctreeNode* currChild = root->getChildAt(i);  
+            drawOctree(currChild);
+        }
+    }
 }
 
 void drawAABB( AABB toDraw ){

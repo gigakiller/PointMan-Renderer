@@ -1,4 +1,5 @@
 #include "Octree.h"
+#include <iostream>
 
 //OctreeNode: Nodes that make up the Octree
 OctreeNode::OctreeNode(AABB boundingBox){
@@ -23,6 +24,15 @@ OctreeNode::~OctreeNode(){
 
 bool OctreeNode::getIsLeaf(){
     return isLeaf;
+}
+
+//get child at index (from 0 to 7)
+OctreeNode* OctreeNode::getChildAt(int i){
+    if( i < 0 || i > 7){
+        std::cerr << "Accessing OctreeNode at invalid index: " << i << std::endl;
+        return NULL;
+    }
+    return children[i]; 
 }
 
 void OctreeNode::spawnChildren(){

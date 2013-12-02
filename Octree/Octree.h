@@ -16,12 +16,13 @@ public:
     //getters
     bool getIsLeaf();
     AABB getAABB();
+    OctreeNode* getChildAt(int i); //get child at index
 
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
     std::vector<Point> data; 
-    OctreeNode** children; //octree has eight children
 private:
+    OctreeNode** children; //octree has eight children
     glm::vec3 nodePosition; //center of the AABB
     AABB aabb;
     bool isLeaf; 

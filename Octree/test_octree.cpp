@@ -128,7 +128,8 @@ void display()
     glEnd();
     glPopMatrix();
 
-    drawAABB(testRoot->getAABB());
+    //drawAABB(testRoot->getAABB());
+    drawOctree(testRoot);
 	
 	Rotation++;
 
