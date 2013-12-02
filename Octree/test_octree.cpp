@@ -106,6 +106,7 @@ void display()
 
     */
 
+/*
     glPushMatrix();
         glEnable(GL_POINT_SMOOTH);
         glPointSize(10.0);
@@ -115,6 +116,19 @@ void display()
         glVertex3f(1.0, 0.0, 0.0);
         glVertex3f(0.0, 0.0, 1.0);
         glEnd();
+    glPopMatrix();
+*/
+
+    //draw each point that we've loaded
+    glPushMatrix();
+    glEnable(GL_POINT_SMOOTH);
+    glPointSize(10.0);
+    glBegin(GL_POINTS);
+    for(unsigned long i = 0; i < pts->size(); i++){
+        glm::vec3 currPos = (pts->at(i)).pos;
+        glVertex3f(currPos.x, currPos.y, currPos.z);
+    }
+    glEnd();
     glPopMatrix();
 	
 	Rotation++;
@@ -309,18 +323,12 @@ int main(int argc, char **argv)
 
     //test to see if we've loaded pts correctly
     //for(unsigned long i = 0; i < pts->size(); i++){
-        //glm::vec3 currPt = pts->at(i);
-        //cout << currPt.x << " " << currPt.y << " " << currPt.z << endl;
+        //Point currPt = pts->at(i);
+        //cout << "Position: " << currPt.pos.x << " " << currPt.pos.y << " " << currPt.pos.z << endl;
+        //cout << "Color: " << currPt.color.x << " " << currPt.color.y << " " << currPt.color.z << endl;
     //}
-
-    for(unsigned long i = 0; i < pts->size(); i++){
-        Point currPt = pts->at(i);
-        cout << "Position: " << currPt.pos.x << " " << currPt.pos.y << " " << currPt.pos.z << endl;
-        cout << "Color: " << currPt.color.x << " " << currPt.color.y << " " << currPt.color.z << endl;
-    }
-    Octree ot(pts);
+    //Octree ot(pts);
     
-    glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
 	win.height = 480;
