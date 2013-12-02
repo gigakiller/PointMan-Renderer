@@ -122,7 +122,7 @@ void display()
     //draw each point that we've loaded
     glPushMatrix();
     glEnable(GL_POINT_SMOOTH);
-    glPointSize(10.0);
+    glPointSize(2.0);
     glBegin(GL_POINTS);
     for(unsigned long i = 0; i < pts->size(); i++){
         glm::vec3 currPos = (pts->at(i)).pos;
