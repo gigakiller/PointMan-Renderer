@@ -24,6 +24,7 @@
 #include <vector>
 #include "data_util.h"
 #include "Point.h"
+#include "Octree.h"
 
 using namespace std;
 #define KEY_ESCAPE 27
@@ -299,6 +300,7 @@ int main(int argc, char **argv)
     //json_pointcloud_test();
 
     //Load points as unstructured data
+    OctreeNode o;
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
     vector<Point>* pts = parseJSONData( const_cast<char*>(file_loc) );
