@@ -6,6 +6,8 @@
 #include <vector>
 #include "data_util.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpadded"
 class OctreeNode 
 {
 public:
@@ -47,5 +49,6 @@ private:
     OctreeNode* buildOctree(std::vector<Point>* points);
     OctreeNode* root;
 };
+#pragma clang diagnostic pop
 
 #endif
