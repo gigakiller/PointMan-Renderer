@@ -76,6 +76,10 @@ void OctreeNode::spawnChildren(){
     children[7] = new OctreeNode(currChildBB); 
 }
 
+AABB OctreeNode::getAABB(){
+    return aabb;
+}
+
 //************************************************
 //Octree: makes up the octree itself
 

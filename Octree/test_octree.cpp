@@ -30,8 +30,8 @@
 using namespace std;
 #define KEY_ESCAPE 27
 
-glm::vec3 currlowCorner;
-glm::vec3 currhighCorner;
+//root for testing purposes
+OctreeNode* testRoot;
 
 //forward declarations:
 void display();
@@ -182,7 +182,7 @@ void display()
     glEnd();
     glPopMatrix();
 
-    drawAABB(currlowCorner, currhighCorner);
+    drawAABB(testRoot->getAABB().lowCorner, testRoot->getAABB().highCorner);
 	
 	Rotation++;
 
@@ -369,17 +369,16 @@ int main(int argc, char **argv)
     //json_pointcloud_test();
 
     //Load points as unstructured data
-    //OctreeNode o;
     const char* file_loc = "../data/chappes_sml.json";
-    //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
+
     pts = parseJSONData( const_cast<char*>(file_loc) );
     AABB currAABB = calcAABB(pts);
-    currlowCorner = currAABB.lowCorner;
-    currhighCorner = currAABB.highCorner;
+    testRoot = new OctreeNode(currAABB); 
+     
     
     cout << "Now testing AABB... there will be cake!" << endl;
-    cout << "Low corner: " << glm::to_string(currlowCorner) << endl;
-    cout << "High corner: " << glm::to_string(currhighCorner) << endl;
+    cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
+    cout << "High corner: " << glm::to_string(testRoot->getAABB().highCorner) << endl;
  
 	// set window values
 	win.width = 640;

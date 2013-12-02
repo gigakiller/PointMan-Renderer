@@ -11,7 +11,10 @@ class OctreeNode
 public:
     OctreeNode(AABB boundingBox);
     ~OctreeNode();
+    //getters
     bool getIsLeaf();
+    AABB getAABB();
+
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
     std::vector<Point> data; 
