@@ -68,12 +68,12 @@ float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner ){
     glm::vec3 aabbSize = highCorner - lowCorner; 
     //identify all 8 corners of the AABB (we already know lowCorner and highCorner)
-    glm::vec3 plusX = lowCorner + aabbSize.x;
-    glm::vec3 plusY = lowCorner + aabbSize.y;
-    glm::vec3 plusZ = lowCorner + aabbSize.z;
-    glm::vec3 plusXY = lowCorner + aabbSize.x + aabbSize.y;
-    glm::vec3 plusXZ = lowCorner + aabbSize.x + aabbSize.z;
-    glm::vec3 plusYZ = lowCorner + aabbSize.y + aabbSize.z;
+    glm::vec3 plusX = lowCorner + glm::vec3(aabbSize.x, 0.0, 0.0);
+    glm::vec3 plusY = lowCorner + glm::vec3(0, aabbSize.y, 0);
+    glm::vec3 plusZ = lowCorner + glm::vec3(0, 0, aabbSize.z);
+    glm::vec3 plusXY = lowCorner + glm::vec3(aabbSize.x, 0, 0) + glm::vec3(0, aabbSize.y, 0);
+    glm::vec3 plusXZ = lowCorner + glm::vec3(aabbSize.x, 0, 0) + glm::vec3(0, 0, aabbSize.z);
+    glm::vec3 plusYZ = lowCorner + glm::vec3(0, aabbSize.y, 0) + glm::vec3(0, 0, aabbSize.z);
     glPushMatrix();
     glBegin(GL_LINES);
     glColor3f(1.0f, 0.0f, 0.0f);
