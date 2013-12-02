@@ -16,6 +16,7 @@
 #include <GL/gl.h>		   // Open Graphics Library (OpenGL) header
 #include <GL/glut.h>	   // The GL Utility Toolkit (GLUT) Header
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <cstdio>
 #include <cstring>
 #include <jsoncpp/json/json.h>
@@ -105,19 +106,6 @@ void display()
 	glPopMatrix();									      // Pop the current matrix stack
 
     */
-
-/*
-    glPushMatrix();
-        glEnable(GL_POINT_SMOOTH);
-        glPointSize(10.0);
-        glBegin(GL_POINTS);
-        glVertex3f(0.0, 0.0, 0.0);
-        glVertex3f(0.0, 1.0, 0.0);
-        glVertex3f(1.0, 0.0, 0.0);
-        glVertex3f(0.0, 0.0, 1.0);
-        glEnd();
-    glPopMatrix();
-*/
 
     //draw each point that we've loaded
     glDisable(GL_LIGHTING); //needed for color to work
@@ -324,15 +312,13 @@ int main(int argc, char **argv)
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
     pts = parseJSONData( const_cast<char*>(file_loc) );
-
-    //test to see if we've loaded pts correctly
-    //for(unsigned long i = 0; i < pts->size(); i++){
-        //Point currPt = pts->at(i);
-        //cout << "Position: " << currPt.pos.x << " " << currPt.pos.y << " " << currPt.pos.z << endl;
-        //cout << "Color: " << currPt.color.x << " " << currPt.color.y << " " << currPt.color.z << endl;
-    //}
-    //Octree ot(pts);
-    
+    glm::vec3 lowCorner;
+    glm::vec3 highCorner;
+    calcAABB(pts, lowCorner, highCorner);
+    cout << "Now testing AABB... there will be cake!" << endl;
+    cout << "Low corner: " << glm::to_string(lowCorner) << endl;
+    cout << "High corner: " << glm::to_string(highCorner) << endl;
+ 
 	// set window values
 	win.width = 640;
 	win.height = 480;
