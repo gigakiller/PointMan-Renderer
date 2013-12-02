@@ -120,6 +120,7 @@ void display()
 */
 
     //draw each point that we've loaded
+    glDisable(GL_LIGHTING); //needed for color to work
     glPushMatrix();
     glEnable(GL_POINT_SMOOTH);
     glPointSize(2.0);
@@ -127,6 +128,9 @@ void display()
     for(unsigned long i = 0; i < pts->size(); i++){
         glm::vec3 currPos = (pts->at(i)).pos;
         glVertex3f(currPos.x, currPos.y, currPos.z);
+        glm::vec3 currColor = (pts->at(i)).color;
+        currColor = (1.0f/255.0f) * currColor; //normalize to range between 0 and 1
+        glColor3f(currColor.x, currColor.y, currColor.z);
     }
     glEnd();
     glPopMatrix();
