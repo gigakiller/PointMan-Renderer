@@ -21,6 +21,10 @@ public:
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
     std::vector<Point> data; 
+    
+    //does this node have points inside, or is it just empty points? I.e. do its children have 
+    //children?
+    bool containsPoints;
 private:
     OctreeNode** children; //octree has eight children
     glm::vec3 nodePosition; //center of the AABB

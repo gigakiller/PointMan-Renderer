@@ -12,6 +12,7 @@ OctreeNode::OctreeNode(AABB boundingBox){
     glm::vec3 aabbDiagonal = aabb.highCorner - aabb.lowCorner;
     //the position of each node is the center of its aabb.
     nodePosition = aabb.lowCorner + 0.5f*aabbDiagonal; 
+    containsPoints = false;
 }
 
 OctreeNode::~OctreeNode(){
