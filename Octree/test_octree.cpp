@@ -30,11 +30,15 @@
 using namespace std;
 #define KEY_ESCAPE 27
 
+glm::vec3 currlowCorner;
+glm::vec3 currhighCorner;
+
 //forward declarations:
 void display();
 void initialize();
 //void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
+void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner );
 int json_pointcloud_test();
 int json_cpp_test();
 
@@ -60,6 +64,61 @@ float Rotation;
 //glm::vec3 vdir(-8,-3,0);
 float eyePosArray[] = {8.0f, 3.0f, 0.0f};
 float vdirArray[] = {-8.0f, -3.0f, 0.0f};
+
+void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner ){
+    glm::vec3 aabbSize = highCorner - lowCorner; 
+    //identify all 8 corners of the AABB (we already know lowCorner and highCorner)
+    glm::vec3 plusX = lowCorner + aabbSize.x;
+    glm::vec3 plusY = lowCorner + aabbSize.y;
+    glm::vec3 plusZ = lowCorner + aabbSize.z;
+    glm::vec3 plusXY = lowCorner + aabbSize.x + aabbSize.y;
+    glm::vec3 plusXZ = lowCorner + aabbSize.x + aabbSize.z;
+    glm::vec3 plusYZ = lowCorner + aabbSize.y + aabbSize.z;
+    glPushMatrix();
+    glBegin(GL_LINES);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    
+    //draw tweleve edges, equal to 24 calls to glVertex3f
+    //edge 1
+    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
+    glVertex3f(plusX.x, plusX.y, plusX.z);
+    //edge 2
+    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
+    glVertex3f(plusY.x, plusY.y, plusY.z);
+    //edge 3
+    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
+    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
+    //edge 4
+    glVertex3f(plusY.x, plusY.y, plusY.z);
+    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
+    //edge 5
+    glVertex3f(plusY.x, plusY.y, plusY.z);
+    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
+    //edge 6
+    glVertex3f(plusX.x, plusX.y, plusX.z);
+    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
+    //egde 7
+    glVertex3f(plusX.x, plusX.y, plusX.z);
+    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
+    //edge 8 
+    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
+    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
+    //edge 9 
+    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
+    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
+    //edge 10
+    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
+    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
+    //edge 11
+    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
+    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
+    //edge 12
+    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
+    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
+
+    glEnd();
+    glPopMatrix();
+}
 
 void display() 
 {
@@ -122,6 +181,8 @@ void display()
     }
     glEnd();
     glPopMatrix();
+
+    drawAABB(currlowCorner, currhighCorner);
 	
 	Rotation++;
 
@@ -312,12 +373,10 @@ int main(int argc, char **argv)
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
     pts = parseJSONData( const_cast<char*>(file_loc) );
-    glm::vec3 lowCorner;
-    glm::vec3 highCorner;
-    calcAABB(pts, lowCorner, highCorner);
+    calcAABB(pts, currlowCorner, currhighCorner);
     cout << "Now testing AABB... there will be cake!" << endl;
-    cout << "Low corner: " << glm::to_string(lowCorner) << endl;
-    cout << "High corner: " << glm::to_string(highCorner) << endl;
+    cout << "Low corner: " << glm::to_string(currlowCorner) << endl;
+    cout << "High corner: " << glm::to_string(currhighCorner) << endl;
  
 	// set window values
 	win.width = 640;
