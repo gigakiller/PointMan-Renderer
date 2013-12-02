@@ -373,7 +373,10 @@ int main(int argc, char **argv)
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
     pts = parseJSONData( const_cast<char*>(file_loc) );
-    calcAABB(pts, currlowCorner, currhighCorner);
+    AABB currAABB = calcAABB(pts);
+    currlowCorner = currAABB.lowCorner;
+    currhighCorner = currAABB.highCorner;
+    
     cout << "Now testing AABB... there will be cake!" << endl;
     cout << "Low corner: " << glm::to_string(currlowCorner) << endl;
     cout << "High corner: " << glm::to_string(currhighCorner) << endl;

@@ -103,10 +103,10 @@ std::vector<Point>* parseJSONData(char* filename){
     return toReturn;
 }
 
-void calcAABB(const std::vector<Point>* pts, glm::vec3& lowCorner, glm::vec3& highCorner){ 
+AABB calcAABB(const std::vector<Point>* pts){
     float inf = std::numeric_limits<int>::infinity();
-    highCorner = glm::vec3(-inf, -inf, -inf); //corner with the highest x, y, z coords
-    lowCorner =  glm::vec3(inf, inf, inf); //corner with lowest x, y, z coords
+    glm::vec3 highCorner = glm::vec3(-inf, -inf, -inf); //corner with the highest x, y, z coords
+    glm::vec3 lowCorner =  glm::vec3(inf, inf, inf); //corner with lowest x, y, z coords
     for(unsigned long i = 0; i < pts->size(); i++){
         glm::vec3 currPos = (pts->at(i)).pos;
         if(currPos.x > highCorner.x)
@@ -122,4 +122,8 @@ void calcAABB(const std::vector<Point>* pts, glm::vec3& lowCorner, glm::vec3& hi
         if(currPos.z < lowCorner.z)
             lowCorner.z = currPos.z;
     } 
+    AABB toReturn;
+    toReturn.lowCorner = lowCorner;
+    toReturn.highCorner = highCorner;
+    return toReturn;
 }

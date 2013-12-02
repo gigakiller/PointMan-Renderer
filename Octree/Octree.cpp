@@ -8,6 +8,9 @@ OctreeNode::OctreeNode(AABB boundingBox){
     } 
     aabb = boundingBox; 
     isLeaf = true;
+    glm::vec3 aabbDiagonal = aabb.highCorner - aabb.lowCorner;
+    //the position of each node is the center of its aabb.
+    nodePosition = aabb.lowCorner + 0.5f*aabbDiagonal; 
 }
 
 OctreeNode::~OctreeNode(){
@@ -23,10 +26,16 @@ void OctreeNode::spawnChildren(){
     //...unless you are Adam or Eve
     isLeaf = false; 
 
+    //The AABB for each child is different. We are going to pass in 
+    //curChildBB as the "current child's" AABB. 
+    AABB currChildBB;
     //TODO: fill in the rest.
-    //Child 0 should be Octant 1
+    //Child 0 should be Octant 1 
+       
     //Child 1 should be Octant 2
+
     //Child 2 should be Octant 3
+
     //...
     //Child 7 should be Octant 8
     //Octants should be arranged spatially in the convention on the Wikipedia page:

@@ -4,12 +4,7 @@
 #include <glm/glm.hpp>
 #include "Point.h"
 #include <vector>
-
-struct AABB
-{
-    glm::vec3 aabbLowCorner;  
-    glm::vec3 aabbHighCorner;  
-};
+#include "data_util.h"
 
 class OctreeNode 
 {

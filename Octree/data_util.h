@@ -6,6 +6,12 @@
 #include <string>
 #include "Point.h"
 
+struct AABB
+{
+    glm::vec3 lowCorner;  
+    glm::vec3 highCorner;  
+};
+
 //gets positions from JSON file
 std::vector<glm::vec3>* parseJSONPositions(char* filename);
 
@@ -13,6 +19,6 @@ std::vector<glm::vec3>* parseJSONPositions(char* filename);
 std::vector<Point>* parseJSONData(char* filename); 
 
 //compute AABB of the point cloud
-void calcAABB(const std::vector<Point>*, glm::vec3& lowCorner, glm::vec3& highCorner); 
+AABB calcAABB(const std::vector<Point>* pts); 
 
 #endif
