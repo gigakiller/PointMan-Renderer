@@ -128,7 +128,9 @@ AABB calcAABB(const std::vector<Point>* pts){
     return toReturn;
 }
 
-void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner ){
+void drawAABB( AABB toDraw ){
+    glm::vec3 highCorner = toDraw.highCorner;
+    glm::vec3 lowCorner = toDraw.lowCorner;
     glm::vec3 aabbSize = highCorner - lowCorner; 
     //identify all 8 corners of the AABB (we already know lowCorner and highCorner)
     glm::vec3 plusX = lowCorner + glm::vec3(aabbSize.x, 0.0, 0.0);

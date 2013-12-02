@@ -23,6 +23,6 @@ std::vector<Point>* parseJSONData(char* filename);
 //compute AABB of the point cloud
 AABB calcAABB(const std::vector<Point>* pts); 
 
-void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner );
+void drawAABB( AABB toDraw );
 
 #endif

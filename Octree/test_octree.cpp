@@ -127,7 +127,7 @@ void display()
     glEnd();
     glPopMatrix();
 
-    drawAABB(testRoot->getAABB().lowCorner, testRoot->getAABB().highCorner);
+    drawAABB(testRoot->getAABB());
 	
 	Rotation++;
 
@@ -212,6 +212,7 @@ int main(int argc, char **argv)
     pts = parseJSONData( const_cast<char*>(file_loc) );
     AABB currAABB = calcAABB(pts);
     testRoot = new OctreeNode(currAABB); 
+    testRoot->spawnChildren();
     
     cout << "Now testing AABB... there will be cake!" << endl;
     cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
@@ -236,5 +237,6 @@ int main(int argc, char **argv)
 	initialize();
 	glutMainLoop();												// run GLUT mainloop
     delete pts;
+    delete testRoot;
 	return 0;
 }
