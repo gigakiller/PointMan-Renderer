@@ -23,6 +23,8 @@ private:
 };
 
 //Our convention for octrees is as follows:
+// + and - are RELATIVE to the parent node
+//
 //  Number  x   y   z
 //  *****************
 //  0       +   +   +
