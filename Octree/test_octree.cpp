@@ -37,6 +37,8 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
 int json_pointcloud_test();
 int json_cpp_test();
 
+vector<Point>* pts;
+
 //ignore the warning that we need to pad to align to 4 bytes
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpadded"
@@ -303,7 +305,7 @@ int main(int argc, char **argv)
     OctreeNode o;
     const char* file_loc = "../data/chappes_sml.json";
     //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
-    vector<Point>* pts = parseJSONData( const_cast<char*>(file_loc) );
+    pts = parseJSONData( const_cast<char*>(file_loc) );
 
     //test to see if we've loaded pts correctly
     //for(unsigned long i = 0; i < pts->size(); i++){
@@ -316,8 +318,8 @@ int main(int argc, char **argv)
         cout << "Position: " << currPt.pos.x << " " << currPt.pos.y << " " << currPt.pos.z << endl;
         cout << "Color: " << currPt.color.x << " " << currPt.color.y << " " << currPt.color.z << endl;
     }
+    Octree ot(pts);
     
-    delete pts;
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
@@ -337,5 +339,6 @@ int main(int argc, char **argv)
     glutKeyboardFunc( keyboard );								// register Keyboard Handler
 	initialize();
 	glutMainLoop();												// run GLUT mainloop
+    delete pts;
 	return 0;
 }

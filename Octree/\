@@ -19,7 +19,3 @@ Octree::~Octree(){
     if(root)
         delete root;
 }
-
-OctreeNode* Octree::buildOctree(std::vector<Point>* points){
-    return NULL;
-}
