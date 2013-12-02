@@ -21,6 +21,8 @@
 #include <jsoncpp/json/json.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include "data_util.h"
 
 using namespace std;
 #define KEY_ESCAPE 27
@@ -287,13 +289,19 @@ int json_pointcloud_test(){
       
     curr_file.close();
      
-     return 0;
+    return 0;
 } 
 
 int main(int argc, char **argv) 
 {
     //json_cpp_test();
-    json_pointcloud_test();
+    //json_pointcloud_test();
+    std::vector<glm::vec3>* pts = parseJSONPositions("../data/chappes_sml.json");
+
+    for(int i = 0; i < pts->size(); i++){
+        glm::vec3 currPt = pts->at(i);
+        cout << currPt.x << " " << currPt.y << " " << currPt.z << endl;
+    }
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
@@ -302,7 +310,6 @@ int main(int argc, char **argv)
 	win.field_of_view_angle = 45;
 	win.z_near = 1.0f;
 	win.z_far = 500.0f;
-
 
 	// initialize and run program
 	glutInit(&argc, argv);                                      // GLUT initialization
