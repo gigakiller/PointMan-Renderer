@@ -23,6 +23,7 @@
 #include <fstream>
 #include <vector>
 #include "data_util.h"
+#include "Point.h"
 
 using namespace std;
 #define KEY_ESCAPE 27
@@ -296,13 +297,25 @@ int main(int argc, char **argv)
 {
     //json_cpp_test();
     //json_pointcloud_test();
+
+    //Load points as unstructured data
     const char* file_loc = "../data/chappes_sml.json";
-    std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
+    //std::vector<glm::vec3>* pts = parseJSONPositions( const_cast<char*>(file_loc) );
+    vector<Point>* pts = parseJSONData( const_cast<char*>(file_loc) );
+
+    //test to see if we've loaded pts correctly
+    //for(unsigned long i = 0; i < pts->size(); i++){
+        //glm::vec3 currPt = pts->at(i);
+        //cout << currPt.x << " " << currPt.y << " " << currPt.z << endl;
+    //}
 
     for(unsigned long i = 0; i < pts->size(); i++){
-        glm::vec3 currPt = pts->at(i);
-        cout << currPt.x << " " << currPt.y << " " << currPt.z << endl;
+        Point currPt = pts->at(i);
+        cout << "Position: " << currPt.pos.x << " " << currPt.pos.y << " " << currPt.pos.z << endl;
+        cout << "Color: " << currPt.color.x << " " << currPt.color.y << " " << currPt.color.z << endl;
     }
+    
+    delete pts;
     glm::vec3 testVec(0.0, 1.0, 2.0);
 	// set window values
 	win.width = 640;
