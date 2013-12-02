@@ -26,6 +26,7 @@
 #include "data_util.h"
 #include "Point.h"
 #include "Octree.h"
+#include "render_util.h"
 
 using namespace std;
 #define KEY_ESCAPE 27

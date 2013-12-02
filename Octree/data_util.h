@@ -23,6 +23,4 @@ std::vector<Point>* parseJSONData(char* filename);
 //compute AABB of the point cloud
 AABB calcAABB(const std::vector<Point>* pts); 
 
-void drawAABB( AABB toDraw );
-
 #endif
