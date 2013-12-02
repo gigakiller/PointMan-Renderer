@@ -4,6 +4,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <string>
+#include <GL/gl.h>		   // Open Graphics Library (OpenGL) header
+#include <GL/glut.h>	   // The GL Utility Toolkit (GLUT) Header
 #include "Point.h"
 
 struct AABB
@@ -20,5 +22,7 @@ std::vector<Point>* parseJSONData(char* filename);
 
 //compute AABB of the point cloud
 AABB calcAABB(const std::vector<Point>* pts); 
+
+void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner );
 
 #endif

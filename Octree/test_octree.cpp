@@ -38,7 +38,6 @@ void display();
 void initialize();
 //void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
-void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner );
 int json_pointcloud_test();
 int json_cpp_test();
 
@@ -65,60 +64,6 @@ float Rotation;
 float eyePosArray[] = {8.0f, 3.0f, 0.0f};
 float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 
-void drawAABB( glm::vec3 lowCorner, glm::vec3 highCorner ){
-    glm::vec3 aabbSize = highCorner - lowCorner; 
-    //identify all 8 corners of the AABB (we already know lowCorner and highCorner)
-    glm::vec3 plusX = lowCorner + glm::vec3(aabbSize.x, 0.0, 0.0);
-    glm::vec3 plusY = lowCorner + glm::vec3(0, aabbSize.y, 0);
-    glm::vec3 plusZ = lowCorner + glm::vec3(0, 0, aabbSize.z);
-    glm::vec3 plusXY = lowCorner + glm::vec3(aabbSize.x, 0, 0) + glm::vec3(0, aabbSize.y, 0);
-    glm::vec3 plusXZ = lowCorner + glm::vec3(aabbSize.x, 0, 0) + glm::vec3(0, 0, aabbSize.z);
-    glm::vec3 plusYZ = lowCorner + glm::vec3(0, aabbSize.y, 0) + glm::vec3(0, 0, aabbSize.z);
-    glPushMatrix();
-    glBegin(GL_LINES);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    
-    //draw tweleve edges, equal to 24 calls to glVertex3f
-    //edge 1
-    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
-    glVertex3f(plusX.x, plusX.y, plusX.z);
-    //edge 2
-    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
-    glVertex3f(plusY.x, plusY.y, plusY.z);
-    //edge 3
-    glVertex3f(lowCorner.x, lowCorner.y, lowCorner.z);
-    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
-    //edge 4
-    glVertex3f(plusY.x, plusY.y, plusY.z);
-    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
-    //edge 5
-    glVertex3f(plusY.x, plusY.y, plusY.z);
-    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
-    //edge 6
-    glVertex3f(plusX.x, plusX.y, plusX.z);
-    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
-    //egde 7
-    glVertex3f(plusX.x, plusX.y, plusX.z);
-    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
-    //edge 8 
-    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
-    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
-    //edge 9 
-    glVertex3f(plusZ.x, plusZ.y, plusZ.z);
-    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
-    //edge 10
-    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
-    glVertex3f(plusYZ.x, plusYZ.y, plusYZ.z);
-    //edge 11
-    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
-    glVertex3f(plusXZ.x, plusXZ.y, plusXZ.z);
-    //edge 12
-    glVertex3f(highCorner.x, highCorner.y, highCorner.z);
-    glVertex3f(plusXY.x, plusXY.y, plusXY.z);
-
-    glEnd();
-    glPopMatrix();
-}
 
 void display() 
 {
@@ -258,115 +203,8 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 }
 #pragma clang diagnostic pop
 
-int json_cpp_test(){
-    string json_example = "{\"array\": \
-                                [\"item1\", \
-                                \"item2\"], \
-                                \"not an array\": \
-                                \"asdf\" \
-                             }";
-
-     // Let's parse it  
-     Json::Value root;
-     Json::Reader reader;
-     bool parsedSuccess = reader.parse(json_example, 
-                                       root, 
-                                       false);
-      
-     if(not parsedSuccess)
-     {
-       // Report failures and their locations 
-       // in the document.
-       cout<<"Failed to parse JSON"<<endl 
-           <<reader.getFormatedErrorMessages()
-           <<endl;
-       return 1;
-     }
-      
-     // Let's extract the array contained 
-     // in the root object
-     const Json::Value array = root["array"];
-     
-     // Iterate over sequence elements and 
-     // print its values
-     for(unsigned int index=0; index<array.size(); 
-         ++index)  
-     {  
-       cout<<"Element " 
-           <<index 
-           <<" in array: "
-           <<array[index].asString()
-           <<endl;
-     }
-      
-     // Lets extract the not array element 
-     // contained in the root object and 
-     // print its value
-     const Json::Value notAnArray = 
-                   root["not an array"];
-     
-     if(not notAnArray.isNull())
-     {
-       cout<<"Not an array: "
-           <<notAnArray.asString()
-           <<endl;
-     }
-     
-     // If we want to print JSON is as easy as doing:
-     cout<<"Json Example pretty print: "
-         <<endl<<root.toStyledString()
-         <<endl;
-     
-     return 0;
-}
-
-int json_pointcloud_test(){
-
-    //open our file
-    ifstream curr_file("../data/chappes_sml.json"); 
-
-     // Let's parse it  
-     Json::Value root;
-     Json::Reader reader;
-     bool parsedSuccess = reader.parse(curr_file, 
-                                       root, 
-                                       false);
-      
-     if(not parsedSuccess)
-     {
-       // Report failures and their locations 
-       // in the document.
-       cout<<"Failed to parse JSON"<<endl 
-           <<reader.getFormatedErrorMessages()
-           <<endl;
-       return 1;
-     }
-      
-     // Let's extract the array contained 
-     // in the root object
-     const Json::Value array = root["positions"];
-     
-     // Iterate over sequence elements and 
-     // print its values
-     for(unsigned int index=0; index<array.size(); 
-         ++index)  
-     {  
-       cout<<"Element " 
-           <<index 
-           <<" in array: "
-           <<array[index][0]
-           <<endl;
-     }
-      
-    curr_file.close();
-     
-    return 0;
-} 
-
 int main(int argc, char **argv) 
 {
-    //json_cpp_test();
-    //json_pointcloud_test();
 
     //Load points as unstructured data
     const char* file_loc = "../data/chappes_sml.json";
@@ -374,7 +212,6 @@ int main(int argc, char **argv)
     pts = parseJSONData( const_cast<char*>(file_loc) );
     AABB currAABB = calcAABB(pts);
     testRoot = new OctreeNode(currAABB); 
-     
     
     cout << "Now testing AABB... there will be cake!" << endl;
     cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
