@@ -27,3 +27,6 @@ data/
 
 #executable file
 test_octree
+
+#ctags output
+tags

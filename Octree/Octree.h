@@ -22,6 +22,17 @@ private:
     bool isLeaf; 
 };
 
+//Our convention for octrees is as follows:
+//  Number  x   y   z
+//  *****************
+//  0       +   +   +
+//  1       -   +   +
+//  2       -   -   +
+//  3       +   -   +
+//  4       +   +   -
+//  5       -   +   -
+//  6       -   -   -
+//  7       +   -   -
 class Octree
 {
 public:

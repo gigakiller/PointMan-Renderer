@@ -29,17 +29,7 @@ void OctreeNode::spawnChildren(){
     //The AABB for each child is different. We are going to pass in 
     //curChildBB as the "current child's" AABB. 
     AABB currChildBB;
-    //TODO: fill in the rest.
-    //Child 0 should be Octant 1 
-       
-    //Child 1 should be Octant 2
-
-    //Child 2 should be Octant 3
-
-    //...
-    //Child 7 should be Octant 8
-    //Octants should be arranged spatially in the convention on the Wikipedia page:
-    //http://en.wikipedia.org/wiki/Octant_(solid_geometry)
+    //octants number 0 to 7, according to convention documented in Octree.h 
 }
 
 //************************************************
