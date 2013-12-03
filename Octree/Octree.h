@@ -58,6 +58,7 @@ class Octree
 {
 public:
     Octree(std::vector<Point>* points); //build octree based on unstructured data
+    void insertPoint( Point p );
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);

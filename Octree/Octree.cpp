@@ -150,8 +150,18 @@ Octree::~Octree(){
         delete root;
 }
 
+void Octree::insertPoint(Point p){
+    root->insertRecursive(p);
+}
+
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){
-    return NULL;
+   
+    AABB rootAABB = calcAABB(points); 
+    OctreeNode* currRoot = new OctreeNode(rootAABB);
+    for(unsigned long i = 0; i < points->size(); i++){
+        currRoot->insertRecursive(points->at(i)); 
+    }
+    return currRoot;
 }
 
 
