@@ -1,6 +1,7 @@
 #include "Octree.h"
 #include <iostream>
 #include <assert.h>
+#include <glm/ext.hpp>
 
 //OctreeNode: Nodes that make up the Octree
 OctreeNode::OctreeNode(AABB boundingBox) : aabb(boundingBox) {
@@ -98,7 +99,12 @@ OctreeNode* OctreeNode::addChild( glm::vec3 position ){
     //find out which octant the child is in
     int octNum;
     AABB childAABB;
-    assert( !aabb.getOctant(position, &octNum, &childAABB) );
+    if( !aabb.getOctant(position, &octNum, &childAABB) ){
+        std::cout << "Low corner: " << glm::to_string(aabb.lowCorner) << std::endl;
+        std::cout << "High corner: " << glm::to_string(aabb.highCorner) << std::endl;
+        std::cout << "Position: " << glm::to_string(position) << std::endl;
+        assert(true);
+    }
     //insert it into the correct child
     if( children[octNum] != NULL ){
         return children[octNum];

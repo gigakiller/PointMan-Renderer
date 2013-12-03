@@ -212,9 +212,10 @@ int main(int argc, char **argv)
     const char* file_loc = "../data/chappes_sml.json";
 
     pts = parseJSONData( const_cast<char*>(file_loc) );
-    AABB currAABB = calcAABB(pts);
-    testRoot = new OctreeNode(currAABB); 
-    testRoot->spawnChildren();
+    //AABB currAABB = calcAABB(pts);
+    //testRoot = new OctreeNode(currAABB); 
+    //testRoot->spawnChildren();
+    Octree* myOctree = new Octree(pts);
     
     cout << "Now testing AABB... there will be cake!" << endl;
     cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
