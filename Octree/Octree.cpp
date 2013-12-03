@@ -165,6 +165,7 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     AABB rootAABB = calcAABB(points); 
     OctreeNode* currRoot = new OctreeNode(rootAABB);
     for(unsigned long i = 0; i < points->size(); i++){
+        std::cout << "Inserting node #" << i << std::endl;
         currRoot->insertRecursive(points->at(i)); 
     }
     return currRoot;
