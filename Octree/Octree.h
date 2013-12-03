@@ -21,10 +21,19 @@ public:
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
     std::vector<Point> data; 
-    
-    //does this node have points inside, or is it just empty points? I.e. do its children have 
-    //children?
+     
+    //true means that there is data in this node, or in its descendants 
+    //false means this node just contains empty space
     bool containsPoints;
+
+    //Insert data into this node, following octree rules. We may have to create children
+    //and recurse. See http://www.brandonpelfrey.com/blog/coding-a-simple-octree/
+    void insertRecursive( Point data );
+
+    //add a child to the correct octant based on the position, then return the child
+    //IF there is already a child at that octant, DO NOT create a new child, return
+    //the child that is already there
+    OctreeNode* addChild( glm::vec3 position );
 private:
     OctreeNode** children; //octree has eight children
     glm::vec3 nodePosition; //center of the AABB

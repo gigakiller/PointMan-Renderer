@@ -122,8 +122,6 @@ AABB calcAABB(const std::vector<Point>* pts){
         if(currPos.z < lowCorner.z)
             lowCorner.z = currPos.z;
     } 
-    AABB toReturn;
-    toReturn.lowCorner = lowCorner;
-    toReturn.highCorner = highCorner;
+    AABB toReturn(highCorner, lowCorner);
     return toReturn;
 }

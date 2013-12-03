@@ -7,12 +7,8 @@
 #include <GL/gl.h>		   // Open Graphics Library (OpenGL) header
 #include <GL/glut.h>	   // The GL Utility Toolkit (GLUT) Header
 #include "Point.h"
+#include "AABB.h"
 
-struct AABB
-{
-    glm::vec3 lowCorner;  
-    glm::vec3 highCorner;  
-};
 
 //gets positions from JSON file
 std::vector<glm::vec3>* parseJSONPositions(char* filename);

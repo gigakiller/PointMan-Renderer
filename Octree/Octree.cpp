@@ -1,13 +1,13 @@
 #include "Octree.h"
 #include <iostream>
+#include <assert.h>
 
 //OctreeNode: Nodes that make up the Octree
-OctreeNode::OctreeNode(AABB boundingBox){
+OctreeNode::OctreeNode(AABB boundingBox) : aabb(boundingBox) {
     children = new OctreeNode*[8];
     for( int i = 0; i < 8; i++){
         children[i] = NULL;
     } 
-    aabb = boundingBox; 
     isLeaf = true;
     glm::vec3 aabbDiagonal = aabb.highCorner - aabb.lowCorner;
     //the position of each node is the center of its aabb.
@@ -47,7 +47,7 @@ void OctreeNode::spawnChildren(){
     //The AABB for each child is different. We are going to pass in 
     //curChildBB as the "current child's" AABB. 
     //Since we are passing-by-copy, this works and is cleaner than explicitly declaring 8 AABBs
-    AABB currChildBB;
+    AABB currChildBB( glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f) );
     //octants number 0 to 7, according to convention documented in Octree.h 
     // + and - are RELATIVE to the parent node
 
@@ -91,6 +91,53 @@ AABB OctreeNode::getAABB(){
     return aabb;
 }
 
+//add a child to the correct octant based on the position, then return the child
+//IF there is already a child at that octant, DO NOT create a new child, return
+//the child that is already there
+OctreeNode* OctreeNode::addChild( glm::vec3 position ){
+    //find out which octant the child is in
+    int octNum;
+    AABB childAABB;
+    assert( !aabb.getOctant(position, &octNum, &childAABB) );
+    //insert it into the correct child
+    if( children[octNum] != NULL ){
+        return children[octNum];
+    } else {
+        children[octNum] = new OctreeNode(childAABB);
+        return children[octNum];
+    }
+}
+
+//based on http://www.brandonpelfrey.com/blog/coding-a-simple-octree/
+void OctreeNode::insertRecursive( Point newData ){
+    if( isLeaf && data.size() == 0 ){ //if the node is a leaf, and it has no data 
+        data.push_back(newData); 
+    } else if( isLeaf && data.size() > 0 ){ //if it is a leaf, and it has data
+        //we only store one point in a leaf
+        //take the current point already in the node, and the new point, figure out which
+        //octant they are in, and then insert 
+
+        //BOLD ASSUMPTION: we only have one data so far! 
+        Point oldData = data[0];
+        data.pop_back(); //pop the old data
+        
+        //create children based on where both the old data and the new data are.
+        OctreeNode* childOldData = addChild( oldData.pos );
+        OctreeNode* childNewData = addChild( newData.pos );
+
+        //re-insert the old point and the new point into the new children
+        //this may occur several times during insert if points are close to each other
+        childOldData->insertRecursive(oldData);
+        childNewData->insertRecursive(newData);
+    } else if ( !isLeaf ){ //not a leaf. insert child, recurse on that child.
+        OctreeNode* newChild = addChild( newData.pos );
+        newChild->insertRecursive( newData );
+    } else {
+        assert(true);
+        std::cerr << "Insert hit invalid case!" << std::endl;
+    }
+}
+
 //************************************************
 //Octree: makes up the octree itself
 
@@ -106,3 +153,5 @@ Octree::~Octree(){
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     return NULL;
 }
+
+
