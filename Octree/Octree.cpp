@@ -96,6 +96,7 @@ AABB OctreeNode::getAABB(){
 //IF there is already a child at that octant, DO NOT create a new child, return
 //the child that is already there
 OctreeNode* OctreeNode::addChild( glm::vec3 position ){
+    isLeaf = false;
     //find out which octant the child is in
     int octNum;
     AABB childAABB;
@@ -166,9 +167,10 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     OctreeNode* currRoot = new OctreeNode(rootAABB);
     for(unsigned long i = 0; i < points->size(); i++){
         std::cout << "Inserting node #" << i << std::endl;
+        if( i == 201 ){
+            int leet = 1337;
+        }
         currRoot->insertRecursive(points->at(i)); 
     }
     return currRoot;
 }
-
-
