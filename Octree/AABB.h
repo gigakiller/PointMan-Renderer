@@ -1,6 +1,8 @@
 #ifndef AABB_H
 #define AABB_H
 #include <glm/glm.hpp>
+#define AABB_EPSILON 0.0001f
+
 class AABB
 {
 public:

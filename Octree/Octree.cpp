@@ -167,7 +167,7 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     OctreeNode* currRoot = new OctreeNode(rootAABB);
     for(unsigned long i = 0; i < points->size(); i++){
         std::cout << "Inserting node #" << i << std::endl;
-        if( i == 201 ){
+        if( i == 199 ){
             int leet = 1337;
         }
         currRoot->insertRecursive(points->at(i)); 

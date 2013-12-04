@@ -83,13 +83,12 @@ bool AABB::getOctant(const glm::vec3 pos, int* outOctNum, AABB* outAABB){
         *outAABB = AABB(highCorner - halfY - halfZ, centroid - halfY - halfZ); 
     } else {
         assert(true);        
-        std::cerr << "Octant not found!" << std::endl;        
+        std::cout << "Octant not found!" << std::endl;        
     }
 
     return true;
 }
 
 bool AABB::isInside(const glm::vec3 pos){
-    return ( pos.x >= lowCorner.x && pos.y >= lowCorner.y && pos.z >= lowCorner.z && 
-        pos.x <= highCorner.x && pos.y <= highCorner.y && pos.z <= highCorner.z );
+    return ( pos.x >= lowCorner.x - AABB_EPSILON && pos.y >= lowCorner.y - AABB_EPSILON && pos.z >= lowCorner.z - AABB_EPSILON && pos.x <= highCorner.x + AABB_EPSILON && pos.y <= highCorner.y + AABB_EPSILON && pos.z <= highCorner.z + AABB_EPSILON );
 }
