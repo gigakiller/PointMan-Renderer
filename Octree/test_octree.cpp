@@ -129,7 +129,7 @@ void display()
     glPopMatrix();
 
     //drawAABB(testRoot->getAABB());
-    drawOctree(testRoot);
+    //drawOctree(testRoot);
 	
 	Rotation++;
 
@@ -221,8 +221,10 @@ int main(int argc, char **argv)
     Octree* myOctree = new Octree(pts);
     
     cout << "Now testing AABB... there will be cake!" << endl;
+    /*
     cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
     cout << "High corner: " << glm::to_string(testRoot->getAABB().highCorner) << endl;
+    */
  
 	// set window values
 	win.width = 640;
