@@ -157,6 +157,11 @@ Octree::~Octree(){
         delete root;
 }
 
+OctreeNode* Octree::getRoot( void ){
+  return root;
+}
+
+
 void Octree::insertPoint(Point p){
     root->insertRecursive(p);
 }

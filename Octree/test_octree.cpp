@@ -34,6 +34,9 @@ using namespace std;
 //root for testing purposes
 OctreeNode* testRoot;
 
+// Octree 
+Octree* myOctree;
+
 //forward declarations:
 void display();
 void initialize();
@@ -128,8 +131,18 @@ void display()
     glEnd();
     glPopMatrix();
 
-    //drawAABB(testRoot->getAABB());
-    //drawOctree(testRoot);
+    /*
+    // Draw first and second layer of the octree
+    drawAABB(myOctree->getRoot()->getAABB());
+    // Draw second layer
+    for(int i = 0; i < 8; i++){
+	OctreeNode* currChild = myOctree->getRoot()->getChildAt(i);  
+	if ( currChild != NULL ){
+	  drawAABB(currChild->getAABB());
+	}
+    }
+    */
+    drawOctree(myOctree->getRoot());
 	
 	Rotation++;
 
@@ -218,7 +231,7 @@ int main(int argc, char **argv)
 
     //testRoot = new OctreeNode(currAABB); 
     //testRoot->spawnChildren();
-    Octree* myOctree = new Octree(pts);
+    myOctree = new Octree(pts);
     
     cout << "Now testing AABB... there will be cake!" << endl;
     /*
