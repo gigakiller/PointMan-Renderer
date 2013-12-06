@@ -3,6 +3,13 @@ PointMan-Renderer
 
 A massive WebGL point cloud renderer by Nathan Marshak and Uriah Baalke. [See LIVE online demo here! (Wait a few moments to allow points to load.)](http://nmarshak1337.github.io/PointMan-Renderer/webgl_client/frag_globe.html)
 
+Below, a low-res render of the church as seen from the client:
+![client_lowres](screenshots/lowres_church.png)
+
+Below, the octree as seen from the server (the church is sideways in this picture):
+![client_lowres](screenshots/church_octree.png)
+
+TODO: We need to integrate octrees / LOD into the client!
 
 ##Usage:
 
