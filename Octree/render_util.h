@@ -7,6 +7,6 @@
 #include "Octree.h"
 
 void drawAABB(AABB toDraw);
-void drawOctree(OctreeNode* root);
+void drawOctree(OctreeNode* root, int depth, int max_depth);
 
 #endif

@@ -1,16 +1,19 @@
 #include "render_util.h"
 
-void drawOctree(OctreeNode* root){
+void drawOctree(OctreeNode* root, int depth, int max_depth){
     // If node is null then return
     if ( root == NULL ) 
-      return;
+        return;
+
+    depth++;
+    if ( depth > max_depth )
+        return;
+
     drawAABB(root->getAABB());
-    //if( !root->getIsLeaf() ){ //if we have children
-        for(int i = 0; i < 8; i++){
-            OctreeNode* currChild = root->getChildAt(i);  
-            drawOctree(currChild);
-        }
-    //}
+    for(int i = 0; i < 8; i++){
+	OctreeNode* currChild = root->getChildAt(i);  
+	drawOctree(currChild, depth, max_depth);
+    }
 }
 
 void drawAABB( AABB toDraw ){

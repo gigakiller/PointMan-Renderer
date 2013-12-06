@@ -36,16 +36,29 @@ OctreeNode* testRoot;
 
 // Octree 
 Octree* myOctree;
+int max_depth = 5;
 
 //forward declarations:
 void display();
 void initialize();
 //void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
+void mouse( int x, int y );
 int json_pointcloud_test();
 int json_cpp_test();
+void sphere_to_cart( float r, float a, float e, glm::vec3 *pos );
+
+void sphere_to_cart( float r, float a, float e, glm::vec3 *pos ) {
+    float x = r*cos(e)*cos(a);
+    float y = r*sin(e);
+    float z = r*cos(e)*sin(a);
+    *pos = glm::vec3( x,y,z );
+}
 
 vector<Point>* pts;
+
+// Eye camera
+glm::mat4 camera(1.0);
 
 //ignore the warning that we need to pad to align to 4 bytes
 #pragma clang diagnostic push
@@ -68,16 +81,23 @@ float Rotation;
 float eyePosArray[] = {8.0f, 3.0f, 0.0f};
 float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 
+// This is a super naive camera, controller using euler angles ( gross ) 
+//glm::vec3 camera_rotation = glm::vec3( 0.0, 0.0, 0.0 );
+glm::vec3 sphere( 0.0, 0.0, 8.0 );
 
 void display() 
 {
     glm::vec3 eyePos( eyePosArray[0], eyePosArray[1], eyePosArray[2] );
     glm::vec3 vdir( vdirArray[0], vdirArray[1], vdirArray[2] );
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		     // Clear Screen and Depth Buffer
-	glLoadIdentity();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		     // Clear Screen and Depth Buffer
+    glLoadIdentity();
     vdir = glm::normalize(vdir);
     glm::vec3 center = eyePos + vdir;
-	gluLookAt( eyePos.x,eyePos.y,eyePos.z, center.x,center.y,center.z, 0,1,0);					  // Define a viewing transformation
+
+    // Update eyePos based on spherical coordinates
+    //gluLookAt( eyePos.x,eyePos.y,eyePos.z, center.x,center.y,center.z, 0,1,0 );
+    glm::mat4 view = glm::inverse( camera );
+    glMultMatrixf( &view[0][0] );
 
     /*
 	
@@ -142,7 +162,7 @@ void display()
 	}
     }
     */
-    drawOctree(myOctree->getRoot());
+    drawOctree(myOctree->getRoot(), 0, max_depth);
 	
 	Rotation++;
 
@@ -157,7 +177,7 @@ void initialize ()
     glMatrixMode(GL_PROJECTION);												// set matrix mode
     glLoadIdentity();															// reset projection matrix
     GLfloat aspect = (GLfloat) win.width / win.height;
-	gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);		// set up a perspective projection matrix
+    gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);		// set up a perspective projection matrix
     glMatrixMode(GL_MODELVIEW);													// specify which matrix is the current matrix
     glShadeModel( GL_SMOOTH );
     glClearDepth( 1.0f );														// specify the clear value for the depth buffer
@@ -165,7 +185,7 @@ void initialize ()
     glDepthFunc( GL_LEQUAL );
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );						// specify implementation-specific hints
 
-	GLfloat amb_light[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+    GLfloat amb_light[] = { 0.1f, 0.1f, 0.1f, 1.0f };
     GLfloat diffuse[] = { 0.6f, 0.6f, 0.6f, 1.0f };
     GLfloat specular[] = { 0.7f, 0.7f, 0.3f, 1.0f };
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, amb_light );
@@ -179,14 +199,14 @@ void initialize ()
     glEnable( GL_DEPTH_TEST );
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0); 
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 }
 
 
 //we are required to read mousePositionX and mousePositionY, but we don't use them
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
+glm::mat4 trans;
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )		
 { 
   switch ( key ) 
@@ -194,27 +214,67 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
     case KEY_ESCAPE:        
       exit ( 0 );   
     case 119: //w
-        eyePosArray[0] -= 1;
+	trans = glm::translate( 0.0f, 0.0f, -2.0f );
+	camera = camera*trans;
         break;
     case 115: //s
-        eyePosArray[0] += 1;
+	trans = glm::translate( 0.0f, 0.0f, 2.0f );
+	camera = camera*trans;
         break;
     case 97: //a
-        eyePosArray[2] += 1;
+	trans = glm::translate( -2.0f, 0.0f, 0.0f );
+	camera = camera*trans;
         break;
     case 100: //d
-        eyePosArray[2] -= 1;
+	trans = glm::translate( 2.0f, 0.0f, 0.0f );
+	camera = camera*trans;
         break;
+    case 'u':
+	trans = glm::translate( 0.0f, 2.0f, 0.0f );
+	camera = camera*trans;
+	break;
+    case 'i':
+	trans = glm::translate( 0.0f, -2.0f, 0.0f );
+	camera = camera*trans;
+	break;
+
+	/*
     case 113: //a
         eyePosArray[1] += 1;
         break;
     case 101: //d
         eyePosArray[1] -= 1;
         break;
+	*/
+    case 'q':
+	camera = glm::rotate( camera, 2.0f, glm::vec3( 0,0,1 ) );
+	break;
+    case 'e':
+	camera = glm::rotate( camera, -2.0f, glm::vec3( 0,0,1 ) );
+	break;
+    case 'j':
+	max_depth++;
+	break;
+    case 'k':
+	max_depth--;
+	break;
 
     default:      
       break;
   }
+}
+
+int prev_x = -1;
+int prev_y = -1;
+glm::mat4 rot;
+void mouse( int x, int y ) {
+    if ( prev_x == -1 )
+	prev_x = x;
+    if ( prev_y == -1 )
+	prev_y = y;
+
+    camera = glm::rotate( camera, -0.01f*(x - prev_x), glm::vec3( 0,1,0 ) );
+    camera = glm::rotate( camera, -0.01f*(y - prev_y), glm::vec3( 1,0,0 ) );
 }
 #pragma clang diagnostic pop
 
@@ -254,10 +314,11 @@ int main(int argc, char **argv)
 	glutCreateWindow(win.title);								// create Window
 	glutDisplayFunc(display);									// register Display Function
 	glutIdleFunc( display );									// register Idle Function
-    glutKeyboardFunc( keyboard );								// register Keyboard Handler
+	glutKeyboardFunc( keyboard );								// register Keyboard Handler
+	glutMotionFunc( mouse );
 	initialize();
 	glutMainLoop();												// run GLUT mainloop
-    delete pts;
-    delete testRoot;
+	delete pts;
+	delete testRoot;
 	return 0;
 }
