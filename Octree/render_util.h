@@ -6,7 +6,12 @@
 #include <glm/glm.hpp>
 #include "Octree.h"
 
+#define OCTREE_DRAW_POINTS 0
+#define OCTREE_DRAW_AABB 1
+#define OCTREE_DRAW_ALL 2 
+
 void drawAABB(AABB toDraw);
-void drawOctree(OctreeNode* root, int depth, int max_depth);
+void drawPoints( std::vector<Point> *pts );
+void drawOctree(OctreeNode* root, int depth, int max_depth, int draw_mode);
 
 #endif

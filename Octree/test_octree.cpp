@@ -85,6 +85,8 @@ float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 //glm::vec3 camera_rotation = glm::vec3( 0.0, 0.0, 0.0 );
 glm::vec3 sphere( 0.0, 0.0, 8.0 );
 
+int draw_mode = OCTREE_DRAW_ALL;
+
 void display() 
 {
     glm::vec3 eyePos( eyePosArray[0], eyePosArray[1], eyePosArray[2] );
@@ -136,6 +138,8 @@ void display()
     */
 
     //draw each point that we've loaded
+   
+    /* 
     glDisable(GL_LIGHTING); //needed for color to work
     glPushMatrix();
     glEnable(GL_POINT_SMOOTH);
@@ -150,6 +154,7 @@ void display()
     }
     glEnd();
     glPopMatrix();
+    */
 
     /*
     // Draw first and second layer of the octree
@@ -162,11 +167,11 @@ void display()
 	}
     }
     */
-    drawOctree(myOctree->getRoot(), 0, max_depth);
-	
-	Rotation++;
+    drawOctree(myOctree->getRoot(), 0, max_depth, draw_mode);
+    
+    Rotation++;
 
-	glutSwapBuffers();
+    glutSwapBuffers();
 }
 
 
@@ -237,6 +242,16 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 	trans = glm::translate( 0.0f, -2.0f, 0.0f );
 	camera = camera*trans;
 	break;
+    case '1':
+	draw_mode = OCTREE_DRAW_ALL;
+	break;
+    case '2':
+	draw_mode = OCTREE_DRAW_AABB;
+	break;
+    case '3':
+	draw_mode = OCTREE_DRAW_POINTS;
+	break;
+
 
 	/*
     case 113: //a

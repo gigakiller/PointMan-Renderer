@@ -1,6 +1,6 @@
 #include "render_util.h"
 
-void drawOctree(OctreeNode* root, int depth, int max_depth){
+void drawOctree(OctreeNode* root, int depth, int max_depth, int draw_mode){
     // If node is null then return
     if ( root == NULL ) 
         return;
@@ -9,12 +9,34 @@ void drawOctree(OctreeNode* root, int depth, int max_depth){
     if ( depth > max_depth )
         return;
 
-    drawAABB(root->getAABB());
+    // Draw things based on draw_mode
+    if ( draw_mode == OCTREE_DRAW_AABB || draw_mode == OCTREE_DRAW_ALL ) 	    	
+	drawPoints(&(root->data));
+    if ( draw_mode == OCTREE_DRAW_POINTS || draw_mode == OCTREE_DRAW_ALL )
+	drawAABB(root->getAABB());
     for(int i = 0; i < 8; i++){
 	OctreeNode* currChild = root->getChildAt(i);  
-	drawOctree(currChild, depth, max_depth);
+	drawOctree(currChild, depth, max_depth, draw_mode);
     }
 }
+
+void drawPoints( std::vector<Point> *pts ) {
+    glDisable(GL_LIGHTING); //needed for color to work
+    glPushMatrix();
+    glEnable(GL_POINT_SMOOTH);
+    glPointSize(2.0);
+    glBegin(GL_POINTS);
+    for(unsigned long i = 0; i < pts->size(); i++){
+        glm::vec3 currColor = (pts->at(i)).color;
+        currColor = (1.0f/255.0f) * currColor; //normalize to range between 0 and 1
+        glColor3f(currColor.x, currColor.y, currColor.z);
+        glm::vec3 currPos = (pts->at(i)).pos;
+        glVertex3f(currPos.x, currPos.y, currPos.z);
+    }
+    glEnd();
+    glPopMatrix();
+}
+    
 
 void drawAABB( AABB toDraw ){
     glm::vec3 highCorner = toDraw.highCorner;
