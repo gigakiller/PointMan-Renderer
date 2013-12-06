@@ -390,8 +390,12 @@
         // Note: A better thing would be to queue 
         if ( new_msg ) 
             return;
-        msg = JSON.parse(evt.data);
-        new_msg = true; 
+        if( evt.data == "1338" ){
+            console.log( "Message received" );
+        } else {
+            msg = JSON.parse(evt.data);
+            new_msg = true; 
+        }
     }
 
     //loadPointCloud();
