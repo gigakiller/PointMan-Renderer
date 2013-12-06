@@ -49,31 +49,34 @@ class PointCloudReqWS(websocket.WebSocketHandler):
     def on_message(self, message):
         msg = loads(message)
         cloud = msg['pointcloud']
-        print "PointCloud Requested: ", cloud
-        # Check if requested cloud is in our "database"
-        if not loaded_clouds.has_key(cloud):
-          print "Error: pointcloud " + cloud + " not available"
-        # Check if we have loaded it into RAM, if not load it
-        if loaded_clouds[cloud] is None:
-          print "Loading ..."
-          data = load(open('data/'+cloud+'.json', 'r'))
-          loaded_clouds[cloud] = data
-          positions = array(data['positions'])
-          centroids[cloud] = (sum(positions)/len(positions)).tolist()
-        # And respond 
-        print "Sending pointcloud"
-        #self.write_message( dumps(loaded_clouds[cloud]) )
-        numberOfPoints = len(loaded_clouds[cloud]['positions'])
-         
-        start = 0
-        fragLen = 10000
-        while start+fragLen < numberOfPoints:
-          self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(fragLen))) )
-          start += fragLen
-          print "sending data:", start
-          sleep(0.1)
-        remainder = numberOfPoints - start
-        self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(remainder))) )
+        if cloud == "1337": 
+            print "Received m3ssage from teh l337 h4x0rZ!"    
+        else:
+            print "PointCloud Requested: ", cloud
+            # Check if requested cloud is in our "database"
+            if not loaded_clouds.has_key(cloud):
+              print "Error: pointcloud " + cloud + " not available"
+            # Check if we have loaded it into RAM, if not load it
+            if loaded_clouds[cloud] is None:
+              print "Loading ..."
+              data = load(open('data/'+cloud+'.json', 'r'))
+              loaded_clouds[cloud] = data
+              positions = array(data['positions'])
+              centroids[cloud] = (sum(positions)/len(positions)).tolist()
+            # And respond 
+            print "Sending pointcloud"
+            #self.write_message( dumps(loaded_clouds[cloud]) )
+            numberOfPoints = len(loaded_clouds[cloud]['positions'])
+             
+            start = 0
+            fragLen = 10000
+            while start+fragLen < numberOfPoints:
+              self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(fragLen))) )
+              start += fragLen
+              print "sending data:", start
+              sleep(0.1)
+            remainder = numberOfPoints - start
+            self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(remainder))) )
         
     def pack_msg( self, cloud, centroid, start, fragLen ):
       positions = cloud['positions'][start:start+fragLen]

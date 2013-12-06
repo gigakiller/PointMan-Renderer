@@ -247,6 +247,13 @@
             use_RoundPoints = !use_RoundPoints;  
             initializeShader();
         }
+
+        //if 't' ... 
+        if( currentKeys[84] ) {
+            //send somes request to our server
+            var req = {"pointcloud":"1337"};
+            ws.send( JSON.stringify(req) );
+        }
     }
 
     function handleKeyUp(event) {
@@ -292,8 +299,6 @@
             mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
             mat4.multiply(cam, roll_mat); 
         }
-
-
     }
 
     // Handle Mouse Events
@@ -371,8 +376,8 @@
     animate();
 
     // PointCloud Websocket ... refactored with lighter callbacks
-    //var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
-    var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
+    var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
+    //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
         //var req = {"pointcloud":"chappes"};
