@@ -51,7 +51,7 @@ class PointCloudReqWS(websocket.WebSocketHandler):
         cloud = msg['pointcloud']
         if cloud == "1337": 
             print "Received m3ssage from teh l337 h4x0rZ!"    
-            self.write_message("1338");
+            self.write_message('{ "power_level": 9000.1 }');
         else:
             print "PointCloud Requested: ", cloud
             # Check if requested cloud is in our "database"

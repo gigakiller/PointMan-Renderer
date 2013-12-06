@@ -390,10 +390,10 @@
         // Note: A better thing would be to queue 
         if ( new_msg ) 
             return;
-        if( evt.data == "1338" ){
-            console.log( "Message received" );
+        msg = JSON.parse(evt.data);
+        if( "power_level" in msg ){
+            console.log( "The power level is: ".concat(msg.power_level) );
         } else {
-            msg = JSON.parse(evt.data);
             new_msg = true; 
         }
     }
