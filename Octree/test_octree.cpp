@@ -298,15 +298,25 @@ int main(int argc, char **argv)
 
     //Load points as unstructured data
     const char* file_loc = "../data/chappes_sml.json";
+    //const char* file_loc = "../data/chappes.json";
+    
+    // NOTE: this large file 650M uses up all of my RAM in the parseJSONData function
+    //const char* file_loc = "../data/chappes_full.json";
 
+    cout << "Parsing Json" << endl;	
     pts = parseJSONData( const_cast<char*>(file_loc) );
+    cout << "Calculating full AABB " << endl;
     AABB currAABB = calcAABB(pts);
     cout << "AABB High Corner: " << glm::to_string(currAABB.highCorner) << endl; 
     cout << "AABB Low Corner: " << glm::to_string(currAABB.lowCorner) << endl; 
 
     //testRoot = new OctreeNode(currAABB); 
     //testRoot->spawnChildren();
+    cout << "Creating Octree" << endl;
     myOctree = new Octree(pts);
+
+    cout << "Populating Octree" << endl;
+    myOctree->populateOctree();
     
     cout << "Now testing AABB... there will be cake!" << endl;
     /*

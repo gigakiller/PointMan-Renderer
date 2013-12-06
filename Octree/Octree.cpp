@@ -145,6 +145,48 @@ void OctreeNode::insertRecursive( Point newData ){
     }
 }
 
+// Populate this node by looking at its children, computing the position and color 
+//   average of their points 
+void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color, bool isFirst ) {
+    glm::vec3 ave_position;
+    glm::vec3 ave_color;
+    int cnt=0;
+    bool first = false;
+
+    // Update our parents average pos and color
+    if ( isFirst ) {
+	*parent_ave_pos = data[0].pos;
+	*parent_ave_color = data[0].color;
+    } else {
+	*parent_ave_pos += data[0].pos;
+	*parent_ave_color += data[0].color;
+    }
+
+    // If we are a leaf then we don't have children     
+    if ( isLeaf ) 
+	return;
+
+    // Recurse down the tree 
+    for( int i=0; i<8; i++ ){
+	OctreeNode* currChild = getChildAt(i);
+	if (currChild == NULL )
+	    continue;
+	if ( cnt == 0 ) {
+	    first = true;
+	} else {
+	    first = false;
+	}
+	cnt++;
+	currChild->populateRecursive(&ave_position, &ave_color, first);
+    }
+
+    // Finally update our own data 
+    Point newData;
+    newData.pos = ave_position/float(cnt);
+    newData.color = ave_color/float(cnt);
+    data.push_back( newData );
+}
+	
 //************************************************
 //Octree: makes up the octree itself
 
@@ -166,12 +208,24 @@ void Octree::insertPoint(Point p){
     root->insertRecursive(p);
 }
 
+// Populate the octree:
+//   Start at the leafs and create representative points and each level that are the 
+//   position and color average of the node points below
+void Octree::populateOctree( void ) {
+    // Dummy average pos and color
+    glm::vec3 ave_position;
+    glm::vec3 ave_color;
+    // Kickoff recursion
+    root->populateRecursive(&ave_position, &ave_color, true);
+}
+
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){
    
     AABB rootAABB = calcAABB(points); 
     OctreeNode* currRoot = new OctreeNode(rootAABB);
     for(unsigned long i = 0; i < points->size(); i++){
-        std::cout << "Inserting node #" << i << std::endl;
+	if ( i%100000 == 0 ) 
+	    std::cout << "Inserting node #" << i << std::endl;
         if( i == 199 ){
             int leet = 1337;
         }
@@ -179,3 +233,5 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     }
     return currRoot;
 }
+
+
