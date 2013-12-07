@@ -212,7 +212,7 @@ void initialize ()
 //we are required to read mousePositionX and mousePositionY, but we don't use them
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-glm::mat4 trans;
+//glm::mat4 trans;
 void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )		
 { 
   switch ( key ) 
@@ -220,28 +220,28 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
     case KEY_ESCAPE:        
       exit ( 0 );   
     case 119: //w
-	trans = glm::translate( 0.0f, 0.0f, -2.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( 0.0f, 0.0f, -2.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
         break;
     case 115: //s
-	trans = glm::translate( 0.0f, 0.0f, 2.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( 0.0f, 0.0f, 2.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
         break;
     case 97: //a
-	trans = glm::translate( -2.0f, 0.0f, 0.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( -2.0f, 0.0f, 0.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
         break;
     case 100: //d
-	trans = glm::translate( 2.0f, 0.0f, 0.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( 2.0f, 0.0f, 0.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
         break;
     case 'u':
-	trans = glm::translate( 0.0f, 2.0f, 0.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( 0.0f, 2.0f, 0.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
 	break;
     case 'i':
-	trans = glm::translate( 0.0f, -2.0f, 0.0f );
-	myCam->camMatrix = myCam->camMatrix*trans;
+	myCam->trans = glm::translate( 0.0f, -2.0f, 0.0f );
+	myCam->camMatrix = myCam->camMatrix*myCam->trans;
 	break;
     case '1':
 	draw_mode = OCTREE_DRAW_ALL;
