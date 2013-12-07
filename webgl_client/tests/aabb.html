@@ -25,15 +25,8 @@
     
     void main(void)
     {
-                float s_contrib = sin(position.x*2.0*3.14159 + u_time);
-                float t_contrib = cos(position.y*2.0*3.14159 + u_time);
-                float height = s_contrib*t_contrib;
-                
-                // Clamp and scale height 
-                float scl = 0.5*clamp( height, min_height, max_height ) + 0.5;
                 // Linearly interpolate between min and max color
                 v_color = scl*min_color + (1.0 - scl)*max_color;
- 
 		//gl_Position = u_modelViewPerspective * vec4(vec3(position, height), 1.0);
 		gl_Position = u_modelViewPerspective* vec4(position, 1.0);
     }
