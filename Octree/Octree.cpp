@@ -246,4 +246,8 @@ void Octree::serialize(char* filename){
     //TODO: Actually implement
 }
 
+void Octree::deserialize(char* filename){
+    //TODO: Actually implement
+}
+
 
