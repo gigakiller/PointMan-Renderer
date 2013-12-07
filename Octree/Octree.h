@@ -65,9 +65,14 @@ public:
     void insertPoint( Point p );
     OctreeNode* getRoot( void );
     void populateOctree( void );
-    //writes the octree to a file, either for the Python server to read, or so that
+    //writes the octree to a .octopus file, either for the Python server to read, or so that
     //we don't have to spend time building it again
+    //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
     void serialize(char* filename);
+    
+    //reads a .octopus file into an octree in memory. This is mostly used to test to see if 
+    //serialization actually worked properly 
+    OctreeNode* deserialize(char* filename);
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
