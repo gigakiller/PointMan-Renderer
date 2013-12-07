@@ -1,5 +1,6 @@
 #include "Octree.h"
 #include <iostream>
+#include <fstream>
 #include <assert.h>
 #include <glm/ext.hpp>
 
@@ -243,12 +244,22 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
 //the third three floats are the upper corner of the AABB. All tirplets after that are positions of points
 //stored inside the node (there may be none)
 void Octree::serialize(char* filename){
-
+    std::ofstream currFile(filename);
+    if( currFile.is_open() ){
+        serializeHelper(root, currFile);    
+    } else {
+        std::cerr << "Failed to open file: " << filename << " for writing!" << std::endl;
+    }
+    currFile.close();
 }
 
 OctreeNode* Octree::deserialize(char* filename){
     //TODO: Actually implement
-    return NULL;
+        return NULL;
+}
+
+void serializeHelper(const OctreeNode* root, const std::ofstream& fileStream){
+    //TODO: implement
 }
 
 

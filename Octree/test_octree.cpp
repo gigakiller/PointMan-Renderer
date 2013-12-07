@@ -308,10 +308,6 @@ int main(int argc, char **argv)
     myOctree->populateOctree();
     
     cout << "Now testing AABB... there will be cake!" << endl;
-    /*
-    cout << "Low corner: " << glm::to_string(testRoot->getAABB().lowCorner) << endl;
-    cout << "High corner: " << glm::to_string(testRoot->getAABB().highCorner) << endl;
-    */
  
     // set window values
     win.width = 640;
