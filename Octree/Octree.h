@@ -76,6 +76,7 @@ public:
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
+    void serializeHelper(OctreeNode* root); 
     OctreeNode* root;
 };
 #pragma clang diagnostic pop

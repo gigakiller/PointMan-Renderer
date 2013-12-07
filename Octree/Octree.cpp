@@ -243,11 +243,12 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
 //the third three floats are the upper corner of the AABB. All tirplets after that are positions of points
 //stored inside the node (there may be none)
 void Octree::serialize(char* filename){
-    //TODO: Actually implement
+
 }
 
-void Octree::deserialize(char* filename){
+OctreeNode* Octree::deserialize(char* filename){
     //TODO: Actually implement
+    return NULL;
 }
 
 
