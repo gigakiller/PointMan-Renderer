@@ -67,7 +67,6 @@ typedef struct {
     int width;
 	int height;
 	char* title;
-
 	float field_of_view_angle;
 	float z_near;
 	float z_far;
@@ -251,16 +250,6 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
     case '3':
 	draw_mode = OCTREE_DRAW_POINTS;
 	break;
-
-
-	/*
-    case 113: //a
-        eyePosArray[1] += 1;
-        break;
-    case 101: //d
-        eyePosArray[1] -= 1;
-        break;
-	*/
     case 'q':
 	camera = glm::rotate( camera, 2.0f, glm::vec3( 0,0,1 ) );
 	break;
@@ -324,26 +313,26 @@ int main(int argc, char **argv)
     cout << "High corner: " << glm::to_string(testRoot->getAABB().highCorner) << endl;
     */
  
-	// set window values
-	win.width = 640;
-	win.height = 480;
-	//win.title = "OpenGL/GLUT Window.";
-	win.field_of_view_angle = 45;
-	win.z_near = 1.0f;
-	win.z_far = 500.0f;
+    // set window values
+    win.width = 640;
+    win.height = 480;
+    //win.title = "OpenGL/GLUT Window.";
+    win.field_of_view_angle = 45;
+    win.z_near = 1.0f;
+    win.z_far = 500.0f;
 
-	// initialize and run program
-	glutInit(&argc, argv);                                      // GLUT initialization
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );  // Display Mode
-	glutInitWindowSize(win.width,win.height);					// set window size
-	glutCreateWindow(win.title);								// create Window
-	glutDisplayFunc(display);									// register Display Function
-	glutIdleFunc( display );									// register Idle Function
-	glutKeyboardFunc( keyboard );								// register Keyboard Handler
-	glutMotionFunc( mouse );
-	initialize();
-	glutMainLoop();												// run GLUT mainloop
-	delete pts;
-	delete testRoot;
-	return 0;
+    // initialize and run program
+    glutInit(&argc, argv);                                      // GLUT initialization
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );  // Display Mode
+    glutInitWindowSize(win.width,win.height);					// set window size
+    glutCreateWindow(win.title);								// create Window
+    glutDisplayFunc(display);									// register Display Function
+    glutIdleFunc( display );									// register Idle Function
+    glutKeyboardFunc( keyboard );								// register Keyboard Handler
+    glutMotionFunc( mouse );
+    initialize();
+    glutMainLoop();												// run GLUT mainloop
+    delete pts;
+    delete myOctree;
+    return 0;
 }
