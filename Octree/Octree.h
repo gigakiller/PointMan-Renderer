@@ -17,6 +17,7 @@ public:
     bool getIsLeaf();
     AABB getAABB();
     OctreeNode* getChildAt(int i); //get child at index
+    glm::vec3 getPosition() const; //position of the node is the centroid of its AABB 
 
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
@@ -76,7 +77,8 @@ public:
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
-    void serializeHelper(const OctreeNode* root, const std::ofstream& fileStream); 
+    //helper method for serialize
+    void writeNodeToFile(const OctreeNode* root, std::ofstream& fileStream); 
     OctreeNode* root;
 };
 #pragma clang diagnostic pop

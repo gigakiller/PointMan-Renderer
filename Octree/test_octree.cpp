@@ -26,16 +26,17 @@
 #include "data_util.h"
 #include "Point.h"
 #include "Octree.h"
+#include "Camera.h"
 #include "render_util.h"
 
 using namespace std;
 #define KEY_ESCAPE 27
 
 //root for testing purposes
-OctreeNode* testRoot;
+OctreeNode* testRoot = NULL;
 
 // Octree 
-Octree* myOctree;
+Octree* myOctree = NULL;
 int max_depth = 5;
 
 //forward declarations:
@@ -46,19 +47,20 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY );
 void mouse( int x, int y );
 int json_pointcloud_test();
 int json_cpp_test();
-void sphere_to_cart( float r, float a, float e, glm::vec3 *pos );
+//void sphere_to_cart( float r, float a, float e, glm::vec3 *pos );
 
-void sphere_to_cart( float r, float a, float e, glm::vec3 *pos ) {
-    float x = r*cos(e)*cos(a);
-    float y = r*sin(e);
-    float z = r*cos(e)*sin(a);
-    *pos = glm::vec3( x,y,z );
-}
+//void sphere_to_cart( float r, float a, float e, glm::vec3 *pos ) {
+    //float x = r*cos(e)*cos(a);
+    //float y = r*sin(e);
+    //float z = r*cos(e)*sin(a);
+    //*pos = glm::vec3( x,y,z );
+//}
 
 vector<Point>* pts;
 
 // Eye camera
-glm::mat4 camera(1.0);
+//glm::mat4 camera(1.0);
+Camera* myCam = NULL;
 
 //ignore the warning that we need to pad to align to 4 bytes
 #pragma clang diagnostic push
@@ -82,7 +84,7 @@ float vdirArray[] = {-8.0f, -3.0f, 0.0f};
 
 // This is a super naive camera, controller using euler angles ( gross ) 
 //glm::vec3 camera_rotation = glm::vec3( 0.0, 0.0, 0.0 );
-glm::vec3 sphere( 0.0, 0.0, 8.0 );
+//glm::vec3 sphere( 0.0, 0.0, 8.0 );
 
 int draw_mode = OCTREE_DRAW_ALL;
 
@@ -97,7 +99,7 @@ void display()
 
     // Update eyePos based on spherical coordinates
     //gluLookAt( eyePos.x,eyePos.y,eyePos.z, center.x,center.y,center.z, 0,1,0 );
-    glm::mat4 view = glm::inverse( camera );
+    glm::mat4 view = glm::inverse( myCam->camMatrix );
     glMultMatrixf( &view[0][0] );
 
     /*
@@ -219,27 +221,27 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
       exit ( 0 );   
     case 119: //w
 	trans = glm::translate( 0.0f, 0.0f, -2.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
         break;
     case 115: //s
 	trans = glm::translate( 0.0f, 0.0f, 2.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
         break;
     case 97: //a
 	trans = glm::translate( -2.0f, 0.0f, 0.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
         break;
     case 100: //d
 	trans = glm::translate( 2.0f, 0.0f, 0.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
         break;
     case 'u':
 	trans = glm::translate( 0.0f, 2.0f, 0.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
 	break;
     case 'i':
 	trans = glm::translate( 0.0f, -2.0f, 0.0f );
-	camera = camera*trans;
+	myCam->camMatrix = myCam->camMatrix*trans;
 	break;
     case '1':
 	draw_mode = OCTREE_DRAW_ALL;
@@ -251,10 +253,10 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 	draw_mode = OCTREE_DRAW_POINTS;
 	break;
     case 'q':
-	camera = glm::rotate( camera, 2.0f, glm::vec3( 0,0,1 ) );
+	myCam->camMatrix = glm::rotate( myCam->camMatrix, 2.0f, glm::vec3( 0,0,1 ) );
 	break;
     case 'e':
-	camera = glm::rotate( camera, -2.0f, glm::vec3( 0,0,1 ) );
+	myCam->camMatrix = glm::rotate( myCam->camMatrix, -2.0f, glm::vec3( 0,0,1 ) );
 	break;
     case 'j':
 	max_depth++;
@@ -270,21 +272,23 @@ void keyboard ( unsigned char key, int mousePositionX, int mousePositionY )
 
 int prev_x = -1;
 int prev_y = -1;
-glm::mat4 rot;
+//glm::mat4 rot;
 void mouse( int x, int y ) {
     if ( prev_x == -1 )
 	prev_x = x;
     if ( prev_y == -1 )
 	prev_y = y;
 
-    camera = glm::rotate( camera, -0.01f*(x - prev_x), glm::vec3( 0,1,0 ) );
-    camera = glm::rotate( camera, -0.01f*(y - prev_y), glm::vec3( 1,0,0 ) );
+    myCam->camMatrix = glm::rotate( myCam->camMatrix, -0.01f*(x - prev_x), glm::vec3( 0,1,0 ) );
+    myCam->camMatrix = glm::rotate( myCam->camMatrix, -0.01f*(y - prev_y), glm::vec3( 1,0,0 ) );
 }
 #pragma clang diagnostic pop
 
 int main(int argc, char **argv) 
 {
 
+    myCam = new Camera;
+    myCam->camMatrix = glm::mat4(1.0);
     //Load points as unstructured data
     const char* file_loc = "../data/chappes_sml.json";
     //const char* file_loc = "../data/chappes.json";
@@ -328,6 +332,8 @@ int main(int argc, char **argv)
     glutMotionFunc( mouse );
     initialize();
     glutMainLoop();												// run GLUT mainloop
+    
+    delete myCam;
     delete pts;
     delete myOctree;
     return 0;

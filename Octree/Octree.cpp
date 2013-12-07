@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <assert.h>
+#include <queue>
 #include <glm/ext.hpp>
 
 //OctreeNode: Nodes that make up the Octree
@@ -36,6 +37,10 @@ OctreeNode* OctreeNode::getChildAt(int i){
         return NULL;
     }
     return children[i]; 
+}
+
+glm::vec3 OctreeNode::getPosition() const{
+    return nodePosition;
 }
 
 void OctreeNode::spawnChildren(){
@@ -226,9 +231,6 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     for(unsigned long i = 0; i < points->size(); i++){
 	if ( i%100000 == 0 ) 
 	    std::cout << "Inserting node #" << i << std::endl;
-        if( i == 199 ){
-            int leet = 1337;
-        }
         currRoot->insertRecursive(points->at(i)); 
     }
     return currRoot;
@@ -239,18 +241,32 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
 //Each line looks like one of two things:
 //The string "NULL" for null nodes, and a line break.
 //A bunch of triplets of floats separated by tabs, finally ended with a line break
-//f f f\tf f f\tf f f\tf f f...\n
+//i f f f\tf f f\tf f f\tf f f...\n
+//The first number is an INT. It represents the octant number/child number. It is -1 for the root, because
+//the root does not have a parent / is not an octant of some parent. 
 //The first 3 float are the position. The second three floats are the lower corner of the AABB
 //the third three floats are the upper corner of the AABB. All tirplets after that are positions of points
 //stored inside the node (there may be none)
 void Octree::serialize(char* filename){
     std::ofstream currFile(filename);
     if( currFile.is_open() ){
-        serializeHelper(root, currFile);    
+        //serialize in a BREADTH-FIRST fashion
+        std::queue<OctreeNode*> bfsQueue;
+        bfsQueue.push(root);
+        while( !bfsQueue.empty() ){
+            OctreeNode* currNode = bfsQueue.front();
+            bfsQueue.pop(); //pop returns void in C++
+            writeNodeToFile(currNode, currFile); //serialize currNode to file
+        }
     } else {
         std::cerr << "Failed to open file: " << filename << " for writing!" << std::endl;
     }
     currFile.close();
+}
+
+void Octree::writeNodeToFile(const OctreeNode* currNode, std::ofstream& fileStream){
+    glm::vec3 nodePos = currNode->getPosition();
+    //for(int i = 0; i <  
 }
 
 OctreeNode* Octree::deserialize(char* filename){
@@ -258,8 +274,5 @@ OctreeNode* Octree::deserialize(char* filename){
         return NULL;
 }
 
-void serializeHelper(const OctreeNode* root, const std::ofstream& fileStream){
-    //TODO: implement
-}
 
 
