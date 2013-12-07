@@ -233,4 +233,17 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
     return currRoot;
 }
 
+//Serializes octree in following format:
+//The line # is the numbering in the breadth-first traversal of the tree (see diagram on page 2 of the spec sheet on Google Docs)
+//Each line looks like one of two things:
+//The string "NULL" for null nodes, and a line break.
+//A bunch of triplets of floats separated by tabs, finally ended with a line break
+//f f f\tf f f\tf f f\tf f f...\n
+//The first 3 float are the position. The second three floats are the lower corner of the AABB
+//the third three floats are the upper corner of the AABB. All tirplets after that are positions of points
+//stored inside the node (there may be none)
+void Octree::serialize(char* filename){
+    //TODO: Actually implement
+}
+
 

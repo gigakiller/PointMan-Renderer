@@ -65,6 +65,9 @@ public:
     void insertPoint( Point p );
     OctreeNode* getRoot( void );
     void populateOctree( void );
+    //writes the octree to a file, either for the Python server to read, or so that
+    //we don't have to spend time building it again
+    void serialize(char* filename);
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
