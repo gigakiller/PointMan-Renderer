@@ -30,3 +30,6 @@ test_octree
 
 #ctags output
 tags
+
+#octopus file (output from serializing the octree in C++)
+*.octopus

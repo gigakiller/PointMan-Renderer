@@ -94,7 +94,7 @@ void OctreeNode::spawnChildren(){
     children[7] = new OctreeNode(currChildBB); 
 }
 
-AABB OctreeNode::getAABB(){
+AABB OctreeNode::getAABB() const{
     return aabb;
 }
 
@@ -161,11 +161,11 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
 
     // Update our parents average pos and color
     if ( isFirst ) {
-	*parent_ave_pos = data[0].pos;
-	*parent_ave_color = data[0].color;
+        *parent_ave_pos = data[0].pos;
+        *parent_ave_color = data[0].color;
     } else {
-	*parent_ave_pos += data[0].pos;
-	*parent_ave_color += data[0].color;
+        *parent_ave_pos += data[0].pos;
+        *parent_ave_color += data[0].color;
     }
 
     // If we are a leaf then we don't have children     
@@ -174,16 +174,16 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
 
     // Recurse down the tree 
     for( int i=0; i<8; i++ ){
-	OctreeNode* currChild = getChildAt(i);
-	if (currChild == NULL )
-	    continue;
-	if ( cnt == 0 ) {
-	    first = true;
-	} else {
-	    first = false;
-	}
-	cnt++;
-	currChild->populateRecursive(&ave_position, &ave_color, first);
+        OctreeNode* currChild = getChildAt(i);
+        if (currChild == NULL )
+            continue;
+        if ( cnt == 0 ) {
+            first = true;
+        } else {
+            first = false;
+        }
+        cnt++;
+        currChild->populateRecursive(&ave_position, &ave_color, first);
     }
 
     // Finally update our own data 
@@ -239,15 +239,14 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
 //Serializes octree in following format:
 //The line # is the numbering in the breadth-first traversal of the tree (see diagram on page 2 of the spec sheet on Google Docs)
 //Each line looks like one of two things:
-//The string "NULL" for null nodes, and a line break.
+//A line break (empty line) for a NULL node
 //A bunch of triplets of floats separated by tabs, finally ended with a line break
-//i f f f\tf f f\tf f f\tf f f...\n
-//The first number is an INT. It represents the octant number/child number. It is -1 for the root, because
-//the root does not have a parent / is not an octant of some parent. 
+//f f f\tf f f\tf f f\tf f f...\n
 //The first 3 float are the position. The second three floats are the lower corner of the AABB
-//the third three floats are the upper corner of the AABB. All tirplets after that are positions of points
-//stored inside the node (there may be none)
-void Octree::serialize(char* filename){
+//the third three floats are the upper corner of the AABB. 
+//Then, after that we have groups of 6 floats. "f f f f f f". There are six floats for each
+//piece of data inside an inner node. The first 3 are position (xyz), the second 3 are color (rgb)
+void Octree::serialize(const char* filename){
     std::ofstream currFile(filename);
     if( currFile.is_open() ){
         //serialize in a BREADTH-FIRST fashion
@@ -257,6 +256,11 @@ void Octree::serialize(char* filename){
             OctreeNode* currNode = bfsQueue.front();
             bfsQueue.pop(); //pop returns void in C++
             writeNodeToFile(currNode, currFile); //serialize currNode to file
+            //enqueue children of currNode
+            for(int i = 0; i < 8; i++){
+                OctreeNode* currChild = currNode->getChildAt(i);
+                bfsQueue.push(currChild);
+            }
         }
     } else {
         std::cerr << "Failed to open file: " << filename << " for writing!" << std::endl;
@@ -265,13 +269,31 @@ void Octree::serialize(char* filename){
 }
 
 void Octree::writeNodeToFile(const OctreeNode* currNode, std::ofstream& fileStream){
+    if( currNode == NULL ){
+        fileStream << std::endl; //line break (empty line) denotes null node
+        return;
+    }
     glm::vec3 nodePos = currNode->getPosition();
-    //for(int i = 0; i <  
+    glm::vec3 lowCorn = currNode->getAABB().lowCorner;
+    glm::vec3 highCorn = currNode->getAABB().highCorner;
+    fileStream << nodePos.x << " " << nodePos.y << " " << nodePos.z << " "; //position of AABB centroid
+    fileStream << lowCorn.x << " " << lowCorn.y << " " << lowCorn.z << " "; //AABB low corner
+    fileStream << highCorn.x << " " << highCorn.y << " " << highCorn.z << " "; //AABB high corner
+
+    //write six-lets (groups of 6 floats) that represent points stored inside node
+    std::vector<Point> data = currNode->data;
+    for(unsigned long i = 0; i < data.size(); i++){
+        glm::vec3 currPos = data[i].pos;
+        glm::vec3 currColor = data[i].color;
+        fileStream << currPos.x << " " << currPos.y << " " << currPos.z << " "; //AABB high corner
+        fileStream << currColor.x << " " << currColor.y << " " << currColor.z << " "; //AABB high corner
+    }
+    fileStream << std::endl; //denotes that "this" OctreeNode is finished. The next line is another node
 }
 
 OctreeNode* Octree::deserialize(char* filename){
     //TODO: Actually implement
-        return NULL;
+    return NULL;
 }
 
 
