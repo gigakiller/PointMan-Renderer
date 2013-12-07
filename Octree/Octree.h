@@ -15,7 +15,7 @@ public:
     ~OctreeNode();
     //getters
     bool getIsLeaf();
-    AABB getAABB();
+    AABB getAABB() const;
     OctreeNode* getChildAt(int i); //get child at index
     glm::vec3 getPosition() const; //position of the node is the centroid of its AABB 
 
@@ -69,7 +69,7 @@ public:
     //writes the octree to a .octopus file, either for the Python server to read, or so that
     //we don't have to spend time building it again
     //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
-    void serialize(char* filename);
+    void serialize(const char* filename);
     
     //reads a .octopus file into an octree in memory. This is mostly used to test to see if 
     //serialization actually worked properly 

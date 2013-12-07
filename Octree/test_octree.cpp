@@ -312,6 +312,9 @@ int main(int argc, char **argv)
     myOctree->populateOctree();
     
     cout << "Now testing AABB... there will be cake!" << endl;
+
+    cout << "Serializing octree... " << endl;
+    myOctree->serialize("chappes_sml.octopus");
  
     // set window values
     win.width = 640;
