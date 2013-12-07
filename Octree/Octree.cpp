@@ -258,8 +258,10 @@ void Octree::serialize(const char* filename){
             writeNodeToFile(currNode, currFile); //serialize currNode to file
             //enqueue children of currNode
             for(int i = 0; i < 8; i++){
-                OctreeNode* currChild = currNode->getChildAt(i);
-                bfsQueue.push(currChild);
+                if( currNode != NULL){
+                    OctreeNode* currChild = currNode->getChildAt(i);
+                    bfsQueue.push(currChild);
+                }
             }
         }
     } else {
