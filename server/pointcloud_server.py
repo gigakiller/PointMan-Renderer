@@ -12,7 +12,10 @@ from time import sleep
 from numpy import array
 
 # Get list of .json files in data
-read_octree(1337)
+my_dict = read_octree(1337)
+for key, value in my_dict.iteritems():
+    print key, value
+
 files = listdir('data')
 loaded_clouds = {}
 centroids = {}
