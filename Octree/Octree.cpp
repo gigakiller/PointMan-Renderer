@@ -6,7 +6,7 @@
 #include <glm/ext.hpp>
 
 //OctreeNode: Nodes that make up the Octree
-OctreeNode::OctreeNode(AABB boundingBox) : aabb(boundingBox) {
+OctreeNode::OctreeNode(AABB boundingBox, unsigned long newIdx) : aabb(boundingBox) {
     children = new OctreeNode*[8];
     for( int i = 0; i < 8; i++){
         children[i] = NULL;
@@ -16,6 +16,7 @@ OctreeNode::OctreeNode(AABB boundingBox) : aabb(boundingBox) {
     //the position of each node is the center of its aabb.
     nodePosition = aabb.lowCorner + 0.5f*aabbDiagonal; 
     containsPoints = false;
+    bfsIdx = newIdx;
 }
 
 OctreeNode::~OctreeNode(){
@@ -43,59 +44,17 @@ glm::vec3 OctreeNode::getPosition() const{
     return nodePosition;
 }
 
-void OctreeNode::spawnChildren(){
-    //if you have children, then by definition you are not a leaf
-    //...unless you are the Blessed Virgin Mary
-    isLeaf = false; 
-    
-    //the lowCorner + halfDiagonal is the centroid of the AABB
-    glm::vec3 halfDiagonal = 0.5f*(aabb.highCorner - aabb.lowCorner);
-
-    //The AABB for each child is different. We are going to pass in 
-    //curChildBB as the "current child's" AABB. 
-    //Since we are passing-by-copy, this works and is cleaner than explicitly declaring 8 AABBs
-    AABB currChildBB( glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f) );
-    //octants number 0 to 7, according to convention documented in Octree.h 
-    // + and - are RELATIVE to the parent node
-
-    //Octant # | x y z
-    //***************
-    //octant 0 | + + +
-    currChildBB.lowCorner = nodePosition;  
-    currChildBB.highCorner = aabb.highCorner; 
-    children[0] = new OctreeNode(currChildBB); 
-    //octant 1 | - + + 
-    currChildBB.lowCorner = nodePosition - glm::vec3(halfDiagonal.x, 0.0f, 0.0f);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(halfDiagonal.x, 0.0f, 0.0f); 
-    children[1] = new OctreeNode(currChildBB); 
-    //octant 2 | - - + 
-    currChildBB.lowCorner = nodePosition - glm::vec3(halfDiagonal.x, halfDiagonal.y, 0.0f);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(halfDiagonal.x, halfDiagonal.y, 0.0f); 
-    children[2] = new OctreeNode(currChildBB); 
-    //octant 3 | + - + 
-    currChildBB.lowCorner = nodePosition - glm::vec3(0.0f, halfDiagonal.y, 0.0f);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(0.0f, halfDiagonal.y, 0.0f); 
-    children[3] = new OctreeNode(currChildBB); 
-    //octant 4 | + + - 
-    currChildBB.lowCorner = nodePosition - glm::vec3(0.0f, 0.0f, halfDiagonal.z);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(0.0f, 0.0f, halfDiagonal.z); 
-    children[4] = new OctreeNode(currChildBB); 
-    //octant 5 | - + - 
-    currChildBB.lowCorner = nodePosition - glm::vec3(halfDiagonal.x, 0.0f, halfDiagonal.z);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(halfDiagonal.x, 0.0f, halfDiagonal.z); 
-    children[5] = new OctreeNode(currChildBB); 
-    //octant 6 | - - - 
-    currChildBB.lowCorner = nodePosition - glm::vec3(halfDiagonal.x, halfDiagonal.y, halfDiagonal.z);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(halfDiagonal.x, halfDiagonal.y, halfDiagonal.z); 
-    children[6] = new OctreeNode(currChildBB); 
-    //octant 7 | + - - 
-    currChildBB.lowCorner = nodePosition - glm::vec3(0.0f, halfDiagonal.y, halfDiagonal.z);  
-    currChildBB.highCorner = aabb.highCorner - glm::vec3(0.0f, halfDiagonal.y, halfDiagonal.z); 
-    children[7] = new OctreeNode(currChildBB); 
-}
-
 AABB OctreeNode::getAABB() const{
     return aabb;
+}
+
+unsigned long OctreeNode::getChildIdx(unsigned int i){
+    return 8*bfsIdx + i + 1;
+}
+
+
+unsigned long OctreeNode::getBfsIdx() const{
+    return bfsIdx; 
 }
 
 //add a child to the correct octant based on the position, then return the child
@@ -116,7 +75,7 @@ OctreeNode* OctreeNode::addChild( glm::vec3 position ){
     if( children[octNum] != NULL ){
         return children[octNum];
     } else {
-        children[octNum] = new OctreeNode(childAABB);
+        children[octNum] = new OctreeNode(childAABB, getChildIdx(octNum));
         return children[octNum];
     }
 }
@@ -227,7 +186,8 @@ void Octree::populateOctree( void ) {
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){
    
     AABB rootAABB = calcAABB(points); 
-    OctreeNode* currRoot = new OctreeNode(rootAABB);
+    //the root starts out with bfsIdx of zero! 
+    OctreeNode* currRoot = new OctreeNode(rootAABB, 0);
     for(unsigned long i = 0; i < points->size(); i++){
 	if ( i%100000 == 0 ) 
 	    std::cout << "Inserting node #" << i << std::endl;
@@ -239,7 +199,6 @@ OctreeNode* Octree::buildOctree(std::vector<Point>* points){
 //Serializes octree in following format:
 //The line # is the numbering in the breadth-first traversal of the tree (see diagram on page 2 of the spec sheet on Google Docs)
 //Each line looks like one of two things:
-//A line break (empty line) for a NULL node
 //A bunch of triplets of floats separated by tabs, finally ended with a line break
 //f f f\tf f f\tf f f\tf f f...\n
 //The first 3 float are the position. The second three floats are the lower corner of the AABB
@@ -272,9 +231,9 @@ void Octree::serialize(const char* filename){
 
 void Octree::writeNodeToFile(const OctreeNode* currNode, std::ofstream& fileStream){
     if( currNode == NULL ){
-        fileStream << std::endl; //line break (empty line) denotes null node
-        return;
+        return; //don't write null nodes
     }
+    fileStream << currNode->getBfsIdx() << " ";
     glm::vec3 nodePos = currNode->getPosition();
     glm::vec3 lowCorn = currNode->getAABB().lowCorner;
     glm::vec3 highCorn = currNode->getAABB().highCorner;
@@ -297,6 +256,3 @@ OctreeNode* Octree::deserialize(char* filename){
     //TODO: Actually implement
     return NULL;
 }
-
-
-
