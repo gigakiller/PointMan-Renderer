@@ -102,42 +102,6 @@ void display()
     glm::mat4 view = glm::inverse( myCam->camMatrix );
     glMultMatrixf( &view[0][0] );
 
-    /*
-	
-	glPushMatrix();										  // Push the current matrix stack
-		glColor3f(1,0,0);
-		glTranslatef(0,0,-2);							  // Multiply the current matrix by a translation matrix
-		//glRotatef(Rotation,0,1,0);						  // Multiply the current matrix by a rotation matrix 
-		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix
-	    glutWireTeapot(1);								  // render a wire­frame teapot respectively. 
-	glPopMatrix();										  // Pop the current matrix stack
-
-	glPushMatrix();										  // Push the current matrix stack	
-		glColor3f(0,1,0);
-		glTranslatef(0,0,2);							  // Multiply the current matrix by a translation matrix
-		//glRotatef(Rotation,0,1,0);
-		glRotatef(90,0,1,0);
-	    glutSolidTeapot(1);
-	glPopMatrix();										  // Pop the current matrix stack
-
-	glPushMatrix();										  // Push the current matrix stack
-		glColor3f(0,0,1);
-		//glRotatef(-Rotation,0,1,0);
-		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix 
-		glTranslatef(0,2,0);							  // Multiply the current matrix by a translation matrix
-		glutSolidCube  (1.3); 
-	glPopMatrix();										  // Pop the current matrix stack
-
-	glPushMatrix();									      // Push the current matrix stack
-		glColor3f(1,1,1);
-		glTranslatef(0,-2.5,0);							  // Multiply the current matrix by a translation matrix
-		//glRotatef(-Rotation,1,1,0);					 	  // Multiply the current matrix by a rotation matrix 
-		glRotatef(90,0,1,0);							  // Multiply the current matrix by a rotation matrix 
-		glutSolidSphere  (1 , 32 , 32 ); 	
-	glPopMatrix();									      // Pop the current matrix stack
-
-    */
-
     //draw each point that we've loaded
    
     /* 

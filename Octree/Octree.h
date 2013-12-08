@@ -11,13 +11,14 @@
 class OctreeNode 
 {
 public:
-    OctreeNode(AABB boundingBox);
+    OctreeNode(AABB boundingBox, unsigned long newIdx); //instantiate WITH a bfsIndex.
     ~OctreeNode();
     //getters
     bool getIsLeaf();
     AABB getAABB() const;
     OctreeNode* getChildAt(int i); //get child at index
     glm::vec3 getPosition() const; //position of the node is the centroid of its AABB 
+    unsigned long getBfsIdx() const;
 
     void spawnChildren();
     //under a multiresolution scheme, a node could hold multiple points
@@ -39,11 +40,19 @@ public:
     //IF there is already a child at that octant, DO NOT create a new child, return
     //the child that is already there
     OctreeNode* addChild( glm::vec3 position );
+
 private:
     OctreeNode** children; //octree has eight children
     glm::vec3 nodePosition; //center of the AABB
     AABB aabb;
     bool isLeaf; 
+    //index in the breadth-first traversal of the tree. Child i of node with
+    //bfsIndex k is 8*k + (i+1), assuming that the root node has bfsIndex of 0,
+    //and child numbering starts at 0. E.g. the 0th child of the root is bfsIdx 1,
+    //and the 0th child of that node is bfsIndex 9.
+    unsigned long bfsIdx; 
+    //get bfsIndex of child i, which is 8*bfsIdx + (i + 1), see above
+    unsigned long getChildIdx(unsigned int i);
 };
 
 //Our convention for octrees is as follows:
@@ -71,9 +80,6 @@ public:
     //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
     void serialize(const char* filename);
     
-    //reads a .octopus file into an octree in memory. This is mostly used to test to see if 
-    //serialization actually worked properly 
-    OctreeNode* deserialize(char* filename);
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
