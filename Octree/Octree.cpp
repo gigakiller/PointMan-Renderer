@@ -251,8 +251,3 @@ void Octree::writeNodeToFile(const OctreeNode* currNode, std::ofstream& fileStre
     }
     fileStream << std::endl; //denotes that "this" OctreeNode is finished. The next line is another node
 }
-
-OctreeNode* Octree::deserialize(char* filename){
-    //TODO: Actually implement
-    return NULL;
-}

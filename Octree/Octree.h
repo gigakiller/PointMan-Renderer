@@ -80,9 +80,6 @@ public:
     //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
     void serialize(const char* filename);
     
-    //reads a .octopus file into an octree in memory. This is mostly used to test to see if 
-    //serialization actually worked properly 
-    OctreeNode* deserialize(char* filename);
     ~Octree();
 private:
     OctreeNode* buildOctree(std::vector<Point>* points);
