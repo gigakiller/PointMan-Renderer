@@ -3,6 +3,11 @@
     /*global window,document,Float32Array,Uint16Array,mat4,vec3,snoise*/
     /*global getShaderSource,createWebGLContext,createProgram*/
 
+    // Octree stuff
+    /*global OctreeNode */
+
+    var octree_node = new OctreeNode();
+
     var NUM_WIDTH_PTS = 200;
     var NUM_HEIGHT_PTS = 200;
 
