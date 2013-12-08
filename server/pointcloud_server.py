@@ -12,7 +12,7 @@ from time import sleep
 from numpy import array
 
 # Get list of .json files in data
-my_dict = read_octree(1337)
+my_octree_dict = read_octree("data/chappes_sml.octopus")
 for key, value in my_dict.iteritems():
     print key, value
 
