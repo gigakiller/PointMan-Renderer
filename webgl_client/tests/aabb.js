@@ -5,8 +5,8 @@
 
     // Octree stuff
     /*global OctreeNode */
-
-    var octree_node = new OctreeNode();
+   
+     
 
     var NUM_WIDTH_PTS = 200;
     var NUM_HEIGHT_PTS = 200;
@@ -57,6 +57,8 @@
 
     (function initializeGrid() {
         function uploadMesh(positions, heights, indices) {
+            console.log(positions);
+            console.log(indices);
             // Positions
             var positionsName = context.createBuffer();
             context.bindBuffer(context.ARRAY_BUFFER, positionsName);
@@ -70,10 +72,58 @@
             context.bufferData(context.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), context.STATIC_DRAW);
         
         }
+
+      /*
+        var positions = [];
+        var indices = [];
+
+        var test_aabb = new AABB( vec3.create(-width,-width,-width), vec3.create(width,width,width) );
+        //test_aabb.draw( positions, indices );
+        */
+        /*
         var width = 0.1
+        var positions = [];
+        var indices = [];
+
+        var test_aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        test_aabb.draw( positions, indices, 0 );
+
+        var width = 0.05;
+        var test_aabb2 = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        test_aabb2.draw( positions, indices, 1 );
+        console.log(positions);
+        console.log(indices);
+        */
+        var width = 0.1
+        var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+
+        var root = new OctreeNode( aabb );
+
+       
+        /* 
+        var positions = [];
+        var indices = [];
+        console.log( root.aabb.lowCorner );
+        console.log( root.aabb.highCorner );
+        root.aabb.draw( positions, indices, 0 );
+        console.log(positions);
+        console.log(indices);
+        */
+        
+       
+         
+        var octree = new Octree( root );
+        var octDrawer = new OctreeDrawer( octree, context );
+        octDrawer.draw();
+        console.log(octDrawer.positions);
+        console.log(octDrawer.indices);
+        
+        
+
+        /*
         var lowCorner = [-width,-width,-width]
         var highCorner = [width,width,width]
-
+      
         var positions = [
             // z-bottom
             lowCorner[0], lowCorner[1], lowCorner[2],
@@ -108,9 +158,12 @@
             7,6,
             6,2
             ];
-
-        uploadMesh(positions, heights, indices);
-        numberOfIndices = indices.length;
+         
+            */
+        uploadMesh(octDrawer.positions, heights, octDrawer.indices);
+        numberOfIndices = octDrawer.indices.length;
+        //uploadMesh(positions, heights, indices);
+        //numberOfIndices = indices.length;
     })();
 
     (function animate(){
