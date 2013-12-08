@@ -2,8 +2,7 @@
 *.slo
 *.lo
 *.o
-#does a .pyc count as an object file?
-*.pyc 
+*.pyc
 
 # Compiled Dynamic libraries
 *.so

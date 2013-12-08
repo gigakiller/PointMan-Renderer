@@ -1,7 +1,9 @@
 #got the following from http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+from itertools import izip_longest
+from octree_node import OctreeNode
+
 def grouper(iterable, n, fillvalue=None):
     nathan_args = [iter(iterable)] * n
-    pdb.set_trace()
     return izip_longest(*nathan_args, fillvalue=fillvalue)
 
 #read in an .octopus file (output from the C++ octree builder)

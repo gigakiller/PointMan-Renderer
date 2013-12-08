@@ -13,8 +13,6 @@ from numpy import array
 
 # Get list of .json files in data
 my_octree_dict = read_octree("data/chappes_sml.octopus")
-for key, value in my_dict.iteritems():
-    print key, value
 
 files = listdir('data')
 loaded_clouds = {}
