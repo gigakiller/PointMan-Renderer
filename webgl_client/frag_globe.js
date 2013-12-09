@@ -438,6 +438,7 @@
         var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
         var root = new OctreeNode( aabb );
         var octree = new Octree( root );
+        //root.createChildAt(0);
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
