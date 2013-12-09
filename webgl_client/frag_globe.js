@@ -217,6 +217,117 @@
         new_msg = false;
     }
 
+    function loadAABB() { 
+        //$.getJSON("data/chappes.json", function( pointCloud ) {
+
+        // Unpack message
+        //var pointCloud = msg["data"];
+        //numberOfPoints = msg["numberOfPoints"];
+        var aabbHighDict = msg.highCorner;
+        var aabbLowDict = msg.lowCorner;
+        var centroidDict = msg.position;
+        var aabbHigh = vec3.create();
+        var aabbLow = vec3.create();
+
+        aabbHigh[0] = aabbHighDict.x; 
+        aabbHigh[1] = aabbHighDict.y; 
+        aabbHigh[2] = aabbHighDict.z; 
+
+        aabbLow[0] = aabbLowDict.x; 
+        aabbLow[1] = aabbLowDict.y; 
+        aabbLow[2] = aabbLowDict.z; 
+
+        centroid[0] = centroidDict.x; 
+        centroid[1] = centroidDict.y; 
+        centroid[2] = centroidDict.z; 
+
+        //draw the low corner, the high corner, and the centroid
+        numberOfPoints = 3;
+        var fragLen = 3; //fragLen is... the number of vertices? 
+        pointsCount += fragLen;
+        //console.log( pointsCount );
+
+        // Upon first message allocate memory for entire cloud
+        if ( pointsIndex == 0 ) {
+            // Initialize pointcloud memory
+            positions = new Float32Array(3 * numberOfPoints);
+            colors = new Float32Array(3 * numberOfPoints);
+
+            // Set up camera pointing towareds centroid 
+            gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
+
+            //assuming the camera starts at the origin, the desired view direction is 
+            //the coordinates of the centroid itself
+
+            //I am assuming that we peer down the "+z" axis of camera space. We're going
+            //to have to rotate the +z axis onto the desired view direction (i.e. the 
+            //direction of the centroid).
+
+            var plusZ = [0, 0, -1];
+            var centroidDir = centroid;
+            var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
+            var desiredRotation = vec3.rotationTo(plusZ, centroidDir); 
+            var startingRot3 = quat4.toMat3(desiredRotation);
+            var startingRot4 = mat3.toMat4(startingRot3);
+            mat4.multiply(cam, startingRot4); 
+        }
+
+        //console.log( pointCloud.positions.length );
+        //for ( var i=0; i<fragLen; i++ ) {
+            ////console.log( pointCloud.positions[i] );
+            //positions[pointsIndex] = pointCloud.positions[i][0];
+            ////  centroid[0] += pointCloud.positions[i][0];
+            //colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
+            //pointsIndex++;
+            //positions[pointsIndex] = pointCloud.positions[i][1];
+            ////  centroid[1] += pointCloud.positions[i][1];
+            //colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
+            //pointsIndex++;
+            //positions[pointsIndex] = pointCloud.positions[i][2];
+            ////  centroid[2] += pointCloud.positions[i][1];
+            //colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
+            //pointsIndex++;
+        //}
+        positions[0] = aabbLow[0];  
+        positions[1] = aabbLow[1];  
+        positions[2] = aabbLow[2];  
+
+        positions[3] = centroid[3];  
+        positions[4] = centroid[4];  
+        positions[5] = centroid[5];  
+
+        positions[6] = aabbHigh[6];  
+        positions[7] = aabbHigh[7];  
+        positions[8] = aabbHigh[8];  
+
+        for( var i=0; i < 9; i += 3 ){
+            colors[i] = 0; 
+            colors[i+1] = 1; 
+            colors[i+2] = 0; 
+        } 
+
+        // Set up Points
+        // Positions
+        var positionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLocation);
+        // Colors
+        var colorsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(colorLocation);
+
+        // Kickoff animation cycle
+        //animate();
+        //console.log(pointsIndex);
+
+        // Indicate that the message has been handled 
+        new_msg = false;
+    }
+
     var time = 0;
 
 
@@ -381,7 +492,8 @@
 
     ws.onopen = function() {
         //var req = {"pointcloud":"chappes"};
-        var req = {"pointcloud":"chappes_sml"};
+        //var req = {"pointcloud":"chappes_sml"};
+        var req = {"pointcloud":"0"};
         ws.send( JSON.stringify(req) );
     };
 
@@ -409,7 +521,10 @@
 
         // If we have a new message then update the pointcloud data
         if ( new_msg ) {
-            loadPointCloud();
+            //loadPointCloud();
+            //Temporary: for now we are going to load an AABB to test to see 
+            //if we are getting the octree from the server correctly
+            loadAABB(); 
         }
 
         // Handle user keyboard inputs
@@ -442,6 +557,7 @@
 
         //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
         gl.drawArrays( gl.POINTS, 0, pointsCount );
+        //gl.drawArrays( gl.LINES, 0, pointsCount );
 
         time += 0.001;
         window.requestAnimFrame(animate);
