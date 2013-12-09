@@ -28,6 +28,9 @@
     gl.enable(gl.BLEND);
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
+    //assuming that we are drawing one cube at a time
+    var numIndices = 32;
+
     var persp = mat4.create();
     mat4.perspective(45.0, canvas.width/canvas.height, 0.1, 100.0, persp);
 
@@ -268,6 +271,11 @@
             // Initialize pointcloud memory
             positions = new Float32Array(3 * numberOfPoints);
             colors = new Float32Array(3 * numberOfPoints);
+            //set up the indices assuming we are drawing one cube at a time.
+            //this is based on Uriah's implementation, which contains 16 lines * 2 because
+            //we need a beginning point and an end point for each line. I think we can get away
+            //with 12, since there are 12 edges in a cube? 
+            indices = new Uint16Array(numIndices); 
 
             // Set up camera pointing towareds centroid 
             gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
@@ -308,6 +316,7 @@
         
         var tmp_positions = [];
         var tmp_colors = [];
+        var tmp_indices = [];
         tmp_positions.push(
             // z-bottom
             aabbLow[0], aabbLow[1], aabbLow[2],
@@ -335,29 +344,33 @@
             positions[i] = tmp_positions[i]; 
             colors[i] = tmp_colors[i];
         }
-                
-        //indices.push(
-            //// z-bottom
-            //0,1,
-            //0,3,
-            //1,2,
-            //2,3,
-            //// z-top
-            //4,5,
-            //4,7,
-            //5,6,
-            //6,7,
-            //// x-left
-            //0,4,
-            //0,1,
-            //4,5,
-            //5,1,
-            //// x-right
-            //3,7,
-            //3,2,
-            //7,6,
-            //6,2
-        //);
+
+        tmp_indices.push(
+            // z-bottom
+            0,1,
+            0,3,
+            1,2,
+            2,3,
+            // z-top
+            4,5,
+            4,7,
+            5,6,
+            6,7,
+            // x-left
+            0,4,
+            0,1,
+            4,5,
+            5,1,
+            // x-right
+            3,7,
+            3,2,
+            7,6,
+            6,2
+        );
+
+        for( i=0; i < numIndices; i++ ){
+            indices[i] = tmp_indices[i];
+        }
 
         // Set up Points
         // Positions
@@ -373,6 +386,9 @@
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
 
+        var indicesName = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
         // Kickoff animation cycle
         //animate();
         //console.log(pointsIndex);
@@ -610,6 +626,7 @@
 
         //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
         gl.drawArrays( gl.POINTS, 0, pointsCount );
+        //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
         //gl.drawArrays( gl.LINES, 0, pointsCount );
 
         time += 0.001;
