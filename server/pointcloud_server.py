@@ -4,6 +4,7 @@
   sends that data over a websocket when requested by the
   client
 '''
+import jsonpickle
 from read_octopus import read_octree
 from tornado import websocket, web, ioloop
 from json import load, loads, dumps
@@ -11,9 +12,12 @@ from os import listdir
 from time import sleep
 from numpy import array
 
-# Get list of .json files in data
+#read in the .octopus file that represents our octree
 my_octree_dict = read_octree("data/chappes_sml.octopus")
+for key, val in my_octree_dict.iteritems():
+    print key, jsonpickle.encode(val)
 
+# Get list of .json files in data
 files = listdir('data')
 loaded_clouds = {}
 centroids = {}
