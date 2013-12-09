@@ -62,11 +62,21 @@
     // Drawing mode, toggle between squares and circles
     var drawMode = 0;
 
+    // Number of octree indices
+    var numberOfIndices = 0;
+
     //position, normal, texCoord location for the earth
     var positionLocation;
     var colorLocation;
     var normalLocation;
     var texCoordLocation;
+
+    // For octree
+    var octreePositionLocation;
+    var u_octreeModelLocation;
+    var u_octreeViewLocation;
+    var u_octreePerspLocation;
+    var octree_program;
 
     var u_InvTransLocation;
     var u_ModelLocation;
@@ -80,6 +90,7 @@
     var use_RoundPoints = true;
 
     function initializeShader() {
+        
         var vs = getShaderSource(document.getElementById("vs"));
         var fs;
 
@@ -88,10 +99,10 @@
         } else {
             fs = getShaderSource(document.getElementById("square-fs"));
         }
-
         globe_program = createProgram(gl, vs, fs, message);
 
-        // Optional binding ( mostly for performance on MAC and opengl-es devices
+
+        // Optional binding ( mostly for performance on mac and opengl-es devices
         gl.bindAttribLocation(globe_program, 0, "Position");
         gl.bindAttribLocation(globe_program, 1, "Color");
         gl.bindAttribLocation(globe_program, 2, "Normal");
@@ -111,7 +122,28 @@
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
         u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
         u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
-        gl.useProgram(globe_program);
+        //gl.useProgram(globe_program);
+        
+
+        // Set up octree shaders
+        var octree_fs = getShaderSource(document.getElementById("octree-fs"));
+        var octree_vs = getShaderSource(document.getElementById("octree-vs"));
+        octree_program = createProgram(gl, octree_vs, octree_fs, message);
+
+
+        gl.bindAttribLocation(octree_program, 0, "position");
+        // Gotta link 
+        gl.linkProgram(octree_program);
+        if (!gl.getProgramParameter(octree_program, gl.LINK_STATUS)) {
+            alert(gl.getProgramInfoLog(octree_program));
+            return;
+        } 
+
+        octreePositionLocation = gl.getAttribLocation(octree_program, "position");
+        u_octreeModelLocation = gl.getUniformLocation(octree_program,"u_Model");
+        u_octreeViewLocation = gl.getUniformLocation(octree_program,"u_View");
+        u_octreePerspLocation = gl.getUniformLocation(octree_program,"u_Persp");
+        //gl.useProgram(octree_program);
     }
 
     initializeShader();
@@ -227,6 +259,7 @@
         // Unpack message
         //var pointCloud = msg["data"];
         //numberOfPoints = msg["numberOfPoints"];
+        
         var aabbHighDict = msg.highCorner;
         var aabbLowDict = msg.lowCorner;
         var centroidDict = msg.position;
@@ -259,16 +292,18 @@
         console.log(aabbLow[0]);
         console.log(aabbLow[1]);
         console.log(aabbLow[2]);
-
+        /*
         //draw the low corner, the high corner, and the centroid
         numberOfPoints = 8;
         var fragLen = 8; //fragLen is... the number of vertices? 
         pointsCount += fragLen;
         //console.log( pointsCount );
+        */
 
         // Upon first message allocate memory for entire cloud
         if ( pointsIndex == 0 ) {
             // Initialize pointcloud memory
+            /*
             positions = new Float32Array(3 * numberOfPoints);
             colors = new Float32Array(3 * numberOfPoints);
             //set up the indices assuming we are drawing one cube at a time.
@@ -276,6 +311,7 @@
             //we need a beginning point and an end point for each line. I think we can get away
             //with 12, since there are 12 edges in a cube? 
             indices = new Uint16Array(numIndices); 
+            */
 
             // Set up camera pointing towareds centroid 
             gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
@@ -295,7 +331,7 @@
             var startingRot4 = mat3.toMat4(startingRot3);
             mat4.multiply(cam, startingRot4); 
         }
-
+        
         //positions[0] = aabbLow[0];  
         //positions[1] = aabbLow[1];  
         //positions[2] = aabbLow[2];  
@@ -313,7 +349,8 @@
             //colors[i+1] = 1; 
             //colors[i+2] = 0; 
         //} 
-        
+       
+        /* 
         var tmp_positions = [];
         var tmp_colors = [];
         var tmp_indices = [];
@@ -385,13 +422,43 @@
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
+        */
 
+        /*
         var indicesName = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+        */
         // Kickoff animation cycle
         //animate();
         //console.log(pointsIndex);
+        
+        //var width = 0.1
+        //var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
+        var root = new OctreeNode( aabb );
+        var octree = new Octree( root );
+        //root.createChildAt(0);
+        var octDrawer = new OctreeDrawer( octree, gl );
+        octDrawer.draw();
+        var positions = octDrawer.positions;
+        var indices = octDrawer.indices;
+        numberOfIndices = indices.length; 
+        console.log(positions);
+        console.log(indices);
+        console.log(numberOfIndices);
+
+        // Positions
+        var octreePositionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(octreePositionLocation);
+
+        // Indices
+        var indicesName = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
         // Indicate that the message has been handled 
         new_msg = false;
@@ -450,20 +517,24 @@
         if ( currentKeys[87] ) {
             //console.log("moving forward\n");
             mat4.translate( cam, [0,0,-cam_vel] );
+            console.log(cam);
         }
         // 's'
         if ( currentKeys[83] ) {
             //console.log("moving backwards\n");
             mat4.translate( cam, [0,0,cam_vel] );
+            console.log(cam);
         }
 
         // 'a'
         if ( currentKeys[65] ) {
             mat4.translate( cam, [-cam_vel,0,0] );
+            console.log(cam);
         }
         // 'd'
         if ( currentKeys[68] ) {
             mat4.translate( cam, [cam_vel,0,0] );
+            console.log(cam);
         }
         //'q' OR 'e' 
         if( currentKeys[81] || currentKeys[69] ) {
@@ -478,6 +549,7 @@
             var roll_mat = mat4.create(); 
             mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
             mat4.multiply(cam, roll_mat); 
+            console.log(cam);
         }
     }
 
@@ -605,7 +677,6 @@
         mat4.inverse( cam, view );
 
         // Update Transforms
-        gl.useProgram(globe_program);
         var model = mat4.create();
         mat4.identity(model);
         var mv = mat4.create();
@@ -618,7 +689,9 @@
         // Render
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+        
+        // Pointcloud Rendering program
+        gl.useProgram(globe_program);
         gl.uniformMatrix4fv(u_ModelLocation, false, model);
         gl.uniformMatrix4fv(u_ViewLocation, false, view);
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
@@ -628,6 +701,14 @@
         gl.drawArrays( gl.POINTS, 0, pointsCount );
         //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
         //gl.drawArrays( gl.LINES, 0, pointsCount );
+       
+        // Octree Rendering program 
+        gl.useProgram(octree_program);
+
+        gl.uniformMatrix4fv(u_octreeModelLocation, false, model);
+        gl.uniformMatrix4fv(u_octreeViewLocation, false, view);
+        gl.uniformMatrix4fv(u_octreePerspLocation, false, persp);
+        gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
 
         time += 0.001;
         window.requestAnimFrame(animate);
