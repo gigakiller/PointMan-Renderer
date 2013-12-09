@@ -331,7 +331,7 @@
                 0.0, 1.0, 0.0,
                 0.0, 1.0, 0.0
                 );
-        for( var i=0; i < 8; i++ ){
+        for( var i=0; i < 3 * numberOfPoints; i++ ){
             positions[i] = tmp_positions[i]; 
             colors[i] = tmp_colors[i];
         }
