@@ -118,6 +118,7 @@
     var numberOfPoints=0;
     var pointsCount=0;
     var positions;
+    var indices;
     var colors;
     var msg;
     var new_msg=false;
@@ -257,8 +258,8 @@
         console.log(aabbLow[2]);
 
         //draw the low corner, the high corner, and the centroid
-        numberOfPoints = 3;
-        var fragLen = 3; //fragLen is... the number of vertices? 
+        numberOfPoints = 8;
+        var fragLen = 8; //fragLen is... the number of vertices? 
         pointsCount += fragLen;
         //console.log( pointsCount );
 
@@ -287,39 +288,76 @@
             mat4.multiply(cam, startingRot4); 
         }
 
-        //console.log( pointCloud.positions.length );
-        //for ( var i=0; i<fragLen; i++ ) {
-            ////console.log( pointCloud.positions[i] );
-            //positions[pointsIndex] = pointCloud.positions[i][0];
-            ////  centroid[0] += pointCloud.positions[i][0];
-            //colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
-            //pointsIndex++;
-            //positions[pointsIndex] = pointCloud.positions[i][1];
-            ////  centroid[1] += pointCloud.positions[i][1];
-            //colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
-            //pointsIndex++;
-            //positions[pointsIndex] = pointCloud.positions[i][2];
-            ////  centroid[2] += pointCloud.positions[i][1];
-            //colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
-            //pointsIndex++;
-        //}
-        positions[0] = aabbLow[0];  
-        positions[1] = aabbLow[1];  
-        positions[2] = aabbLow[2];  
+        //positions[0] = aabbLow[0];  
+        //positions[1] = aabbLow[1];  
+        //positions[2] = aabbLow[2];  
 
-        positions[3] = centroid[3];  
-        positions[4] = centroid[4];  
-        positions[5] = centroid[5];  
+        //positions[3] = centroid[3];  
+        //positions[4] = centroid[4];  
+        //positions[5] = centroid[5];  
 
-        positions[6] = aabbHigh[6];  
-        positions[7] = aabbHigh[7];  
-        positions[8] = aabbHigh[8];  
+        //positions[6] = aabbHigh[6];  
+        //positions[7] = aabbHigh[7];  
+        //positions[8] = aabbHigh[8];  
 
-        for( var i=0; i < 9; i += 3 ){
-            colors[i] = 0; 
-            colors[i+1] = 1; 
-            colors[i+2] = 0; 
-        } 
+        //for( var i=0; i < 9; i += 3 ){
+            //colors[i] = 0; 
+            //colors[i+1] = 1; 
+            //colors[i+2] = 0; 
+        //} 
+        
+        var tmp_positions = [];
+        var tmp_colors = [];
+        tmp_positions.push(
+            // z-bottom
+            aabbLow[0], aabbLow[1], aabbLow[2],
+            aabbLow[0], aabbHigh[1], aabbLow[2],
+            aabbHigh[0], aabbHigh[1], aabbLow[2],
+            aabbHigh[0], aabbLow[1], aabbLow[2],
+            // z-top
+            aabbLow[0], aabbLow[1], aabbHigh[2],
+            aabbLow[0], aabbHigh[1], aabbHigh[2],
+            aabbHigh[0], aabbHigh[1], aabbHigh[2],
+            aabbHigh[0], aabbLow[1], aabbHigh[2]
+        );
+        tmp_colors.push(
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0,
+                
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 1.0, 0.0
+                );
+        for( var i=0; i < 8; i++ ){
+            positions[i] = tmp_positions[i]; 
+            colors[i] = tmp_colors[i];
+        }
+                
+        //indices.push(
+            //// z-bottom
+            //0,1,
+            //0,3,
+            //1,2,
+            //2,3,
+            //// z-top
+            //4,5,
+            //4,7,
+            //5,6,
+            //6,7,
+            //// x-left
+            //0,4,
+            //0,1,
+            //4,5,
+            //5,1,
+            //// x-right
+            //3,7,
+            //3,2,
+            //7,6,
+            //6,2
+        //);
 
         // Set up Points
         // Positions
@@ -508,7 +546,7 @@
     ws.onopen = function() {
         //var req = {"pointcloud":"chappes"};
         //var req = {"pointcloud":"chappes_sml"};
-        var req = {"pointcloud":"0"};
+        var req = {"pointcloud":"18"};
         ws.send( JSON.stringify(req) );
     };
 
