@@ -95,9 +95,34 @@
         console.log(indices);
         */
         var width = 0.1
-        var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        var aabb = new AABB( vec3.create([width,width,width]), vec3.create([-width,-width,-width]) );
 
         var root = new OctreeNode( aabb );
+        
+        root.createChildAt(0);
+        root.createChildAt(1);
+        root.createChildAt(2);
+        root.createChildAt(3);
+        root.createChildAt(4);
+        root.createChildAt(5);
+        root.createChildAt(6);
+        root.createChildAt(7);
+        console.log( root.children[0].position );
+
+        /* Battling with gl-matrix
+        var v = vec3.create();
+        vec3.subtract( root.aabb.highCorner, root.aabb.lowCorner, v );
+        var centroid = vec3.create();
+        vec3.scale( v, 0.5 )
+        vec3.add( root.aabb.lowCorner, v, centroid );
+        console.log( centroid );
+        */
+
+        /*
+        var width = 0.05
+        var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        root.children[0] = new OctreeNode( aabb );
+        */
 
        
         /* 
