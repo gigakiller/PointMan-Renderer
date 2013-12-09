@@ -253,10 +253,6 @@
         new_msg = false;
     }
 
-
-    // Front Queue
-    var expansion_front = Queue();       
-
     function loadAABB() { 
         //$.getJSON("data/chappes.json", function( pointCloud ) {
 
@@ -310,12 +306,15 @@
             /*
             positions = new Float32Array(3 * numberOfPoints);
             colors = new Float32Array(3 * numberOfPoints);
+<<<<<<< HEAD
+            */
+=======
             //set up the indices assuming we are drawing one cube at a time.
             //this is based on Uriah's implementation, which contains 16 lines * 2 because
             //we need a beginning point and an end point for each line. I think we can get away
             //with 12, since there are 12 edges in a cube? 
             indices = new Uint16Array(numIndices); 
-            */
+>>>>>>> e2dcc396453dde9dc8dfc3ba2ca218db2b0edf7f
 
             // Set up camera pointing towareds centroid 
             gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
@@ -384,6 +383,33 @@
         for( var i=0; i < 3 * numberOfPoints; i++ ){
             positions[i] = tmp_positions[i]; 
             colors[i] = tmp_colors[i];
+<<<<<<< HEAD
+        }*/
+                
+        //indices.push(
+            //// z-bottom
+            //0,1,
+            //0,3,
+            //1,2,
+            //2,3,
+            //// z-top
+            //4,5,
+            //4,7,
+            //5,6,
+            //6,7,
+            //// x-left
+            //0,4,
+            //0,1,
+            //4,5,
+            //5,1,
+            //// x-right
+            //3,7,
+            //3,2,
+            //7,6,
+            //6,2
+        //);
+        
+=======
         }
 
         tmp_indices.push(
@@ -412,7 +438,9 @@
         for( i=0; i < numIndices; i++ ){
             indices[i] = tmp_indices[i];
         }
+>>>>>>> e2dcc396453dde9dc8dfc3ba2ca218db2b0edf7f
 
+        /*
         // Set up Points
         // Positions
         var positionsName = gl.createBuffer();
@@ -428,11 +456,9 @@
         gl.enableVertexAttribArray(colorLocation);
         */
 
-        /*
         var indicesName = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-        */
         // Kickoff animation cycle
         //animate();
         //console.log(pointsIndex);
@@ -440,13 +466,8 @@
         //var width = 0.1
         //var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
         var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
-        var root = new OctreeNode( aabb, 0 );
-        console.log(root.getChildrenIds());
+        var root = new OctreeNode( aabb );
         var octree = new Octree( root );
-        for ( var j=0; j<8; j++ ){
-          root.createChildAt(j);
-          console.log(root.children[j].getChildrenIds());
-        }
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
