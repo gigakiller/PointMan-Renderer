@@ -145,7 +145,7 @@ OctreeNode.prototype.createChildAt = function(i){
             this.children[7] = new OctreeNode( child_aabb );
             break;
         default:
-            console.log( "error, how did we get here?" );
+            console.err( "error, how did we get here?" );
             break;
     }
 };
