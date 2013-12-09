@@ -632,13 +632,16 @@
     //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
-        //var req = {"pointcloud":"chappes"};
-        //var req = {"pointcloud":"chappes_sml"};
+        //var req = {"pointcloud":"17"};
+        //ws.send( JSON.stringify(req) );
+
         //var req = {"pointcloud":"18"};
-        var req = {"pointcloud":"17"};
+        //ws.send( JSON.stringify(req) );
+
+        var req = [17];
         ws.send( JSON.stringify(req) );
 
-        var req = {"pointcloud":"18"};
+        req = [18];
         ws.send( JSON.stringify(req) );
     };
 

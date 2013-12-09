@@ -58,7 +58,8 @@ class PointCloudReqWS(websocket.WebSocketHandler):
 
     def on_message(self, message):
         msg = loads(message)
-        cloud = msg['pointcloud']
+        #cloud = msg['pointcloud']
+        cloud = msg[0];
         nodeIdx = int(cloud)
 
         if my_octree_dict.has_key(nodeIdx):
