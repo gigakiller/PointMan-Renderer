@@ -241,6 +241,21 @@
         centroid[1] = centroidDict.y; 
         centroid[2] = centroidDict.z; 
 
+        console.log("Centroid position:");
+        console.log(centroid[0]);
+        console.log(centroid[1]);
+        console.log(centroid[2]);
+
+        console.log("AABB high corner:");
+        console.log(aabbHigh[0]);
+        console.log(aabbHigh[1]);
+        console.log(aabbHigh[2]);
+
+        console.log("AABB low corner:");
+        console.log(aabbLow[0]);
+        console.log(aabbLow[1]);
+        console.log(aabbLow[2]);
+
         //draw the low corner, the high corner, and the centroid
         numberOfPoints = 3;
         var fragLen = 3; //fragLen is... the number of vertices? 
