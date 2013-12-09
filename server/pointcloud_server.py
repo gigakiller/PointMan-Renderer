@@ -58,9 +58,14 @@ class PointCloudReqWS(websocket.WebSocketHandler):
 
     def on_message(self, message):
         msg = loads(message)
-        cloud = msg['pointcloud']
+        #cloud = msg['pointcloud']
+        cloud = msg[0];
         nodeIdx = int(cloud)
-        self.write_message( jsonpickle.encode(my_octree_dict[nodeIdx]) ) 
+
+        if my_octree_dict.has_key(nodeIdx):
+            self.write_message( jsonpickle.encode(my_octree_dict[nodeIdx]) ) 
+        else:
+            self.write_message( "" ) 
 
         #if cloud == "1337": 
             #print "Received m3ssage from teh l337 h4x0rZ!"    

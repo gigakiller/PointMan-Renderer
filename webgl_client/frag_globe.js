@@ -640,9 +640,16 @@
     //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
-        //var req = {"pointcloud":"chappes"};
-        //var req = {"pointcloud":"chappes_sml"};
-        var req = {"pointcloud":"18"};
+        //var req = {"pointcloud":"17"};
+        //ws.send( JSON.stringify(req) );
+
+        //var req = {"pointcloud":"18"};
+        //ws.send( JSON.stringify(req) );
+
+        var req = [17];
+        ws.send( JSON.stringify(req) );
+
+        req = [18];
         ws.send( JSON.stringify(req) );
     };
 
@@ -651,6 +658,10 @@
         // Note: A better thing would be to queue 
         if ( new_msg ) 
             return;
+        if( evt.data == "" ){
+            console.log( "Requested null node in tree!" );
+            return;
+        }
         msg = JSON.parse(evt.data);
         if( "power_level" in msg ){
             console.log( "The power level is: ".concat(msg.power_level) );
