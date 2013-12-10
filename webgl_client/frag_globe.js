@@ -263,53 +263,17 @@
     console.log( expansion_req );
 
     function handleMsg() { 
-        //$.getJSON("data/chappes.json", function( pointCloud ) {
+        if(msg[0].bfsIdx == 0){ //we have recieved the root. this only happens once! 
+            var highCorner = msg[0].highCorner;
+            var lowCorner = msg[0].lowCorner;
+            var new_highCorner = vec3.create([highCorner.x, highCorner.y, highCorner.z]); 
+            var new_lowCorner = vec3.create([lowCorner.x, lowCorner.y, lowCorner.z]); 
 
-        // Unpack message
-        //var pointCloud = msg["data"];
-        //numberOfPoints = msg["numberOfPoints"];
-        
-        console.log("Number of octree nodes sent: ".concat(msg.length));
-        var curr_aabb = msg[0];
-        var aabbHighDict = curr_aabb.highCorner;
-        var aabbLowDict = curr_aabb.lowCorner;
-        var centroidDict = curr_aabb.position;
-        var aabbHigh = vec3.create();
-        var aabbLow = vec3.create();
+            var new_aabb = new AABB( new_highCorner, new_lowCorner );
+            var new_root  = new OctreeNode( new_aabb, 0 );
+            octree = new Octree(new_root); 
 
-        aabbHigh[0] = aabbHighDict.x; 
-        aabbHigh[1] = aabbHighDict.y; 
-        aabbHigh[2] = aabbHighDict.z; 
-
-        aabbLow[0] = aabbLowDict.x; 
-        aabbLow[1] = aabbLowDict.y; 
-        aabbLow[2] = aabbLowDict.z; 
-
-        centroid[0] = centroidDict.x; 
-        centroid[1] = centroidDict.y; 
-        centroid[2] = centroidDict.z; 
-
-        /*
-        //draw the low corner, the high corner, and the centroid
-        numberOfPoints = 8;
-        var fragLen = 8; //fragLen is... the number of vertices? 
-        pointsCount += fragLen;
-        //console.log( pointsCount );
-        */
-
-        // Upon first message allocate memory for entire cloud
-        if ( pointsIndex == 0 ) {
-            // Initialize pointcloud memory
-            /*
-            positions = new Float32Array(3 * numberOfPoints);
-            colors = new Float32Array(3 * numberOfPoints);
-            //set up the indices assuming we are drawing one cube at a time.
-            //this is based on Uriah's implementation, which contains 16 lines * 2 because
-            //we need a beginning point and an end point for each line. I think we can get away
-            //with 12, since there are 12 edges in a cube? 
-            indices = new Uint16Array(numIndices); 
-            */
-
+            centroid = new_root.position;
             // Set up camera pointing towareds centroid 
             gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
 
@@ -327,126 +291,13 @@
             var startingRot3 = quat4.toMat3(desiredRotation);
             var startingRot4 = mat3.toMat4(startingRot3);
             mat4.multiply(cam, startingRot4); 
-
         }
+         
+        //var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
+        //var root = new OctreeNode( aabb, 0 );
+        //console.log(root.getChildrenIds());
+        //var octree = new Octree( root );
         
-        //positions[0] = aabbLow[0];  
-        //positions[1] = aabbLow[1];  
-        //positions[2] = aabbLow[2];  
-
-        //positions[3] = centroid[3];  
-        //positions[4] = centroid[4];  
-        //positions[5] = centroid[5];  
-
-        //positions[6] = aabbHigh[6];  
-        //positions[7] = aabbHigh[7];  
-        //positions[8] = aabbHigh[8];  
-
-        //for( var i=0; i < 9; i += 3 ){
-            //colors[i] = 0; 
-            //colors[i+1] = 1; 
-            //colors[i+2] = 0; 
-        //} 
-       
-        /* 
-        var tmp_positions = [];
-        var tmp_colors = [];
-        var tmp_indices = [];
-        tmp_positions.push(
-            // z-bottom
-            aabbLow[0], aabbLow[1], aabbLow[2],
-            aabbLow[0], aabbHigh[1], aabbLow[2],
-            aabbHigh[0], aabbHigh[1], aabbLow[2],
-            aabbHigh[0], aabbLow[1], aabbLow[2],
-            // z-top
-            aabbLow[0], aabbLow[1], aabbHigh[2],
-            aabbLow[0], aabbHigh[1], aabbHigh[2],
-            aabbHigh[0], aabbHigh[1], aabbHigh[2],
-            aabbHigh[0], aabbLow[1], aabbHigh[2]
-        );
-        tmp_colors.push(
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0
-                );
-        for( var i=0; i < 3 * numberOfPoints; i++ ){
-            positions[i] = tmp_positions[i]; 
-            colors[i] = tmp_colors[i];
-        }
-
-        tmp_indices.push(
-            // z-bottom
-            0,1,
-            0,3,
-            1,2,
-            2,3,
-            // z-top
-            4,5,
-            4,7,
-            5,6,
-            6,7,
-            // x-left
-            0,4,
-            0,1,
-            4,5,
-            5,1,
-            // x-right
-            3,7,
-            3,2,
-            7,6,
-            6,2
-        );
-
-        for( i=0; i < numIndices; i++ ){
-            indices[i] = tmp_indices[i];
-        }
-
-        // Set up Points
-        // Positions
-        var positionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(positionLocation);
-        // Colors
-        var colorsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colorLocation);
-        */
-
-        /*
-        var indicesName = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-        */
-        // Kickoff animation cycle
-        //animate();
-        //console.log(pointsIndex);
-        
-        //var width = 0.1
-        //var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
-        
-        var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
-        var root = new OctreeNode( aabb, 0 );
-        console.log(root.getChildrenIds());
-        var octree = new Octree( root );
-        
-        /*
-        for ( var j=0; j<8; j++ ){
-          root.createChildAt(j);
-          console.log(root.children[j].getChildrenIds());
-        }
-        */
-        // For 
-
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
@@ -637,35 +488,23 @@
     //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
-        //var req = {"pointcloud":"17"};
+        //var req = [2, 18];
         //ws.send( JSON.stringify(req) );
 
-        //req = {"pointcloud":"18"};
-        //ws.send( JSON.stringify(req) );
-
-        //var req = [17];
-        //ws.send( JSON.stringify(req) );
-
-        var req = [2, 18];
+        //trigger client-server cascade by requesting root  
+        var req = [0]; 
         ws.send( JSON.stringify(req) );
     };
 
     ws.onmessage = function (evt) {
         // If we haven't yet handled the previous message then ignore current one
         // Note: A better thing would be to queue 
-        if ( new_msg ) 
-            return;
-        if( evt.data == "" ){
-            console.log( "Requested null node in tree!" );
+        if ( new_msg ) {
             return;
         }
         msg = JSON.parse(evt.data);
-        if( "power_level" in msg ){
-            console.log( "The power level is: ".concat(msg.power_level) );
-        } else {
-            new_msg = true; 
-        }
-    }
+        new_msg = true; 
+    };
 
     //initializeShader();
     animate();
