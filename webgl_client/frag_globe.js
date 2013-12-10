@@ -58,7 +58,6 @@
     centroid[1] = 0.0;
     centroid[2] = 0.0;
 
-
     // Drawing mode, toggle between squares and circles
     var drawMode = 0;
 
@@ -260,10 +259,10 @@
         //var pointCloud = msg["data"];
         //numberOfPoints = msg["numberOfPoints"];
         
-        var first_aabb = msg[0];
-        var aabbHighDict = first_aabb.highCorner;
-        var aabbLowDict = first_aabb.lowCorner;
-        var centroidDict = first_aabb.position;
+        var curr_aabb = msg[0];
+        var aabbHighDict = curr_aabb.highCorner;
+        var aabbLowDict = curr_aabb.lowCorner;
+        var centroidDict = curr_aabb.position;
         var aabbHigh = vec3.create();
         var aabbLow = vec3.create();
 
@@ -279,20 +278,6 @@
         centroid[1] = centroidDict.y; 
         centroid[2] = centroidDict.z; 
 
-        console.log("Centroid position:");
-        console.log(centroid[0]);
-        console.log(centroid[1]);
-        console.log(centroid[2]);
-
-        console.log("AABB high corner:");
-        console.log(aabbHigh[0]);
-        console.log(aabbHigh[1]);
-        console.log(aabbHigh[2]);
-
-        console.log("AABB low corner:");
-        console.log(aabbLow[0]);
-        console.log(aabbLow[1]);
-        console.log(aabbLow[2]);
         /*
         //draw the low corner, the high corner, and the centroid
         numberOfPoints = 8;
