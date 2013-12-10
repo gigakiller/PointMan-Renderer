@@ -20,6 +20,31 @@
         return;
     }
 
+    //function drawSingleAABB( curr_aabb ){
+        //var curr_root  = new OctreeNode( curr_aabb, 0 );
+        //var curr_octree = new Octree( curr_root ); 
+        //var octDrawer = new OctreeDrawer( curr_octree, gl );
+        //octDrawer.draw();
+        //var positions = octDrawer.positions;
+        //var indices = octDrawer.indices;
+        //numberOfIndices = indices.length; 
+        //console.log(positions);
+        //console.log(indices);
+        //console.log(numberOfIndices);
+
+        //// Positions
+        //var octreePositionsName = gl.createBuffer();
+        //gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+        //gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        //gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+        //gl.enableVertexAttribArray(octreePositionLocation);
+
+        //// Indices
+        //var indicesName = gl.createBuffer();
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+        //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    //}
+
     ///////////////////////////////////////////////////////////////////////////
 
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -69,6 +94,8 @@
     var colorLocation;
     var normalLocation;
     var texCoordLocation;
+
+    var octree_dict = {};
 
     // For octree
     var octreePositionLocation;
@@ -255,13 +282,13 @@
     // Front Queue
     var root = null;
     var octree = new Octree( root );
-    var front = new Queue();       
+    var front = new Queue(); //the current nodes that we're using for rendering
+    //var expansion_front = new Queue(); //the nodes we want to get the children of 
+    //the expansion front is always a subset of the front.
+
     var expansion_req = new Array();
     // ID of root node
-    expansion_req.push(0); 
-
-    console.log( expansion_req );
-
+    //expansion_req.push(0); 
     function handleMsg() { 
         if(msg[0].bfsIdx == 0){ //we have recieved the root. this only happens once! 
             var highCorner = msg[0].highCorner;
@@ -292,12 +319,19 @@
             var startingRot4 = mat3.toMat4(startingRot3);
             mat4.multiply(cam, startingRot4); 
         }
-         
-        //var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
-        //var root = new OctreeNode( aabb, 0 );
-        //console.log(root.getChildrenIds());
-        //var octree = new Octree( root );
+
+        //put the children into the current front
+        //also put them into the tree.
+        for( var i=0; i < msg.length; i++ ){
+            front.enqueue( msg[i] );
+            octree_dict[msg[i].bfsIdx] = msg[i]; 
+        }
+
+        //render everything in the current front
         
+        //loop through the current front and put children in the "current" request IFF the current node
+        //was actually rendered
+          
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
