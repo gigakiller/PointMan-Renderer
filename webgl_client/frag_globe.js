@@ -336,9 +336,9 @@
         var indices = [];
         drawFront( front, positions, indices );
         numberOfIndices = indices.length;
-        console.log(positions);
-        console.log(indices);
-        console.log(numberOfIndices);
+        //console.log(positions);
+        //console.log(indices);
+        //console.log(numberOfIndices);
 
         // Positions
         var octreePositionsName = gl.createBuffer();
