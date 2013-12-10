@@ -433,12 +433,12 @@
         
         //var width = 0.1
         //var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
-        /*
+        
         var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
         var root = new OctreeNode( aabb, 0 );
         console.log(root.getChildrenIds());
         var octree = new Octree( root );
-        */
+        
         /*
         for ( var j=0; j<8; j++ ){
           root.createChildAt(j);
@@ -689,15 +689,15 @@
         }
 
         // Request pending nodes from server
-        if ( ws.readyState == ws.OPEN ) {
-          if ( expansion_req.length > 0 ) {
-            console.log( "Sending expansion req" + String(expansion_req) );
-            console.log( expansion_req );
-            console.log(JSON.stringify( expansion_req ))
-            ws.send( JSON.stringify( expansion_req ) );
-            expansion_req = [];
-          }
-        }
+        //if ( ws.readyState == ws.OPEN ) {
+          //if ( expansion_req.length > 0 ) {
+            //console.log( "Sending expansion req" + String(expansion_req) );
+            //console.log( expansion_req );
+            //console.log(JSON.stringify( expansion_req ))
+            //ws.send( JSON.stringify( expansion_req ) );
+            //expansion_req = [];
+          //}
+        //}
 
         // Handle user keyboard inputs
         handleUserInput();
