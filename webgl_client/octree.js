@@ -3,22 +3,67 @@
 /*
   Javascript Octree implementation
 */
+function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
+    positions.push(
+        // z-bottom
+        lowCorner.x, lowCorner.y, lowCorner.z,
+        lowCorner.x, highCorner.y, lowCorner.z,
+        highCorner.x, highCorner.y, lowCorner.z,
+        highCorner.x, lowCorner.y, lowCorner.z,
+        // z-top
+        lowCorner.x, lowCorner.y, highCorner.z,
+        lowCorner.x, highCorner.y, highCorner.z,
+        highCorner.x, highCorner.y, highCorner.z,
+        highCorner.x, lowCorner.y, highCorner.z
+    );
+    indices.push(
+        // z-bottom
+        0+8*aabb_num,1+8*aabb_num,
+        0+8*aabb_num,3+8*aabb_num,
+        1+8*aabb_num,2+8*aabb_num,
+        2+8*aabb_num,3+8*aabb_num,
+        // z-top
+        4+8*aabb_num,5+8*aabb_num,
+        4+8*aabb_num,7+8*aabb_num,
+        5+8*aabb_num,6+8*aabb_num,
+        6+8*aabb_num,7+8*aabb_num,
+        // x-left
+        0+8*aabb_num,4+8*aabb_num,
+        0+8*aabb_num,1+8*aabb_num,
+        4+8*aabb_num,5+8*aabb_num,
+        5+8*aabb_num,1+8*aabb_num,
+        // x-right
+        3+8*aabb_num,7+8*aabb_num,
+        3+8*aabb_num,2+8*aabb_num,
+        7+8*aabb_num,6+8*aabb_num,
+        6+8*aabb_num,2+8*aabb_num
+    );
+}
+
+function drawFront( front, positions, indices ) {
+    var aabb;
+    var highCorner;
+    var lowCorner;
+    for( var i=0; i<front.length; i++ ) {
+        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i );
+    }         
+}
 
 function AABB( highCorner, lowCorner ) {
-  /* TODO: figure outthe right way to do this
-  if ( !(lowCorner instanceof vec3) || !(highCorner instanceof vec3) ) {
-    console.log( "Low Corner or High Corner not vec3" );
-  }
-  */
-  this.lowCorner = lowCorner;
-  this.highCorner = highCorner;
-  var aabbDiagonal = vec3.create();
-  this.centroid = vec3.create();
+    /* TODO: figure outthe right way to do this
+    if ( !(lowCorner instanceof vec3) || !(highCorner instanceof vec3) ) {
+      console.log( "Low Corner or High Corner not vec3" );
+    }
+    */
+    this.lowCorner = lowCorner;
+    this.highCorner = highCorner;
+    var aabbDiagonal = vec3.create();
+    this.centroid = vec3.create();
 
-  // Compute centroid given low and high corners
-  vec3.subtract( this.highCorner, this.lowCorner, aabbDiagonal );
-  vec3.scale( aabbDiagonal, 0.5 );
-  vec3.add( this.lowCorner, aabbDiagonal, this.centroid );
+    // Compute centroid given low and high corners
+    vec3.subtract( this.highCorner, this.lowCorner, aabbDiagonal );
+    vec3.scale( aabbDiagonal, 0.5 );
+    vec3.add( this.lowCorner, aabbDiagonal, this.centroid );
 }
 
 AABB.prototype.draw = function( positions, indices, aabb_num ) {

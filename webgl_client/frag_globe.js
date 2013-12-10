@@ -282,7 +282,8 @@
     // Front Queue
     var root = null;
     var octree = new Octree( root );
-    var front = new Queue(); //the current nodes that we're using for rendering
+    //var front = new Queue(); //the current nodes that we're using for rendering
+    var front = []; //the current nodes that we're using for rendering
     //var expansion_front = new Queue(); //the nodes we want to get the children of 
     //the expansion front is always a subset of the front.
 
@@ -323,7 +324,8 @@
         //put the children into the current front
         //also put them into the tree.
         for( var i=0; i < msg.length; i++ ){
-            front.enqueue( msg[i] );
+            //front.enqueue( msg[i] );
+            front.push( msg[i] );
             octree_dict[msg[i].bfsIdx] = msg[i]; 
         }
 
@@ -331,12 +333,18 @@
         
         //loop through the current front and put children in the "current" request IFF the current node
         //was actually rendered
-          
+         
+        /* 
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
         var indices = octDrawer.indices;
         numberOfIndices = indices.length; 
+        */
+        var positions = [];
+        var indices = [];
+        drawFront( front, positions, indices );
+        numberOfIndices = indices.length;
         console.log(positions);
         console.log(indices);
         console.log(numberOfIndices);
