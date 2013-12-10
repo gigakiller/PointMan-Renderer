@@ -259,6 +259,7 @@
         //var pointCloud = msg["data"];
         //numberOfPoints = msg["numberOfPoints"];
         
+        console.log("Number of octree nodes sent: ".concat(msg.length));
         var curr_aabb = msg[0];
         var aabbHighDict = curr_aabb.highCorner;
         var aabbLowDict = curr_aabb.lowCorner;

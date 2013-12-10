@@ -73,7 +73,6 @@ class PointCloudReqWS(websocket.WebSocketHandler):
         requested_nodes = filter(None, requested_nodes); #get rid of Nones
 
         to_send = jsonpickle.encode( requested_nodes )
-        print to_send
         self.write_message( to_send )
 
         #if cloud == "1337": 
