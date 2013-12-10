@@ -301,7 +301,7 @@
             var new_root  = new OctreeNode( new_aabb, 0 );
             octree = new Octree(new_root); 
 
-            centroid = new_root.position;
+            //centroid = new_root.position;
             // Set up camera pointing towareds centroid 
             gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
 
@@ -398,12 +398,6 @@
             initializeShader();
         }
 
-        //if 't' ... 
-        if( currentKeys[84] ) {
-            //send somes request to our server
-            var req = {"pointcloud":"1337"};
-            ws.send( JSON.stringify(req) );
-        }
     }
 
     function handleKeyUp(event) {
@@ -534,8 +528,10 @@
     ws.onopen = function() {
         //var req = [2, 18];
         //ws.send( JSON.stringify(req) );
+        ws.send("centroid");
 
         //trigger client-server cascade by requesting root  
+
         var req = [0]; 
         ws.send( JSON.stringify(req) );
     };
@@ -548,6 +544,15 @@
         }
         msg = JSON.parse(evt.data);
         if( msg.length === 0 ){
+            return;
+        } else if( msg.hasOwnProperty('centroid') ){
+            console.log("Got centroid!");
+            centroid[0] = msg.centroid[0];
+            centroid[1] = msg.centroid[1];
+            centroid[2] = msg.centroid[2];
+            console.log(centroid[0]);
+            console.log(centroid[1]);
+            console.log(centroid[2]);
             return;
         }
         new_msg = true; 

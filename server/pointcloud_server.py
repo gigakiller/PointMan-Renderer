@@ -20,7 +20,9 @@ def dict_lookup(dictionary, key):
         return None
 
 #read in the .octopus file that represents our octree
-my_octree_dict = read_octree("data/chappes_sml.octopus")
+my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes_sml.octopus")
+print centroid_x, centroid_y, centroid_z
+centroid_array = [centroid_x, centroid_y, centroid_z]
 print "Read in the .octopus file!"
 #for key, val in my_octree_dict.iteritems():
     #print key, jsonpickle.encode(val)
@@ -64,17 +66,23 @@ class PointCloudReqWS(websocket.WebSocketHandler):
         print "WebSocket opened"
 
     def on_message(self, message):
-        msg = loads(message)
+        
         #cloud = msg['pointcloud']
         #cloud = msg[0];
         #nodeIdx = int(cloud)
 
-        requested_nodes = map(lambda i: dict_lookup(my_octree_dict, i), msg)  
-        requested_nodes = filter(None, requested_nodes); #get rid of Nones
+        #print "The MESSAGE is:"
+        #print message
+        if( message == "centroid" ):
+            self.write_message( dumps({ "centroid" : centroid_array }) );
+        else:
+            msg = loads(message)
+            requested_nodes = map(lambda i: dict_lookup(my_octree_dict, i), msg)  
+            requested_nodes = filter(None, requested_nodes); #get rid of Nones
 
-        to_send = jsonpickle.encode( requested_nodes )
-        self.write_message( to_send )
-        sleep(0.1)
+            to_send = jsonpickle.encode( requested_nodes )
+            self.write_message( to_send )
+            sleep(0.1)
 
         #if cloud == "1337": 
             #print "Received m3ssage from teh l337 h4x0rZ!"    
