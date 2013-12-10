@@ -362,6 +362,7 @@
             }
         } 
 
+        ws.send( JSON.stringify(requested_children) );
         // Indicate that the message has been handled 
         new_msg = false;
     }
