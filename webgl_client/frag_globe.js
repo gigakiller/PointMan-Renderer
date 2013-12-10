@@ -130,7 +130,6 @@
         var octree_vs = getShaderSource(document.getElementById("octree-vs"));
         octree_program = createProgram(gl, octree_vs, octree_fs, message);
 
-
         gl.bindAttribLocation(octree_program, 0, "position");
         // Gotta link 
         gl.linkProgram(octree_program);
@@ -255,9 +254,16 @@
 
 
     // Front Queue
-    var expansion_front = Queue();       
+    var root = null;
+    var octree = new Octree( root );
+    var front = new Queue();       
+    var expansion_req = new Array();
+    // ID of root node
+    expansion_req.push(0); 
 
-    function loadAABB() { 
+    console.log( expansion_req );
+
+    function handleMsg() { 
         //$.getJSON("data/chappes.json", function( pointCloud ) {
 
         // Unpack message
@@ -334,6 +340,7 @@
             var startingRot3 = quat4.toMat3(desiredRotation);
             var startingRot4 = mat3.toMat4(startingRot3);
             mat4.multiply(cam, startingRot4); 
+
         }
         
         //positions[0] = aabbLow[0];  
@@ -439,14 +446,20 @@
         
         //var width = 0.1
         //var aabb = new AABB( vec3.create([-width,-width,-width]), vec3.create([width,width,width]) );
+        /*
         var aabb = new AABB( vec3.create(aabbHigh), vec3.create(aabbLow) );
         var root = new OctreeNode( aabb, 0 );
         console.log(root.getChildrenIds());
         var octree = new Octree( root );
+        */
+        /*
         for ( var j=0; j<8; j++ ){
           root.createChildAt(j);
           console.log(root.children[j].getChildrenIds());
         }
+        */
+        // For 
+
         var octDrawer = new OctreeDrawer( octree, gl );
         octDrawer.draw();
         var positions = octDrawer.positions;
@@ -632,9 +645,6 @@
 
     var elapsedTime = 5000;
 
-    //initializeShader();
-    animate();
-
     // PointCloud Websocket ... refactored with lighter callbacks
     var ws = new WebSocket("ws://localhost:8888/pointcloud_ws");
     //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
@@ -670,6 +680,10 @@
         }
     }
 
+    //initializeShader();
+    animate();
+
+
     //loadPointCloud();
     //animate();
 
@@ -684,7 +698,18 @@
             //loadPointCloud();
             //Temporary: for now we are going to load an AABB to test to see 
             //if we are getting the octree from the server correctly
-            loadAABB(); 
+            handleMsg(); 
+        }
+
+        // Request pending nodes from server
+        if ( ws.readyState == ws.OPEN ) {
+          if ( expansion_req.length > 0 ) {
+            console.log( "Sending expansion req" + String(expansion_req) );
+            console.log( expansion_req );
+            console.log(JSON.stringify( expansion_req ))
+            ws.send( JSON.stringify( expansion_req ) );
+            expansion_req = [];
+          }
         }
 
         // Handle user keyboard inputs
@@ -706,7 +731,6 @@
         mat4.transpose(invTrans);
 
         // Render
-
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         // Pointcloud Rendering program
