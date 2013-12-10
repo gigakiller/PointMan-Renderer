@@ -12,6 +12,13 @@ from os import listdir
 from time import sleep
 from numpy import array
 
+#do a "safe" dictionary lookup, where if it doesn't have the key, we just return none.
+def dict_lookup(dictionary, key):
+    if(dictionary.has_key(key)):
+        return dictionary[key]
+    else:
+        return None
+
 #read in the .octopus file that represents our octree
 my_octree_dict = read_octree("data/chappes_sml.octopus")
 print "Read in the .octopus file!"
@@ -59,13 +66,15 @@ class PointCloudReqWS(websocket.WebSocketHandler):
     def on_message(self, message):
         msg = loads(message)
         #cloud = msg['pointcloud']
-        cloud = msg[0];
-        nodeIdx = int(cloud)
+        #cloud = msg[0];
+        #nodeIdx = int(cloud)
 
-        if my_octree_dict.has_key(nodeIdx):
-            self.write_message( jsonpickle.encode(my_octree_dict[nodeIdx]) ) 
-        else:
-            self.write_message( "" ) 
+        requested_nodes = map(lambda i: dict_lookup(my_octree_dict, i), msg)  
+        requested_nodes = filter(None, requested_nodes); #get rid of Nones
+
+        to_send = jsonpickle.encode( requested_nodes )
+        print to_send
+        self.write_message( to_send )
 
         #if cloud == "1337": 
             #print "Received m3ssage from teh l337 h4x0rZ!"    

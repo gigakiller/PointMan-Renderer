@@ -635,13 +635,13 @@
         //var req = {"pointcloud":"17"};
         //ws.send( JSON.stringify(req) );
 
-        //var req = {"pointcloud":"18"};
+        //req = {"pointcloud":"18"};
         //ws.send( JSON.stringify(req) );
 
-        var req = [17];
-        ws.send( JSON.stringify(req) );
+        //var req = [17];
+        //ws.send( JSON.stringify(req) );
 
-        req = [18];
+        var req = [2, 18];
         ws.send( JSON.stringify(req) );
     };
 
