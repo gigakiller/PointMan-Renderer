@@ -260,9 +260,10 @@
         //var pointCloud = msg["data"];
         //numberOfPoints = msg["numberOfPoints"];
         
-        var aabbHighDict = msg.highCorner;
-        var aabbLowDict = msg.lowCorner;
-        var centroidDict = msg.position;
+        var first_aabb = msg[0];
+        var aabbHighDict = first_aabb.highCorner;
+        var aabbLowDict = first_aabb.lowCorner;
+        var centroidDict = first_aabb.position;
         var aabbHigh = vec3.create();
         var aabbLow = vec3.create();
 
