@@ -547,6 +547,9 @@
             return;
         }
         msg = JSON.parse(evt.data);
+        if( msg.length === 0 ){
+            return;
+        }
         new_msg = true; 
     };
 
