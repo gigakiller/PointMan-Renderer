@@ -284,7 +284,7 @@
     var octree = new Octree( root );
     //var front = new Queue(); //the current nodes that we're using for rendering
     var front = []; //the current nodes that we're using for rendering
-    //var expansion_front = new Queue(); //the nodes we want to get the children of 
+    var expansion_front = []; //the nodes we want to get the children of 
     //the expansion front is always a subset of the front.
 
     var expansion_req = new Array();
@@ -326,21 +326,12 @@
         for( var i=0; i < msg.length; i++ ){
             //front.enqueue( msg[i] );
             front.push( msg[i] );
+            expansion_front.push( msg[i] );
             octree_dict[msg[i].bfsIdx] = msg[i]; 
         }
 
         //render everything in the current front
-        
-        //loop through the current front and put children in the "current" request IFF the current node
-        //was actually rendered
          
-        /* 
-        var octDrawer = new OctreeDrawer( octree, gl );
-        octDrawer.draw();
-        var positions = octDrawer.positions;
-        var indices = octDrawer.indices;
-        numberOfIndices = indices.length; 
-        */
         var positions = [];
         var indices = [];
         drawFront( front, positions, indices );
@@ -360,6 +351,16 @@
         var indicesName = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+        //make a request based on the children of everything in the current expansion front
+        var requested_children = [];
+        while( expansion_front.length > 0 ){
+            var currParent = expansion_front.pop(); 
+            var currIdx = currParent.bfsIdx;
+            for(i=0; i < 8; i++){
+                requested_children.push( 8*currIdx + i + 1 );
+            }
+        } 
 
         // Indicate that the message has been handled 
         new_msg = false;
