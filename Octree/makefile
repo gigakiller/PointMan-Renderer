@@ -12,7 +12,7 @@ IDIR=.
 #We let the following be set by the environment/
 #the makefile at the top of the recursion
 
-COMPILERFLAGS = -Weverything -g
+COMPILERFLAGS = -Weverything -O3
 CC = clang++
 CFLAGS = $(COMPILERFLAGS) $(INCLUDE)
 DEPS = $(wildcard $(IDIR)/*.h)
