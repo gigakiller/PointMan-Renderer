@@ -56,7 +56,7 @@
     //assuming that we are drawing one cube at a time
     var numIndices = 32;
 
-    var subset_size = 65534;
+    var SUBSET_SIZE = 65534;
 
     //pos_subsets and ind_subsets form a partition of our octree_positions array and our 
     //index array, respectively. this will be used later when we draw the octree, in order
@@ -394,12 +394,9 @@
         drawFront( front, octree_positions, indices );
         
         //initialize our 2D arrays that partition octree_positions and indices
-        pos_subsets.length = octree_positions.length;
-        ind_subsets.length = indices.length;
+        pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
         for( i=0; i < pos_subsets.length; i++){
             pos_subsets[i] = [];
-        }
-        for( i=0; i < ind_subsets.length; i++){
             ind_subsets[i] = [];
         }
 
@@ -741,20 +738,49 @@
         gl.uniformMatrix4fv(u_octreeViewLocation, false, view);
         gl.uniformMatrix4fv(u_octreePerspLocation, false, persp);
 
-
         if ( indices.length  > 0 && ( renderMode == 1 || renderMode == 2 )){
-            //var octreePositionsName = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
-            gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
-            gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(octreePositionLocation);
+            //gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+            //gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
+            //gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+            //gl.enableVertexAttribArray(octreePositionLocation);
 
-            // Indices
-            //var indicesName = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+            ////Indices
+            //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+            //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-            gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+            //gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+            
+            //*********************************************************************
+            
+            //first, populate pos_subsets and ind_subsets
+            for(var i=0; i < indices.length; i++){
+                var curr_idx = indices[i];
+                var curr_subset = Math.floor(i / SUBSET_SIZE); //integer division
+                var subset_idx = i % SUBSET_SIZE;
+                pos_subsets[curr_subset][3*subset_idx] = positions[curr_idx];
+                pos_subsets[curr_subset][3*subset_idx + 1] = positions[curr_idx + 1];
+                pos_subsets[curr_subset][3*subset_idx + 2] = positions[curr_idx + 2];
+                ind_subsets[curr_subset][subset_idx] = subset_idx;
+            }
+
+            //loop through each subset, and make a draw call for each
+            for(i=0; i < pos_subsets.length; i++){
+                var curr_positions = new Float32Array(pos_subsets[i]);  
+                var curr_idxs = new Uint16Array(ind_subsets[i]);  
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+                gl.bufferData(gl.ARRAY_BUFFER, curr_positions, gl.STATIC_DRAW);
+                //gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
+                gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(octreePositionLocation);
+
+                //Indices
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, curr_idxs, gl.STATIC_DRAW);
+                //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+                gl.drawElements(gl.LINES, curr_idxs.length, gl.UNSIGNED_SHORT,0);
+            }
         }
 
         time += 0.001;
