@@ -349,9 +349,9 @@
                     positions.push( front_pts[j].x );
                     positions.push( front_pts[j].y );
                     positions.push( front_pts[j].z );
-                    colors.push( front_pts[j].r );
-                    colors.push( front_pts[j].g );
-                    colors.push( front_pts[j].b );
+                    colors.push( front_pts[j].r/255.0 );
+                    colors.push( front_pts[j].g/255.0 );
+                    colors.push( front_pts[j].b/255.0 );
                     pointsCount += 1;
                 }
             }
