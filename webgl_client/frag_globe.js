@@ -286,6 +286,9 @@
     var front = []; //the current nodes that we're using for rendering
     var expansion_front = []; //the nodes we want to get the children of 
     //the expansion front is always a subset of the front.
+    var positions = [];
+    var colors = [];
+    var pointsCount = 0;
 
     var expansion_req = new Array();
     // ID of root node
@@ -323,6 +326,7 @@
 
         //put the children into the current front
         //also put them into the tree.
+    
         for( var i=0; i < msg.length; i++ ){
             //front.enqueue( msg[i] );
             front.push( msg[i] );
@@ -330,11 +334,40 @@
             octree_dict[msg[i].bfsIdx] = msg[i]; 
         }
 
-        //render everything in the current front
-         
-        var positions = [];
+        // Update points to render based on current front
+        var front_pts;
+        pointsCount = 0;
+        for( var i=0; i<front.length; i++ ){
+            if ( front[i].hasOwnProperty("points") ){
+                front_pts = front[i].points;
+                for ( var j=0; j<front_pts.length; j++ ){
+                    positions.push( front_pts[j].x );
+                    positions.push( front_pts[j].y );
+                    positions.push( front_pts[j].z );
+                    colors.push( front_pts[j].r );
+                    colors.push( front_pts[j].g );
+                    colors.push( front_pts[j].b );
+                    pointsCount += 3;
+                }
+            }
+        }
+        // Positions
+        var positionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLocation);
+        // Colors
+        var colorsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(colorLocation);
+
+        //Render everything in the current front
+        var octree_positions = [];
         var indices = [];
-        drawFront( front, positions, indices );
+        drawFront( front, octree_positions, indices );
         numberOfIndices = indices.length;
         //console.log(positions);
         //console.log(indices);
@@ -343,7 +376,7 @@
         // Positions
         var octreePositionsName = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(octree_positions), gl.STATIC_DRAW);
         gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(octreePositionLocation);
 
@@ -368,7 +401,6 @@
     }
 
     var time = 0;
-
 
     var mouseLeftDown = false;
     var mouseRightDown = false;
