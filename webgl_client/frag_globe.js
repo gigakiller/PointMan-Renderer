@@ -775,12 +775,12 @@
                 gl.enableVertexAttribArray(octreePositionLocation);
 
                 //Indices
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, curr_idxs, gl.STATIC_DRAW);
+                //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+                //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, curr_idxs, gl.STATIC_DRAW);
                 //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
                 //gl.drawElements(gl.LINES, curr_idxs.length, gl.UNSIGNED_SHORT,0);
-                gl.drawArrays( gl.POINTS, 0, pointsCount );
+                gl.drawArrays( gl.POINTS, 0, curr_idxs.length );
             }
         }
 
