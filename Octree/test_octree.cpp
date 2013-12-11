@@ -277,6 +277,8 @@ int main(int argc, char **argv)
     
     cout << "Now testing AABB... there will be cake!" << endl;
 
+    cout << "Num nodes in octree " << myOctree->getNumNodes() << endl;
+
     //cout << "Serializing octree... " << endl;
     //myOctree->serialize("chappes_sml.octopus");
  

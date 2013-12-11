@@ -79,6 +79,10 @@ public:
     //we don't have to spend time building it again
     //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
     void serialize(const char* filename);
+
+    //read from a .octopus file and construct the octree from that
+    //OctreeNode* deserialize(const char* filename);
+    int getNumNodes();
     
     ~Octree();
 private:
@@ -86,6 +90,8 @@ private:
     //helper method for serialize
     void writeNodeToFile(const OctreeNode* root, std::ofstream& fileStream); 
     OctreeNode* root;
+    //gets the number of descendants of the root, assuming that count starts out as zero
+    void getNumDescendants(OctreeNode* root, int& count);
 };
 #pragma clang diagnostic pop
 

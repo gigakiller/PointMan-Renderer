@@ -63,7 +63,7 @@ unsigned long OctreeNode::getBfsIdx() const{
 OctreeNode* OctreeNode::addChild( glm::vec3 position ){
     isLeaf = false;
     //find out which octant the child is in
-    int octNum;
+    unsigned int octNum;
     AABB childAABB;
     if( !aabb.getOctant(position, &octNum, &childAABB) ){
         std::cout << "Low corner: " << glm::to_string(aabb.lowCorner) << std::endl;
@@ -162,6 +162,22 @@ Octree::Octree(std::vector<Point>* points){
 Octree::~Octree(){
     if(root)
         delete root;
+}
+
+int Octree::getNumNodes(){
+   int count = 0; 
+   getNumDescendants(root, count);
+   return count;
+}
+
+void Octree::getNumDescendants(OctreeNode* currNode, int& count){
+    count++;
+    for(int i = 0; i < 8; i++){
+       OctreeNode* currChild = currNode->getChildAt(i);  
+       if( currChild != NULL ){
+           getNumDescendants(currChild, count);
+       }
+    }  
 }
 
 OctreeNode* Octree::getRoot( void ){

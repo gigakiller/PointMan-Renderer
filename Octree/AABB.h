@@ -11,7 +11,7 @@ public:
     //given a position pos, if it is outside the AABB, return false.
     //if it is inside the AABB, return true and read the octant number into outOctNum,
     //read the AABB of that octant into outAABB
-    bool getOctant(const glm::vec3 pos, int* outOctNum, AABB* outAABB);
+    bool getOctant(const glm::vec3 pos, unsigned int* outOctNum, AABB* outAABB);
     //is the position pos inside the AABB?
     bool isInside(const glm::vec3 pos); 
     void setBounds( glm::vec3 newHighCorner, glm::vec3 newLowCorner );
