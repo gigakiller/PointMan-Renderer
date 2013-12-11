@@ -121,6 +121,14 @@ function OctreeNode( boundingBox, id ) {
     }
 }
 
+// Get parent id requires function:
+//   (idx - ((idx-1)%8)-1)/8
+//   in javascript Math.floor((idx - ((idx-1)%8)-1)/8)
+/*
+OctreeNode.prototype.getParentId = function(){
+    return 
+*/
+
 OctreeNode.prototype.getChildIdAt = function(i){
     return 8*this.id + (i+1);
 }
