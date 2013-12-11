@@ -306,6 +306,24 @@
     var indices = [];
 
     var expansion_req = new Array();
+
+    //this takes lvl_array, and replaces its contents with its children
+    function down_one_level( lvl_array ){
+        var new_lvl_array = [];
+        console.log("Going down one level!");
+        for(var i=0; i < lvl_array.length; i++){
+            var currParent = lvl_array[i];   
+            var currIdx = currParent.bfsIdx;
+            for(i=0; i < 8; i++){
+                var child_idx = 8*currIdx + i + 1; 
+                if( child_idx in octree_dict ) {
+                    new_lvl_array.push(octree_dict[child_idx]); 
+                }
+            }
+        }
+        return new_lvl_array;
+    }
+
     // ID of root node
     //expansion_req.push(0); 
     function handleMsg() { 
@@ -466,7 +484,9 @@
         }
 
         //user presses J, we go DOWN a level! 
-
+        if ( currentKeys[74] ) {
+            curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+        } 
     }
 
     function handleKeyUp(event) {
