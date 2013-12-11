@@ -86,6 +86,9 @@
     // Drawing mode, toggle between squares and circles
     var drawMode = 0;
 
+    // Rendering modes, points/octree
+    var renderMode = 0;
+
     // Number of octree indices
     var numberOfIndices = 0;
 
@@ -357,9 +360,9 @@
             }
         }
         // Positions
+        /*
         gl.useProgram(globe_program);
         var positionsName = gl.createBuffer();
-        /*
         gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
@@ -386,6 +389,7 @@
         //console.log(indices);
         //console.log(numberOfIndices);
 
+        /*
         gl.useProgram(octree_program);
         // Positions
         var octreePositionsName = gl.createBuffer();
@@ -398,6 +402,9 @@
         var indicesName = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        */
+        octree_positions = new Float32Array(octree_positions);
+        indices = new Uint16Array(indices);
 
         //make a request based on the children of everything in the current expansion front
         var requested_children = [];
@@ -436,6 +443,19 @@
                 drawMode = 0;
             }
             console.log(drawMode);
+        }
+
+        if ( currentKeys[49] ) {
+            // Draw points 
+            renderMode = 0;
+        }
+        if ( currentKeys[50] ) {
+            // Draw octree
+            renderMode = 1;
+        }
+        if ( currentKeys[51] ) {
+            // Draw points and octree
+            renderMode = 2;
         }
 
         //toggle between round and square points
@@ -684,6 +704,7 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
         // Pointcloud Rendering program
+        
         gl.useProgram(globe_program);
         gl.uniformMatrix4fv(u_ModelLocation, false, model);
         gl.uniformMatrix4fv(u_ViewLocation, false, view);
@@ -692,7 +713,7 @@
 
        
         //var positionsName = gl.createBuffer();
-        if ( pointsCount > 0 ) {
+        if ( pointsCount > 0 && ( renderMode == 0 || renderMode == 2 )) {
           gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
           gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
           gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
@@ -709,8 +730,9 @@
         }
         //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
         //gl.drawArrays( gl.LINES, 0, pointsCount );
+        
       
-        /* 
+         
         // Octree Rendering program 
         gl.useProgram(octree_program);
 
@@ -718,19 +740,21 @@
         gl.uniformMatrix4fv(u_octreeViewLocation, false, view);
         gl.uniformMatrix4fv(u_octreePerspLocation, false, persp);
 
-        var octreePositionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(octree_positions), gl.STATIC_DRAW);
-        gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(octreePositionLocation);
 
-        // Indices
-        var indicesName = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        if ( indices.length  > 0 && ( renderMode == 1 || renderMode == 2 )){
+            //var octreePositionsName = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+            gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
+            gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(octreePositionLocation);
 
-        gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
-        */
+            // Indices
+            //var indicesName = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+            gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+        }
 
         time += 0.001;
         window.requestAnimFrame(animate);
