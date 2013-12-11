@@ -329,6 +329,15 @@
     function handleMsg() { 
         if(msg[0].bfsIdx == 0){ //we have recieved the root. this only happens once! 
             curr_draw_lvl.push(msg[0]);
+
+            octree_positions = [];
+            indices = [];
+            drawFront( curr_draw_lvl, octree_positions, indices );
+
+            numberOfIndices = indices.length;
+            octree_positions = new Float32Array(octree_positions);
+            indices = new Uint16Array(indices);
+
             var highCorner = msg[0].highCorner;
             var lowCorner = msg[0].lowCorner;
             var new_highCorner = vec3.create([highCorner.x, highCorner.y, highCorner.z]); 
@@ -409,9 +418,9 @@
         
 
         //Render everything in the current front
-        octree_positions = [];
-        indices = [];
-        drawFront( curr_draw_lvl, octree_positions, indices );
+        //octree_positions = [];
+        //indices = [];
+        //drawFront( curr_draw_lvl, octree_positions, indices );
         
         //initialize our 2D arrays that partition octree_positions and indices
         pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
@@ -420,9 +429,9 @@
             ind_subsets[i] = [];
         }
 
-        numberOfIndices = indices.length;
-        octree_positions = new Float32Array(octree_positions);
-        indices = new Uint16Array(indices);
+        //numberOfIndices = indices.length;
+        //octree_positions = new Float32Array(octree_positions);
+        //indices = new Uint16Array(indices);
 
         //make a request based on the children of everything in the current expansion front
         var requested_children = [];
@@ -449,7 +458,7 @@
     var currentKeys = {};
     // Handle Keyboard Events
     function handleKeyDown(event) {
-        console.log( "keycode: " + event.keyCode + "\n" );
+        //console.log( "keycode: " + event.keyCode + "\n" );
         currentKeys[event.keyCode] = true; 
 
         // For events that update once
@@ -485,7 +494,12 @@
         //user presses J, we go DOWN a level! 
         if ( currentKeys[74] ) {
             curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+            octree_positions = [];
+            indices = [];
             drawFront( curr_draw_lvl, octree_positions, indices );
+            numberOfIndices = indices.length;
+            octree_positions = new Float32Array(octree_positions);
+            indices = new Uint16Array(indices);
         } 
     }
 
@@ -503,24 +517,24 @@
         if ( currentKeys[87] ) {
             //console.log("moving forward\n");
             mat4.translate( cam, [0,0,-cam_vel] );
-            console.log(cam);
+            //console.log(cam);
         }
         // 's'
         if ( currentKeys[83] ) {
             //console.log("moving backwards\n");
             mat4.translate( cam, [0,0,cam_vel] );
-            console.log(cam);
+            //console.log(cam);
         }
 
         // 'a'
         if ( currentKeys[65] ) {
             mat4.translate( cam, [-cam_vel,0,0] );
-            console.log(cam);
+            //console.log(cam);
         }
         // 'd'
         if ( currentKeys[68] ) {
             mat4.translate( cam, [cam_vel,0,0] );
-            console.log(cam);
+            //console.log(cam);
         }
         //'q' OR 'e' 
         if( currentKeys[81] || currentKeys[69] ) {
@@ -535,7 +549,7 @@
             var roll_mat = mat4.create(); 
             mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
             mat4.multiply(cam, roll_mat); 
-            console.log(cam);
+            //console.log(cam);
         }
     }
 
