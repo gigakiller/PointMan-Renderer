@@ -339,6 +339,8 @@
 
         // Update points to render based on current front
         var front_pts;
+        positions = [];
+        colors = [];
         pointsCount = 0;
         for( var i=0; i<front.length; i++ ){
             if ( front[i].hasOwnProperty("points") ){
@@ -357,16 +359,23 @@
         // Positions
         gl.useProgram(globe_program);
         var positionsName = gl.createBuffer();
+        /*
         gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
         gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(positionLocation);
+        
         // Colors
         var colorsName = gl.createBuffer();
+        
         gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
+        */
+        positions = new Float32Array(positions);
+        colors = new Float32Array(colors);
+        
 
         //Render everything in the current front
         octree_positions = [];
@@ -682,23 +691,26 @@
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
        
-        var positionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(positionLocation);
-        // Colors
-        var colorsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colorLocation);
+        //var positionsName = gl.createBuffer();
+        if ( pointsCount > 0 ) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+          gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+          gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+          gl.enableVertexAttribArray(positionLocation);
+          // Colors
+          //var colorsName = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+          gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+          gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+          gl.enableVertexAttribArray(colorLocation);
 
-        //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
-        gl.drawArrays( gl.POINTS, 0, pointsCount );
+          //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
+          gl.drawArrays( gl.POINTS, 0, pointsCount );
+        }
         //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
         //gl.drawArrays( gl.LINES, 0, pointsCount );
-       
+      
+        /* 
         // Octree Rendering program 
         gl.useProgram(octree_program);
 
@@ -718,6 +730,7 @@
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
         gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
+        */
 
         time += 0.001;
         window.requestAnimFrame(animate);
