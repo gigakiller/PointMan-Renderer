@@ -411,7 +411,6 @@
         //Render everything in the current front
         octree_positions = [];
         indices = [];
-        //drawFront( front, octree_positions, indices );
         drawFront( curr_draw_lvl, octree_positions, indices );
         
         //initialize our 2D arrays that partition octree_positions and indices
@@ -486,6 +485,7 @@
         //user presses J, we go DOWN a level! 
         if ( currentKeys[74] ) {
             curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+            drawFront( curr_draw_lvl, octree_positions, indices );
         } 
     }
 
