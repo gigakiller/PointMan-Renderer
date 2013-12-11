@@ -290,6 +290,9 @@
     var colors = [];
     var pointsCount = 0;
 
+    var octree_positions = [];
+    var indices = [];
+
     var expansion_req = new Array();
     // ID of root node
     //expansion_req.push(0); 
@@ -347,11 +350,12 @@
                     colors.push( front_pts[j].r );
                     colors.push( front_pts[j].g );
                     colors.push( front_pts[j].b );
-                    pointsCount += 3;
+                    pointsCount += 1;
                 }
             }
         }
         // Positions
+        gl.useProgram(globe_program);
         var positionsName = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -365,14 +369,15 @@
         gl.enableVertexAttribArray(colorLocation);
 
         //Render everything in the current front
-        var octree_positions = [];
-        var indices = [];
+        octree_positions = [];
+        indices = [];
         drawFront( front, octree_positions, indices );
         numberOfIndices = indices.length;
         //console.log(positions);
         //console.log(indices);
         //console.log(numberOfIndices);
 
+        gl.useProgram(octree_program);
         // Positions
         var octreePositionsName = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
@@ -590,6 +595,32 @@
         new_msg = true; 
     };
 
+
+    // Positions
+    var positionsName = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([]), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionLocation);
+    // Colors
+    var colorsName = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([]), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(colorLocation);
+
+    // Positions
+    var octreePositionsName = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([]), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(octreePositionLocation);
+
+    // Indices
+    var indicesName = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([]), gl.STATIC_DRAW);
+
     //initializeShader();
     animate();
 
@@ -650,6 +681,19 @@
         gl.uniformMatrix4fv(u_PerspLocation, false, persp);
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
+       
+        var positionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLocation);
+        // Colors
+        var colorsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(colorLocation);
+
         //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
         gl.drawArrays( gl.POINTS, 0, pointsCount );
         //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
@@ -661,6 +705,18 @@
         gl.uniformMatrix4fv(u_octreeModelLocation, false, model);
         gl.uniformMatrix4fv(u_octreeViewLocation, false, view);
         gl.uniformMatrix4fv(u_octreePerspLocation, false, persp);
+
+        var octreePositionsName = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(octree_positions), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(octreePositionLocation);
+
+        // Indices
+        var indicesName = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
         gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
 
         time += 0.001;
