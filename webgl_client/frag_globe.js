@@ -757,9 +757,9 @@
                 var curr_idx = indices[i];
                 var curr_subset = Math.floor(i / SUBSET_SIZE); //integer division
                 var subset_idx = i % SUBSET_SIZE;
-                pos_subsets[curr_subset][3*subset_idx] = positions[curr_idx];
-                pos_subsets[curr_subset][3*subset_idx + 1] = positions[curr_idx + 1];
-                pos_subsets[curr_subset][3*subset_idx + 2] = positions[curr_idx + 2];
+                pos_subsets[curr_subset][3*subset_idx] = octree_positions[curr_idx];
+                pos_subsets[curr_subset][3*subset_idx + 1] = octree_positions[curr_idx + 1];
+                pos_subsets[curr_subset][3*subset_idx + 2] = octree_positions[curr_idx + 2];
                 ind_subsets[curr_subset][subset_idx] = subset_idx;
             }
 
@@ -779,7 +779,8 @@
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, curr_idxs, gl.STATIC_DRAW);
                 //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
-                gl.drawElements(gl.LINES, curr_idxs.length, gl.UNSIGNED_SHORT,0);
+                //gl.drawElements(gl.LINES, curr_idxs.length, gl.UNSIGNED_SHORT,0);
+                gl.drawArrays( gl.POINTS, 0, pointsCount );
             }
         }
 
