@@ -133,8 +133,12 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
         *parent_ave_pos = data[0].pos;
         *parent_ave_color = data[0].color;
     } else {
-        *parent_ave_pos += data[0].pos;
-        *parent_ave_color += data[0].color;
+        //*parent_ave_pos += data[0].pos;
+        //*parent_ave_color += data[0].color;
+        for(unsigned long i = 1; i < data.size(); i++){
+            *parent_ave_pos += data[i].pos;
+            *parent_ave_color += data[i].color;
+        }
     }
 
     // If we are a leaf then we don't have children     
@@ -151,7 +155,8 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
         } else {
             first = false;
         }
-        cnt++;
+        //cnt++;
+        cnt += currChild->data.size();
         currChild->populateRecursive(&ave_position, &ave_color, first);
     }
 
