@@ -58,11 +58,14 @@
 
     var SUBSET_SIZE = 65534;
 
+    //when we handle message, go DOWN one level
+    var listen_down_lvl = false;
+
     //pos_subsets and ind_subsets form a partition of our octree_positions array and our 
     //index array, respectively. this will be used later when we draw the octree, in order
     //to split our draw into multiple draw calls. (In WebGL, draw is limited to 65536 indices). 
-    var pos_subsets = [];
-    var ind_subsets = [];
+    //var pos_subsets = [];
+    //var ind_subsets = [];
 
     var persp = mat4.create();
     mat4.perspective(45.0, canvas.width/canvas.height, 0.1, 100.0, persp);
@@ -311,28 +314,40 @@
     //this takes lvl_array, and replaces its contents with its children
     function down_one_level( lvl_array ){
         level++;
-        var new_lvl_array = [];
+        //var new_lvl_array = [];
+        var requested_children = [];
         console.log("LEVEL: ".concat(level));
+
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
             var currIdx = currParent.bfsIdx;
-            var child_cnt = 0;
+
             for(var j=0; j < 8; j++){
-                var child_idx = 8*currIdx + j + 1; 
-                //if( child_idx in octree_dict ) { // I think this is like a linear search
-                if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
-                    child_cnt+=1;
-                    new_lvl_array.push(octree_dict[child_idx]); 
-                }
+                requested_children.push( 8*currIdx + j + 1 );
             }
-            // If we don't have any children then add ourselves
-            if ( child_cnt == 0 ) {
-                new_lvl_array.push(currParent); 
-            }
+
+            //the thing is, we shouldn't proceed until we get the message BACK
+            //down_one_level should be SYNCHRONOUS
+
+            //var child_cnt = 0;
+            //for(var j=0; j < 8; j++){
+                //var child_idx = 8*currIdx + j + 1; 
+                ////if( child_idx in octree_dict ) { // I think this is like a linear search
+                //if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
+                    //child_cnt+=1;
+                    //new_lvl_array.push(octree_dict[child_idx]); 
+                //}
+            //}
+            //// If we don't have any children then add ourselves
+            //if ( child_cnt == 0 ) {
+                //new_lvl_array.push(currParent); 
+            //}
                 
         }
-        return new_lvl_array;
+        ws.send( JSON.stringify(requested_children) );
+        listen_down_lvl = true;
+        //return new_lvl_array;
     }
 
     // this takes lvl_array and replaces its contents with the parents
@@ -407,109 +422,60 @@
         //put the children into the current front
         //also put them into the tree.
     
-        for( var i=0; i < msg.length; i++ ){
-            //front.enqueue( msg[i] );
-            front.push( msg[i] );
-            expansion_front.push( msg[i] );
-            octree_dict[msg[i].bfsIdx] = msg[i]; 
-        }
-
-        // Update points to render based on current front
-        /* 
-        var front_pts;
-        positions = [];
-        colors = [];
-        pointsCount = 0;
-        for( var i=0; i<front.length; i++ ){
-            if ( front[i].hasOwnProperty("points") ){
-                front_pts = front[i].points;
-                for ( var j=0; j<front_pts.length; j++ ){
-                    positions.push( front_pts[j].x );
-                    positions.push( front_pts[j].y );
-                    positions.push( front_pts[j].z );
-                    colors.push( front_pts[j].r/255.0 );
-                    colors.push( front_pts[j].g/255.0 );
-                    colors.push( front_pts[j].b/255.0 );
-                    pointsCount += 1;
-                }
-            }
-        }
-        */
-        /*
-        var curr_draw_lvl_pts;
-        positions = [];
-        colors = [];
-        pointsCount = 0;
-        for( var i=0; i<curr_draw_lvl.length; i++ ){
-            if ( curr_draw_lvl[i].hasOwnProperty("points") ){
-                curr_draw_lvl_pts = curr_draw_lvl[i].points;
-                for ( var j=0; j<curr_draw_lvl_pts.length; j++ ){
-                    positions.push( curr_draw_lvl_pts[j].x );
-                    positions.push( curr_draw_lvl_pts[j].y );
-                    positions.push( curr_draw_lvl_pts[j].z );
-                    colors.push( curr_draw_lvl_pts[j].r/255.0 );
-                    colors.push( curr_draw_lvl_pts[j].g/255.0 );
-                    colors.push( curr_draw_lvl_pts[j].b/255.0 );
-                    pointsCount += 1;
-                }
-            }
-        }
-        */
-        
-        // Positions
-        /*
-        gl.useProgram(globe_program);
-        var positionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(positionLocation);
-        
-        // Colors
-        var colorsName = gl.createBuffer();
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colorLocation);
-        */
-        positions = [];
-        colors = [];
-        pointsCount = drawFront( curr_draw_lvl, positions, colors );
-        positions = new Float32Array(positions);
-        colors = new Float32Array(colors);
-        //console.log(positions);
-        //console.log(pointsCount);
-        
-
-        //Render everything in the current front
-        //octree_positions = [];
-        //indices = [];
-        //drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+        //for( var i=0; i < msg.length; i++ ){
+            ////front.enqueue( msg[i] );
+            //front.push( msg[i] );
+            //expansion_front.push( msg[i] );
+            //octree_dict[msg[i].bfsIdx] = msg[i]; 
+        //}
         
         //initialize our 2D arrays that partition octree_positions and indices
-        pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
-        for( i=0; i < pos_subsets.length; i++){
-            pos_subsets[i] = [];
-            ind_subsets[i] = [];
-        }
+        //pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
+        //for( i=0; i < pos_subsets.length; i++){
+            //pos_subsets[i] = [];
+            //ind_subsets[i] = [];
+        //}
 
         //numberOfIndices = indices.length;
         //octree_positions = new Float32Array(octree_positions);
         //indices = new Uint16Array(indices);
 
         //make a request based on the children of everything in the current expansion front
-        var requested_children = [];
-        while( expansion_front.length > 0 ){
-            var currParent = expansion_front.pop(); 
-            var currIdx = currParent.bfsIdx;
-            for(i=0; i < 8; i++){
-                requested_children.push( 8*currIdx + i + 1 );
-            }
-        } 
+        //var requested_children = [];
+        //while( expansion_front.length > 0 ){
+            //var currParent = expansion_front.pop(); 
+            //var currIdx = currParent.bfsIdx;
+            //for(i=0; i < 8; i++){
+                //requested_children.push( 8*currIdx + i + 1 );
+            //}
+        //} 
 
-        ws.send( JSON.stringify(requested_children) );
+        //ws.send( JSON.stringify(requested_children) );
         // Indicate that the message has been handled 
+
+        if(listen_down_lvl){
+            listen_down_lvl = false; //put flag back down
+            curr_draw_lvl = [];
+
+            for(var i=0; i < msg.length; i++){
+                //put into octree and the curr_draw_lvl
+                octree_dict[msg[i].bfsIdx] = msg[i]; 
+                curr_draw_lvl.push(msg[i]);
+            }
+
+            octree_positions = [];
+            indices = [];
+            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            numberOfIndices = indices.length;
+            octree_positions = new Float32Array(octree_positions);
+            indices = new Uint16Array(indices);
+            // Update points drawing
+            positions = [];
+            colors = [];
+            pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            positions = new Float32Array(positions);
+            colors = new Float32Array(colors);
+        }
         new_msg = false;
     }
 
@@ -558,20 +524,21 @@
 
         //user presses J, we go DOWN a level! 
         if ( currentKeys[74] ) {
-            curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+            down_one_level ( curr_draw_lvl );
+            //curr_draw_lvl = down_one_level( curr_draw_lvl ); 
             // Update octree drawing
-            octree_positions = [];
-            indices = [];
-            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
-            numberOfIndices = indices.length;
-            octree_positions = new Float32Array(octree_positions);
-            indices = new Uint16Array(indices);
-            // Update points drawing
-            positions = [];
-            colors = [];
-            pointsCount = drawFront( curr_draw_lvl, positions, colors );
-            positions = new Float32Array(positions);
-            colors = new Float32Array(colors);
+            ////octree_positions = [];
+            ////indices = [];
+            ////drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            ////numberOfIndices = indices.length;
+            ////octree_positions = new Float32Array(octree_positions);
+            ////indices = new Uint16Array(indices);
+            ////// Update points drawing
+            ////positions = [];
+            ////colors = [];
+            ////pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            ////positions = new Float32Array(positions);
+            ////colors = new Float32Array(colors);
         } 
 
         //user presses K, we go UP on level!
