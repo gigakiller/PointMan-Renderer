@@ -312,10 +312,11 @@
         var new_lvl_array = [];
         console.log("Going down one level!");
         for(var i=0; i < lvl_array.length; i++){
+            console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
             var currIdx = currParent.bfsIdx;
-            for(i=0; i < 8; i++){
-                var child_idx = 8*currIdx + i + 1; 
+            for(var j=0; j < 8; j++){
+                var child_idx = 8*currIdx + j + 1; 
                 if( child_idx in octree_dict ) {
                     new_lvl_array.push(octree_dict[child_idx]); 
                 }
