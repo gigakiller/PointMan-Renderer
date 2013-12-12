@@ -40,13 +40,34 @@ function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
     );
 }
 
-function drawFront( front, positions, indices ) {
+function drawOctreeFront( front, positions, indices ) {
     var aabb;
     var highCorner;
     var lowCorner;
     for( var i=0; i<front.length; i++ ) {
         drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i );
     }         
+}
+
+function drawFront( curr_draw_lvl, positions, colors ){
+    //positions = [];
+    //colors = [];
+    pointsCount = 0;
+    for( var i=0; i<curr_draw_lvl.length; i++ ){
+        if ( curr_draw_lvl[i].hasOwnProperty("points") ){
+            curr_draw_lvl_pts = curr_draw_lvl[i].points;
+            for ( var j=0; j<curr_draw_lvl_pts.length; j++ ){
+                positions.push( curr_draw_lvl_pts[j].x );
+                positions.push( curr_draw_lvl_pts[j].y );
+                positions.push( curr_draw_lvl_pts[j].z );
+                colors.push( curr_draw_lvl_pts[j].r/255.0 );
+                colors.push( curr_draw_lvl_pts[j].g/255.0 );
+                colors.push( curr_draw_lvl_pts[j].b/255.0 );
+                pointsCount += 1;
+            }
+        }
+    }
+    return pointsCount;
 }
 
 function AABB( highCorner, lowCorner ) {
