@@ -1,6 +1,6 @@
 #ifndef OCTREE_H
 #define OCTREE_H
-#define MAX_PTS_PER_LEAF 1
+#define MAX_PTS_PER_LEAF 50
 
 #include <glm/glm.hpp>
 #include "Point.h"
