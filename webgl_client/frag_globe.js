@@ -314,12 +314,19 @@
             console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
             var currIdx = currParent.bfsIdx;
+            var child_cnt = 0;
             for(var j=0; j < 8; j++){
                 var child_idx = 8*currIdx + j + 1; 
                 if( child_idx in octree_dict ) {
+                    child_cnt+=1;
                     new_lvl_array.push(octree_dict[child_idx]); 
                 }
             }
+            // If we don't have any children then add ourselves
+            if ( child_cnt == 0 ) {
+                new_lvl_array.push(currParent); 
+            }
+                
         }
         return new_lvl_array;
     }
