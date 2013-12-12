@@ -289,7 +289,6 @@
         new_msg = false;
     }
 
-
     // Front Queue
     var root = null;
     var octree = new Octree( root );
@@ -325,6 +324,29 @@
         return new_lvl_array;
     }
 
+    // this takes lvl_array and replaces its contents with the parents
+    function up_one_level( lvl_array ){
+        var new_lvl_array = [];
+        var parents_pushed = {};
+        console.log("Going up one level!");
+        for( var i=0; i < lvl_array.length; i++){
+            console.log("At lvl_array item:".concat(i));
+            var currChild = lvl_array[i];
+            var currIdx = currChild.bfsIdx;
+            var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
+            // If we have already added the parents, then go to the next child
+            if ( parent_idx in parents_pushed ) {
+                continue;
+            }
+            // If the parent is in the octree_dict then add it to the new_lvl_array
+            if ( parent_idx in octree_dict ) {
+                parents_pushed[parent_idx] = octree_dict[parent_idx];
+                new_lvl_array.push(octree_dict[parent_idx]); 
+            }
+        }
+        return new_lvl_array;
+    }
+
     // ID of root node
     //expansion_req.push(0); 
     function handleMsg() { 
@@ -333,7 +355,7 @@
 
             octree_positions = [];
             indices = [];
-            drawFront( curr_draw_lvl, octree_positions, indices );
+            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
 
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
@@ -379,6 +401,7 @@
         }
 
         // Update points to render based on current front
+        /* 
         var front_pts;
         positions = [];
         colors = [];
@@ -397,6 +420,28 @@
                 }
             }
         }
+        */
+        /*
+        var curr_draw_lvl_pts;
+        positions = [];
+        colors = [];
+        pointsCount = 0;
+        for( var i=0; i<curr_draw_lvl.length; i++ ){
+            if ( curr_draw_lvl[i].hasOwnProperty("points") ){
+                curr_draw_lvl_pts = curr_draw_lvl[i].points;
+                for ( var j=0; j<curr_draw_lvl_pts.length; j++ ){
+                    positions.push( curr_draw_lvl_pts[j].x );
+                    positions.push( curr_draw_lvl_pts[j].y );
+                    positions.push( curr_draw_lvl_pts[j].z );
+                    colors.push( curr_draw_lvl_pts[j].r/255.0 );
+                    colors.push( curr_draw_lvl_pts[j].g/255.0 );
+                    colors.push( curr_draw_lvl_pts[j].b/255.0 );
+                    pointsCount += 1;
+                }
+            }
+        }
+        */
+        
         // Positions
         /*
         gl.useProgram(globe_program);
@@ -414,14 +459,19 @@
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
         */
+        positions = [];
+        colors = [];
+        pointsCount = drawFront( curr_draw_lvl, positions, colors );
         positions = new Float32Array(positions);
         colors = new Float32Array(colors);
+        console.log(positions);
+        console.log(pointsCount);
         
 
         //Render everything in the current front
         //octree_positions = [];
         //indices = [];
-        //drawFront( curr_draw_lvl, octree_positions, indices );
+        //drawOctreeFront( curr_draw_lvl, octree_positions, indices );
         
         //initialize our 2D arrays that partition octree_positions and indices
         pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
@@ -495,13 +545,39 @@
         //user presses J, we go DOWN a level! 
         if ( currentKeys[74] ) {
             curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+            // Update octree drawing
             octree_positions = [];
             indices = [];
-            drawFront( curr_draw_lvl, octree_positions, indices );
+            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
             indices = new Uint16Array(indices);
+            // Update points drawing
+            positions = [];
+            colors = [];
+            pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            positions = new Float32Array(positions);
+            colors = new Float32Array(colors);
         } 
+
+        //user presses K, we go UP on level!
+        if ( currentKeys[75] ) {
+            curr_draw_lvl = up_one_level( curr_draw_lvl ); 
+            // Update octree drawing
+            octree_positions = [];
+            indices = [];
+            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            numberOfIndices = indices.length;
+            octree_positions = new Float32Array(octree_positions);
+            indices = new Uint16Array(indices);
+            // Update points drawing
+            positions = [];
+            colors = [];
+            pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            positions = new Float32Array(positions);
+            colors = new Float32Array(colors);
+        }
+
     }
 
     function handleKeyUp(event) {
@@ -700,6 +776,7 @@
         var dt = currTime - prevTime;
         elapsedTime += dt;
         prevTime = currTime;
+
 
         // If we have a new message then update the pointcloud data
         if ( new_msg ) {
