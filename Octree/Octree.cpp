@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <queue>
 #include <glm/ext.hpp>
+#include <stdlib.h>
 
 //OctreeNode: Nodes that make up the Octree
 OctreeNode::OctreeNode(AABB boundingBox, unsigned long newIdx) : aabb(boundingBox) {
@@ -120,6 +121,9 @@ void OctreeNode::insertRecursive( Point newData ){
     }
 }
 
+void OctreeNode::popRandomSample(){
+    std::cout << rand() << std::endl;
+}
 // Populate this node by looking at its children, computing the position and color 
 //   average of their points 
 void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color) {

@@ -37,6 +37,11 @@ public:
     //   average of their points 
     void populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color ); 
 
+    // Populate via random sampling of children. Given that a node has k valid children, each
+    // with n samples, we take n/k samples from each child and add it to the parent. These 
+    // serve as the parent's samples/data.
+    void popRandomSample();
+
     //add a child to the correct octant based on the position, then return the child
     //IF there is already a child at that octant, DO NOT create a new child, return
     //the child that is already there
