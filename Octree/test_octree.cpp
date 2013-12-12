@@ -251,7 +251,7 @@ void mouse( int x, int y ) {
 int main(int argc, char **argv) 
 {
 
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
     AABB foo;
     OctreeNode* test = new OctreeNode(foo, 1337);
 
