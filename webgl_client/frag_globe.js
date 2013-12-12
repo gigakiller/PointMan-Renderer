@@ -325,6 +325,29 @@
         return new_lvl_array;
     }
 
+    // this takes lvl_array and replaces its contents with the parents
+    function up_one_level( lvl_array ){
+        var new_lvl_array = [];
+        var parents_pushed = {};
+        console.log("Going up one level!");
+        for( var i=0; i < lvl_array.length; i++){
+            console.log("At lvl_array item:".concat(i));
+            var currChild = lvl_array[i];
+            var currIdx = currChild.bfsIdx;
+            var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
+            // If we have already added the parents, then go to the next child
+            if ( parent_idx in parents_pushed ) {
+                continue;
+            }
+            // If the parent is in the octree_dict then add it to the new_lvl_array
+            if ( parent_idx in octree_dict ) {
+                parents_pushed[parent_idx] = octree_dict[parent_idx];
+                new_lvl_array.push(octree_dict[parent_idx]); 
+            }
+        }
+        return new_lvl_array;
+    }
+
     // ID of root node
     //expansion_req.push(0); 
     function handleMsg() { 
@@ -502,6 +525,18 @@
             octree_positions = new Float32Array(octree_positions);
             indices = new Uint16Array(indices);
         } 
+
+        //user presses K, we go UP on level!
+        if ( currentKeys[75] ) {
+            curr_draw_lvl = up_one_level( curr_draw_lvl ); 
+            octree_positions = [];
+            indices = [];
+            drawFront( curr_draw_lvl, octree_positions, indices );
+            numberOfIndices = indices.length;
+            octree_positions = new Float32Array(octree_positions);
+            indices = new Uint16Array(indices);
+        }
+
     }
 
     function handleKeyUp(event) {
