@@ -252,12 +252,12 @@ int main(int argc, char **argv)
 {
 
     srand(static_cast<unsigned int>(time(NULL)));
-    AABB foo;
-    OctreeNode* test = new OctreeNode(foo, 1337);
+    //AABB foo;
+    //OctreeNode* test = new OctreeNode(foo, 1337);
 
-    test->popRandomSample();
-    test->popRandomSample();
-    test->popRandomSample();
+    //test->popRandomSample();
+    //test->popRandomSample();
+    //test->popRandomSample();
 
     myCam = new Camera;
     myCam->camMatrix = glm::mat4(1.0);

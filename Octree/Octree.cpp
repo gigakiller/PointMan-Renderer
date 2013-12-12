@@ -4,7 +4,8 @@
 #include <assert.h>
 #include <queue>
 #include <glm/ext.hpp>
-#include <stdlib.h>
+#include "data_util.h"
+#include <algorithm>
 
 //OctreeNode: Nodes that make up the Octree
 OctreeNode::OctreeNode(AABB boundingBox, unsigned long newIdx) : aabb(boundingBox) {
@@ -122,8 +123,34 @@ void OctreeNode::insertRecursive( Point newData ){
 }
 
 void OctreeNode::popRandomSample(){
-    std::cout << rand() << std::endl;
+    if ( isLeaf )
+        return;
+
+    int num_valid_children = 0; //number of non null children
+    //compute the number of valid children, and also MAKE SURE CHILDREN ARE POPULATED 
+    for( int i=0; i<8; i++ ){
+        OctreeNode* currChild = getChildAt(i);
+        if (currChild != NULL) {
+            num_valid_children++; 
+            currChild->popRandomSample();
+        }
+    }
+    for( int i=0; i<8; i++){
+        OctreeNode* currChild = getChildAt(i);
+        if( currChild != NULL) { //for each valid child
+            int child_num_pts = static_cast<int>((currChild->data).size());
+            int num_samples = std::max( child_num_pts / num_valid_children, 1 );
+            int* rand_idxs = new int[num_samples];
+            getNrandom(rand_idxs, num_samples, child_num_pts - 1);
+            for(int j=0; j < num_samples; j++){
+                int curr_idx = rand_idxs[j];
+                data.push_back( currChild->data[ static_cast<unsigned long>(curr_idx) ] );
+            }
+            delete rand_idxs;
+        } 
+    } 
 }
+
 // Populate this node by looking at its children, computing the position and color 
 //   average of their points 
 void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color) {
@@ -199,7 +226,8 @@ void Octree::populateOctree( void ) {
     glm::vec3 ave_position;
     glm::vec3 ave_color;
     // Kickoff recursion
-    root->populateRecursive(&ave_position, &ave_color);
+    //root->populateRecursive(&ave_position, &ave_color);
+    root->popRandomSample();
 }
 
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){
