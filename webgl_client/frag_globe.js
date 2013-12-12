@@ -330,7 +330,7 @@
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
-            console.log(ss_error[i]);
+            //console.log(ss_error[i]);
             var currIdx = currParent.bfsIdx;
 
             for(var j=0; j < 8; j++){

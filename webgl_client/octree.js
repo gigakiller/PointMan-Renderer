@@ -17,8 +17,9 @@
 function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Persp ) {
     // TODO: ....
     // Model,View, Model is identity
-    var mv = mat4.create();
-    mat4.multiply(View, Model, mv); //is the correct order? it matches what we have elsewhere...
+    //var mv = mat4.create();
+    //mat4.multiply(View, Model, mv); //is the correct order? it matches what we have elsewhere...
+    //BOLD ASSUMPTION: assume model is identity! 
 
     for ( var i=0; i<front.length; i++ ) {
         // Transform
@@ -30,7 +31,7 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         halfVec[2] = (front[i].highCorner.z - front[i].lowCorner.z)/2.0;
         halfVec[3] = 0.0;
 
-        mat4.multiply( mv, halfVec ); //transform the halfVec to camera space
+        mat4.multiply( View, halfVec, halfVec ); //transform the halfVec to camera space
         //var radius = vec4.length(halfVec)/2; //radius in camera space
         
         //I don't **think** we divide by 2 because we already do so above
@@ -43,7 +44,7 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         //centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
         //centroid_pos[3] = 0; 
 
-        calcScreenSpaceError( halfVec, radius, Persp, mv, maxErr );
+        calcScreenSpaceError( halfVec, radius, Persp, View, maxErr );
         screen_space_error[i] = maxErr;
     }
 }
@@ -65,6 +66,8 @@ function calcScreenSpaceError( half_vec, radius, Persp, modelview, maxError ) {
     } else {
         maxError = Math.PI * hv_length * hv_length; //use the area of the "circle"    
     }
+
+    console.log(maxError);
 
     //maxError = centroidScreenspace[2]; //take the z-coordinate 
 }
