@@ -314,7 +314,6 @@
     //this takes lvl_array, and replaces its contents with its children
     function down_one_level( lvl_array ){
         level++;
-        //var new_lvl_array = [];
         var requested_children = [];
         console.log("LEVEL: ".concat(level));
 
@@ -325,8 +324,7 @@
 
             for(var j=0; j < 8; j++){
                 requested_children.push( 8*currIdx + j + 1 );
-            }
-
+            } 
             //the thing is, we shouldn't proceed until we get the message BACK
             //down_one_level should be SYNCHRONOUS
 
@@ -347,7 +345,6 @@
         }
         ws.send( JSON.stringify(requested_children) );
         listen_down_lvl = true;
-        //return new_lvl_array;
     }
 
     // this takes lvl_array and replaces its contents with the parents
@@ -455,12 +452,29 @@
 
         if(listen_down_lvl){
             listen_down_lvl = false; //put flag back down
-            curr_draw_lvl = [];
 
+            var old_draw_lvl = curr_draw_lvl;
+            curr_draw_lvl = [];
+            //console.log("curr_draw_lvl length: ".concat(curr_draw_lvl.length);
             for(var i=0; i < msg.length; i++){
                 //put into octree and the curr_draw_lvl
                 octree_dict[msg[i].bfsIdx] = msg[i]; 
                 curr_draw_lvl.push(msg[i]);
+            }
+            for(var i=0; i < old_draw_lvl.length; i++){
+                var currParent = old_draw_lvl[i];
+                var currIdx = currParent.bfsIdx;
+                var child_cnt = 0;
+                for(var j=0; j < 8; j++){
+                    var child_idx = 8*currIdx + j + 1; 
+                    //if( child_idx in octree_dict ) { // I think this is like a linear search
+                    if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
+                        child_cnt+=1;
+                    }
+                }
+                if( child_cnt == 0){
+                    curr_draw_lvl.push(currParent);
+                }
             }
 
             octree_positions = [];

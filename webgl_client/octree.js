@@ -102,6 +102,7 @@ function drawOctreeFront( front, positions, indices ) {
     var highCorner;
     var lowCorner;
     for( var i=0; i<front.length; i++ ) {
+        //console.log("Drawing front at position: ".concat(i));
         drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i );
     }         
 }
