@@ -37,26 +37,36 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         var radius = vec4.length(halfVec); //radius in camera space
         var maxErr;
 
-        var centroid_pos = vec4.create();
-        centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
-        centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
-        centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
-        centroid_pos[3] = 0; 
+        //var centroid_pos = vec4.create();
+        //centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
+        //centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
+        //centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
+        //centroid_pos[3] = 0; 
 
-        calcScreenSpaceError( centroid_pos, radius, Persp, mv, maxErr );
+        calcScreenSpaceError( halfVec, radius, Persp, mv, maxErr );
         screen_space_error[i] = maxErr;
     }
 }
 
 //For now I'm going to do something REALLY DUMB, and just use the Z-distance of the 
 //projected centroid position
-function calcScreenSpaceError( centroid, radius, Persp, modelview, maxError ) {
+function calcScreenSpaceError( half_vec, radius, Persp, modelview, maxError ) {
     //var centroid_pos = Persp * modelveiw * centroid; 
-    var fullTranform = mat4.create();   
-    mat4.multiply(Persp, modelView, fullTransform);
-    var centroidScreenspace = vec4.create();
-    mat4.multiply(fullTransform, centroid, centroidScreenspace);
-    maxError = centroidScreenspace[2]; //take the z-coordinate 
+    var fullTransform = mat4.create();   
+    mat4.multiply(Persp, modelview, fullTransform);
+    var half_vec_ss = vec4.create(); //half_vec in screenspace
+    mat4.multiply(fullTransform, half_vec, half_vec_ss);
+
+    var hv_length = vec4.length(half_vec_ss); 
+    
+    //do a very simple z-cull: if the circle is behind us, don't draw it
+    if(half_vec_ss[2] < 0){ //assuming +z is INTO screen
+        maxError = 0; //not on the screen, we don't need to draw
+    } else {
+        maxError = Math.PI * hv_length * hv_length; //use the area of the "circle"    
+    }
+
+    //maxError = centroidScreenspace[2]; //take the z-coordinate 
 }
        
 

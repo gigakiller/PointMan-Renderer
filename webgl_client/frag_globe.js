@@ -53,6 +53,8 @@
     gl.enable(gl.BLEND);
     //gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
+    var model = mat4.create();
+
     //assuming that we are drawing one cube at a time
     var numIndices = 32;
 
@@ -321,9 +323,14 @@
         var requested_children = [];
         console.log("LEVEL: ".concat(level));
 
+        //screenspace error
+        var ss_error = [];
+        calcFrontScreenSpaceError(lvl_array, ss_error, model, view, persp); 
+
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
+            console.log(ss_error[i]);
             var currIdx = currParent.bfsIdx;
 
             for(var j=0; j < 8; j++){
@@ -811,13 +818,12 @@
         handleUserInput();
         //handleMouseMove();
 
+        mat4.identity(model);
         // Invert camera pose to get view matrix
         view = mat4.create();
         mat4.inverse( cam, view );
 
         // Update Transforms
-        var model = mat4.create();
-        mat4.identity(model);
         var mv = mat4.create();
         mat4.multiply(view, model, mv);
 
