@@ -320,7 +320,8 @@
             var child_cnt = 0;
             for(var j=0; j < 8; j++){
                 var child_idx = 8*currIdx + j + 1; 
-                if( child_idx in octree_dict ) {
+                //if( child_idx in octree_dict ) { // I think this is like a linear search
+                if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
                     child_cnt+=1;
                     new_lvl_array.push(octree_dict[child_idx]); 
                 }
@@ -346,11 +347,13 @@
             var currIdx = currChild.bfsIdx;
             var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
             // If we have already added the parents, then go to the next child
-            if ( parent_idx in parents_pushed ) {
+            //if ( parent_idx in parents_pushed ) {
+            if ( parents_pushed.hasOwnProperty(parent_idx) ) {
                 continue;
             }
             // If the parent is in the octree_dict then add it to the new_lvl_array
-            if ( parent_idx in octree_dict ) {
+            //if ( parent_idx in octree_dict ) {
+            if ( octree_dict.hasOwnProperty(parent_idx) ) {
                 parents_pushed[parent_idx] = octree_dict[parent_idx];
                 new_lvl_array.push(octree_dict[parent_idx]); 
             }
