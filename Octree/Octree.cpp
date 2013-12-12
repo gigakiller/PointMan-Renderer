@@ -122,43 +122,26 @@ void OctreeNode::insertRecursive( Point newData ){
 
 // Populate this node by looking at its children, computing the position and color 
 //   average of their points 
-void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color, bool isFirst ) {
-    glm::vec3 ave_position;
-    glm::vec3 ave_color;
+void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color) {
+    glm::vec3 ave_position(0, 0, 0);
+    glm::vec3 ave_color(0, 0, 0);
     int cnt=0;
-    bool first = false;
 
     // Update our parents average pos and color
-    if ( isFirst ) {
-        *parent_ave_pos = data[0].pos;
-        *parent_ave_color = data[0].color;
-    } else {
-        *parent_ave_pos += data[0].pos;
-        *parent_ave_color += data[0].color;
-        //for(unsigned long i = 1; i < data.size(); i++){
-            //*parent_ave_pos += data[i].pos;
-            //*parent_ave_color += data[i].color;
-        //}
-    }
+    *parent_ave_pos += data[0].pos;
+    *parent_ave_color += data[0].color;
 
     // If we are a leaf then we don't have children     
     if ( isLeaf ) 
-	return;
+        return;
 
     // Recurse down the tree 
     for( int i=0; i<8; i++ ){
         OctreeNode* currChild = getChildAt(i);
         if (currChild == NULL )
             continue;
-        if ( cnt == 0 ) {
-            first = true;
-        } else {
-            first = false;
-        }
-        //cnt++;
-        //std::cut << currChild->data.size() << std::endl;
         cnt += data.size();
-        currChild->populateRecursive(&ave_position, &ave_color, first);
+        currChild->populateRecursive(&ave_position, &ave_color);
     }
 
     // Finally update our own data 
@@ -212,7 +195,7 @@ void Octree::populateOctree( void ) {
     glm::vec3 ave_position;
     glm::vec3 ave_color;
     // Kickoff recursion
-    root->populateRecursive(&ave_position, &ave_color, true);
+    root->populateRecursive(&ave_position, &ave_color);
 }
 
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){

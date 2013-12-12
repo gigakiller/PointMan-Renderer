@@ -35,7 +35,7 @@ public:
 
     // Populate this node by looking at its children, computing the position and color 
     //   average of their points 
-    void populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color, bool isFirst ); 
+    void populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color ); 
 
     //add a child to the correct octant based on the position, then return the child
     //IF there is already a child at that octant, DO NOT create a new child, return
