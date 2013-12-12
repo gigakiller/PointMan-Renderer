@@ -89,28 +89,26 @@ void OctreeNode::insertRecursive( Point newData ){
         //take the current point already in the node, and the new point, figure out which
         //octant they are in, and then insert 
 
-        /*
         Point oldData = data[0];
         data.pop_back(); //pop the old data
         //create children based on where both the old data and the new data are.
         OctreeNode* childOldData = addChild( oldData.pos );
-        childOldData->insertRecursive(oldData);
         OctreeNode* childNewData = addChild( newData.pos );
         //re-insert the old point and the new point into the new children
         //this may occur several times during insert if points are close to each other
+        childOldData->insertRecursive(oldData);
         childNewData->insertRecursive(newData);
-        */
 
-        data.push_back( newData );        
-        if( data.size() >  MAX_PTS_PER_LEAF ){ //if below limit, simply add to data
-        //too many points in leaf!
-            while( !data.empty() ){
-                Point currPt = data.back(); 
-                data.pop_back(); //pop returns null in C++
-                OctreeNode* currPtNode = addChild( currPt.pos );
-                currPtNode->insertRecursive( currPt );
-            }
-        } 
+        //data.push_back( newData );        
+        //if( data.size() >  MAX_PTS_PER_LEAF ){ //if below limit, simply add to data
+        ////too many points in leaf!
+            //while( !data.empty() ){
+                //Point currPt = data.back(); 
+                //data.pop_back(); //pop returns null in C++
+                //OctreeNode* currPtNode = addChild( currPt.pos );
+                //currPtNode->insertRecursive( currPt );
+            //}
+        //} 
     } else if ( !isLeaf ){ //not a leaf. insert child, recurse on that child.
         OctreeNode* newChild = addChild( newData.pos );
         newChild->insertRecursive( newData );
@@ -133,12 +131,12 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
         *parent_ave_pos = data[0].pos;
         *parent_ave_color = data[0].color;
     } else {
-        //*parent_ave_pos += data[0].pos;
-        //*parent_ave_color += data[0].color;
-        for(unsigned long i = 1; i < data.size(); i++){
-            *parent_ave_pos += data[i].pos;
-            *parent_ave_color += data[i].color;
-        }
+        *parent_ave_pos += data[0].pos;
+        *parent_ave_color += data[0].color;
+        //for(unsigned long i = 1; i < data.size(); i++){
+            //*parent_ave_pos += data[i].pos;
+            //*parent_ave_color += data[i].color;
+        //}
     }
 
     // If we are a leaf then we don't have children     
@@ -156,7 +154,8 @@ void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent
             first = false;
         }
         //cnt++;
-        cnt += currChild->data.size();
+        //std::cut << currChild->data.size() << std::endl;
+        cnt += data.size();
         currChild->populateRecursive(&ave_position, &ave_color, first);
     }
 
