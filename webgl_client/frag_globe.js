@@ -126,6 +126,8 @@
 
     var use_RoundPoints = true;
 
+    var level = 0;
+
     function initializeShader() {
         
         var vs = getShaderSource(document.getElementById("vs"));
@@ -308,8 +310,9 @@
 
     //this takes lvl_array, and replaces its contents with its children
     function down_one_level( lvl_array ){
+        level++;
         var new_lvl_array = [];
-        console.log("Going down one level!");
+        console.log("LEVEL: ".concat(level));
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
@@ -326,9 +329,10 @@
 
     // this takes lvl_array and replaces its contents with the parents
     function up_one_level( lvl_array ){
+        level--;
         var new_lvl_array = [];
         var parents_pushed = {};
-        console.log("Going up one level!");
+        console.log("LEVEL: ".concat(level));
         for( var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currChild = lvl_array[i];
