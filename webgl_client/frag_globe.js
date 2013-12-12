@@ -61,6 +61,10 @@
     //when we handle message, go DOWN one level
     var listen_down_lvl = false;
 
+    //when we know that we are ineligible to grow anymore. Set to false
+    //when we move the camera!
+    var finished_growing = true;
+
     //pos_subsets and ind_subsets form a partition of our octree_positions array and our 
     //index array, respectively. this will be used later when we draw the octree, in order
     //to split our draw into multiple draw calls. (In WebGL, draw is limited to 65536 indices). 
@@ -414,6 +418,8 @@
             var startingRot3 = quat4.toMat3(desiredRotation);
             var startingRot4 = mat3.toMat4(startingRot3);
             mat4.multiply(cam, startingRot4); 
+
+            finished_growing = false;
         }
 
         //put the children into the current front
@@ -461,6 +467,8 @@
                 octree_dict[msg[i].bfsIdx] = msg[i]; 
                 curr_draw_lvl.push(msg[i]);
             }
+
+            var num_leaves = 0;
             for(var i=0; i < old_draw_lvl.length; i++){
                 var currParent = old_draw_lvl[i];
                 var currIdx = currParent.bfsIdx;
@@ -473,8 +481,12 @@
                     }
                 }
                 if( child_cnt == 0){
+                    num_leaves++;
                     curr_draw_lvl.push(currParent);
                 }
+            }
+            if( num_leaves == old_draw_lvl.length ){
+                finished_growing = true;  
             }
 
             octree_positions = [];
@@ -766,6 +778,10 @@
     //animate();
 
     function animate(){
+        if( !listen_down_lvl && !finished_growing ){ //flag is down
+            down_one_level( curr_draw_lvl ); //go down one level
+        }
+
         var currTime = new Date().getTime();
         var dt = currTime - prevTime;
         elapsedTime += dt;
