@@ -262,8 +262,8 @@ int main(int argc, char **argv)
     myCam = new Camera;
     myCam->camMatrix = glm::mat4(1.0);
     //Load points as unstructured data
-    //const char* file_loc = "../data/chappes_sml.json";
-    const char* file_loc = "../data/chappes.json";
+    const char* file_loc = "../data/chappes_sml.json";
+    //const char* file_loc = "../data/chappes.json";
     
     // NOTE: this large file 650M uses up all of my RAM in the parseJSONData function
     //const char* file_loc = "../data/chappes_full.json";
@@ -287,10 +287,9 @@ int main(int argc, char **argv)
 
     cout << "Num nodes in octree " << myOctree->getNumNodes() << endl;
 
-    //cout << "Serializing octree... " << endl;
-    //myOctree->serialize("chappes_sml.octopus");
-    //
-    
+    cout << "Serializing octree... " << endl;
+    myOctree->serialize("chappes_sml.octopus");
+    cout << "Serialization DONE!" << endl; 
 
  
     // set window values

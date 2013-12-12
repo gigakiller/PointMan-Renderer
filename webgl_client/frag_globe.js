@@ -283,7 +283,7 @@
 
         // Kickoff animation cycle
         //animate();
-        console.log(pointsIndex);
+        //console.log(pointsIndex);
 
         // Indicate that the message has been handled 
         new_msg = false;
@@ -311,7 +311,7 @@
         var new_lvl_array = [];
         console.log("Going down one level!");
         for(var i=0; i < lvl_array.length; i++){
-            console.log("At lvl_array item:".concat(i));
+            //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
             var currIdx = currParent.bfsIdx;
             for(var j=0; j < 8; j++){
@@ -330,7 +330,7 @@
         var parents_pushed = {};
         console.log("Going up one level!");
         for( var i=0; i < lvl_array.length; i++){
-            console.log("At lvl_array item:".concat(i));
+            //console.log("At lvl_array item:".concat(i));
             var currChild = lvl_array[i];
             var currIdx = currChild.bfsIdx;
             var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
@@ -464,8 +464,8 @@
         pointsCount = drawFront( curr_draw_lvl, positions, colors );
         positions = new Float32Array(positions);
         colors = new Float32Array(colors);
-        console.log(positions);
-        console.log(pointsCount);
+        //console.log(positions);
+        //console.log(pointsCount);
         
 
         //Render everything in the current front
@@ -766,7 +766,6 @@
 
     //initializeShader();
     animate();
-
 
     //loadPointCloud();
     //animate();
