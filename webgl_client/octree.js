@@ -18,29 +18,46 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
     // TODO: ....
     // Model,View, Model is identity
     var mv = mat4.create();
-    mat4.multiply(View, Model, mv);
+    mat4.multiply(View, Model, mv); //is the correct order? it matches what we have elsewhere...
 
     for ( var i=0; i<front.length; i++ ) {
         // Transform
-        var centroid = vec4.create();
-        centroid[0] = (front[i].highCorner.x - front[i].lowCorner.x)/2.0;
-        centroid[1] = (front[i].highCorner.y - front[i].lowCorner.y)/2.0;
-        centroid[2] = (front[i].highCorner.z - front[i].lowCorner.z)/2.0;
-        centroid[4] = 0.0;
-        mat4.multiply( mv, centroid );
-        var radius = vec4.length(centroid)/2; 
+
+        //"Centroid" refers to the vector from one corner of the AABB to the other!
+        var halfVec = vec4.create();
+        halfVec[0] = (front[i].highCorner.x - front[i].lowCorner.x)/2.0;
+        halfVec[1] = (front[i].highCorner.y - front[i].lowCorner.y)/2.0;
+        halfVec[2] = (front[i].highCorner.z - front[i].lowCorner.z)/2.0;
+        halfVec[3] = 0.0;
+
+        mat4.multiply( mv, halfVec ); //transform the halfVec to camera space
+        //var radius = vec4.length(halfVec)/2; //radius in camera space
+        
+        //I don't **think** we divide by 2 because we already do so above
+        var radius = vec4.length(halfVec); //radius in camera space
         var maxErr;
-        calcScreenSpaceError( centroid, radius, Persp, maxErr );
+
+        var centroid_pos = vec4.create();
+        centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
+        centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
+        centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
+        centroid_pos[3] = 0; 
+
+        calcScreenSpaceError( centroid_pos, radius, Persp, mv, maxErr );
         screen_space_error[i] = maxErr;
     }
 }
 
-function calcScreenSpaceError( centroid, radius, Persp, maxError ) {
-    // TODO: this is pretty straightforward
-};
-
-
-
+//For now I'm going to do something REALLY DUMB, and just use the Z-distance of the 
+//projected centroid position
+function calcScreenSpaceError( centroid, radius, Persp, modelview, maxError ) {
+    //var centroid_pos = Persp * modelveiw * centroid; 
+    var fullTranform = mat4.create();   
+    mat4.multiply(Persp, modelView, fullTransform);
+    var centroidScreenspace = vec4.create();
+    mat4.multiply(fullTransform, centroid, centroidScreenspace);
+    maxError = centroidScreenspace[2]; //take the z-coordinate 
+}
        
 
 function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
