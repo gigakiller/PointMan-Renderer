@@ -19,4 +19,8 @@ std::vector<Point>* parseJSONData(char* filename);
 //compute AABB of the point cloud
 AABB calcAABB(const std::vector<Point>* pts); 
 
+//fill an array with N random numbers between 0 and max_val (inclusive)
+//read into an array "buf", with size buf_len (# of ints).
+void getNrandom(int* buf, const int buf_len, const int max_val); 
+
 #endif

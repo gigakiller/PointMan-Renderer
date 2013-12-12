@@ -20,7 +20,9 @@ def dict_lookup(dictionary, key):
         return None
 
 #read in the .octopus file that represents our octree
-my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes_sml.octopus")
+my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes_sml_randsample.octopus")
+print "Length of dictionary ", len(my_octree_dict)
+#my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes.octopus")
 print centroid_x, centroid_y, centroid_z
 centroid_array = [centroid_x, centroid_y, centroid_z]
 print "Read in the .octopus file!"

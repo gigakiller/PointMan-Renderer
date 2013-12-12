@@ -251,6 +251,14 @@ void mouse( int x, int y ) {
 int main(int argc, char **argv) 
 {
 
+    srand(static_cast<unsigned int>(time(NULL)));
+    //AABB foo;
+    //OctreeNode* test = new OctreeNode(foo, 1337);
+
+    //test->popRandomSample();
+    //test->popRandomSample();
+    //test->popRandomSample();
+
     myCam = new Camera;
     myCam->camMatrix = glm::mat4(1.0);
     //Load points as unstructured data
@@ -279,8 +287,10 @@ int main(int argc, char **argv)
 
     cout << "Num nodes in octree " << myOctree->getNumNodes() << endl;
 
-    //cout << "Serializing octree... " << endl;
-    //myOctree->serialize("chappes_sml.octopus");
+    cout << "Serializing octree... " << endl;
+    myOctree->serialize("chappes_sml.octopus");
+    cout << "Serialization DONE!" << endl; 
+
  
     // set window values
     win.width = 640;
