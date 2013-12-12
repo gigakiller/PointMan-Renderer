@@ -1,8 +1,48 @@
 /*global vec3*/
 
 /*
-  Javascript Octree implementation
+  Javascript Octree implementation and other such utility functions
 */
+
+/*
+  Basic algorithm:
+    * Note: I think we need to do a frustrum cull first
+    * Transform octree AABB centroid into view space, pre-persperpective
+    * Use (highCorner-lowCorner)/2 as the sphere radius
+    * Then use algebraic sphere sse computation as per:
+      * http://www.clownfrogfish.com/2012/09/14/on-the-perspective-projection-of-a-sphere/  
+      * http://article.gmane.org/gmane.games.devel.algorithms/21697
+      * https://github.com/farbrausch/fr_public/blob/master/werkkzeug3/engine.cpp#L4265
+*/
+function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Persp ) {
+    // TODO: ....
+    // Model,View, Model is identity
+    var mv = mat4.create();
+    mat4.multiply(View, Model, mv);
+
+    for ( var i=0; i<front.length; i++ ) {
+        // Transform
+        var centroid = vec4.create();
+        centroid[0] = (front[i].highCorner.x - front[i].lowCorner.x)/2.0;
+        centroid[1] = (front[i].highCorner.y - front[i].lowCorner.y)/2.0;
+        centroid[2] = (front[i].highCorner.z - front[i].lowCorner.z)/2.0;
+        centroid[4] = 0.0;
+        mat4.multiply( mv, centroid );
+        var radius = vec4.length(centroid)/2; 
+        var maxErr;
+        calcScreenSpaceError( centroid, radius, Persp, maxErr );
+        screen_space_error[i] = maxErr;
+    }
+}
+
+function calcScreenSpaceError( centroid, radius, Persp, maxError ) {
+    // TODO: this is pretty straightforward
+};
+
+
+
+       
+
 function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
     positions.push(
         // z-bottom
