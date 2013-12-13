@@ -251,11 +251,19 @@ void mouse( int x, int y ) {
 int main(int argc, char **argv) 
 {
 
+    srand(static_cast<unsigned int>(time(NULL)));
+    //AABB foo;
+    //OctreeNode* test = new OctreeNode(foo, 1337);
+
+    //test->popRandomSample();
+    //test->popRandomSample();
+    //test->popRandomSample();
+
     myCam = new Camera;
     myCam->camMatrix = glm::mat4(1.0);
     //Load points as unstructured data
-    const char* file_loc = "../data/chappes_sml.json";
-    //const char* file_loc = "../data/chappes.json";
+    //const char* file_loc = "../data/chappes_sml.json";
+    const char* file_loc = "../data/chappes.json";
     
     // NOTE: this large file 650M uses up all of my RAM in the parseJSONData function
     //const char* file_loc = "../data/chappes_full.json";
@@ -277,8 +285,12 @@ int main(int argc, char **argv)
     
     cout << "Now testing AABB... there will be cake!" << endl;
 
+    cout << "Num nodes in octree " << myOctree->getNumNodes() << endl;
+
     cout << "Serializing octree... " << endl;
     myOctree->serialize("chappes_sml.octopus");
+    cout << "Serialization DONE!" << endl; 
+
  
     // set window values
     win.width = 640;

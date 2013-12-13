@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <queue>
 #include <glm/ext.hpp>
+#include "data_util.h"
+#include <algorithm>
 
 //OctreeNode: Nodes that make up the Octree
 OctreeNode::OctreeNode(AABB boundingBox, unsigned long newIdx) : aabb(boundingBox) {
@@ -63,7 +65,7 @@ unsigned long OctreeNode::getBfsIdx() const{
 OctreeNode* OctreeNode::addChild( glm::vec3 position ){
     isLeaf = false;
     //find out which octant the child is in
-    int octNum;
+    unsigned int octNum;
     AABB childAABB;
     if( !aabb.getOctant(position, &octNum, &childAABB) ){
         std::cout << "Low corner: " << glm::to_string(aabb.lowCorner) << std::endl;
@@ -89,18 +91,28 @@ void OctreeNode::insertRecursive( Point newData ){
         //take the current point already in the node, and the new point, figure out which
         //octant they are in, and then insert 
 
-        //BOLD ASSUMPTION: we only have one data so far! 
+        /*
         Point oldData = data[0];
         data.pop_back(); //pop the old data
-        
         //create children based on where both the old data and the new data are.
         OctreeNode* childOldData = addChild( oldData.pos );
         OctreeNode* childNewData = addChild( newData.pos );
-
         //re-insert the old point and the new point into the new children
         //this may occur several times during insert if points are close to each other
         childOldData->insertRecursive(oldData);
         childNewData->insertRecursive(newData);
+        */
+
+        data.push_back( newData );        
+        if( data.size() >  MAX_PTS_PER_LEAF ){ //if below limit, simply add to data
+        //too many points in leaf!
+            while( !data.empty() ){
+                Point currPt = data.back(); 
+                data.pop_back(); //pop returns null in C++
+                OctreeNode* currPtNode = addChild( currPt.pos );
+                currPtNode->insertRecursive( currPt );
+            }
+        } 
     } else if ( !isLeaf ){ //not a leaf. insert child, recurse on that child.
         OctreeNode* newChild = addChild( newData.pos );
         newChild->insertRecursive( newData );
@@ -110,39 +122,57 @@ void OctreeNode::insertRecursive( Point newData ){
     }
 }
 
+void OctreeNode::popRandomSample(){
+    if ( isLeaf )
+        return;
+
+    int num_valid_children = 0; //number of non null children
+    //compute the number of valid children, and also MAKE SURE CHILDREN ARE POPULATED 
+    for( int i=0; i<8; i++ ){
+        OctreeNode* currChild = getChildAt(i);
+        if (currChild != NULL) {
+            num_valid_children++; 
+            currChild->popRandomSample();
+        }
+    }
+    for( int i=0; i<8; i++){
+        OctreeNode* currChild = getChildAt(i);
+        if( currChild != NULL) { //for each valid child
+            int child_num_pts = static_cast<int>((currChild->data).size());
+            int num_samples = std::max( child_num_pts / num_valid_children, 1 );
+            int* rand_idxs = new int[num_samples];
+            getNrandom(rand_idxs, num_samples, child_num_pts - 1);
+            for(int j=0; j < num_samples; j++){
+                int curr_idx = rand_idxs[j];
+                data.push_back( currChild->data[ static_cast<unsigned long>(curr_idx) ] );
+            }
+            delete rand_idxs;
+        } 
+    } 
+}
+
 // Populate this node by looking at its children, computing the position and color 
 //   average of their points 
-void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color, bool isFirst ) {
-    glm::vec3 ave_position;
-    glm::vec3 ave_color;
+void OctreeNode::populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color) {
+    glm::vec3 ave_position(0, 0, 0);
+    glm::vec3 ave_color(0, 0, 0);
     int cnt=0;
-    bool first = false;
 
     // Update our parents average pos and color
-    if ( isFirst ) {
-        *parent_ave_pos = data[0].pos;
-        *parent_ave_color = data[0].color;
-    } else {
-        *parent_ave_pos += data[0].pos;
-        *parent_ave_color += data[0].color;
-    }
+    *parent_ave_pos += data[0].pos;
+    *parent_ave_color += data[0].color;
 
     // If we are a leaf then we don't have children     
     if ( isLeaf ) 
-	return;
+        return;
 
     // Recurse down the tree 
     for( int i=0; i<8; i++ ){
         OctreeNode* currChild = getChildAt(i);
         if (currChild == NULL )
             continue;
-        if ( cnt == 0 ) {
-            first = true;
-        } else {
-            first = false;
-        }
-        cnt++;
-        currChild->populateRecursive(&ave_position, &ave_color, first);
+        cnt += data.size();
+        currChild->populateRecursive(&ave_position, &ave_color);
     }
 
     // Finally update our own data 
@@ -164,6 +194,22 @@ Octree::~Octree(){
         delete root;
 }
 
+int Octree::getNumNodes(){
+   int count = 0; 
+   getNumDescendants(root, count);
+   return count;
+}
+
+void Octree::getNumDescendants(OctreeNode* currNode, int& count){
+    count++;
+    for(int i = 0; i < 8; i++){
+       OctreeNode* currChild = currNode->getChildAt(i);  
+       if( currChild != NULL ){
+           getNumDescendants(currChild, count);
+       }
+    }  
+}
+
 OctreeNode* Octree::getRoot( void ){
   return root;
 }
@@ -180,7 +226,8 @@ void Octree::populateOctree( void ) {
     glm::vec3 ave_position;
     glm::vec3 ave_color;
     // Kickoff recursion
-    root->populateRecursive(&ave_position, &ave_color, true);
+    //root->populateRecursive(&ave_position, &ave_color);
+    root->popRandomSample();
 }
 
 OctreeNode* Octree::buildOctree(std::vector<Point>* points){

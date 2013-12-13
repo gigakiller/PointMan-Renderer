@@ -12,10 +12,26 @@ from os import listdir
 from time import sleep
 from numpy import array
 
+#do a "safe" dictionary lookup, where if it doesn't have the key, we just return none.
+def dict_lookup(dictionary, key):
+    if(dictionary.has_key(key)):
+        return dictionary[key]
+    else:
+        return None
+
 #read in the .octopus file that represents our octree
-my_octree_dict = read_octree("data/chappes_sml.octopus")
-for key, val in my_octree_dict.iteritems():
-    print key, jsonpickle.encode(val)
+my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes_sml_randsample.octopus")
+#my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes_randsample.octopus")
+print "Length of dictionary ", len(my_octree_dict)
+#my_octree_dict, centroid_x, centroid_y, centroid_z = read_octree("data/chappes.octopus")
+print centroid_x, centroid_y, centroid_z
+centroid_array = [centroid_x, centroid_y, centroid_z]
+print "Read in the .octopus file!"
+#for key, val in my_octree_dict.iteritems():
+    #print key, jsonpickle.encode(val)
+
+#below line is for testing purposes
+print jsonpickle.encode(my_octree_dict[0]);
 
 # Get list of .json files in data
 files = listdir('data')
@@ -53,37 +69,53 @@ class PointCloudReqWS(websocket.WebSocketHandler):
         print "WebSocket opened"
 
     def on_message(self, message):
-        msg = loads(message)
-        cloud = msg['pointcloud']
-        if cloud == "1337": 
-            print "Received m3ssage from teh l337 h4x0rZ!"    
-            self.write_message('{ "power_level": 9000.1 }');
+        
+        #cloud = msg['pointcloud']
+        #cloud = msg[0];
+        #nodeIdx = int(cloud)
+
+        #print "The MESSAGE is:"
+        #print message
+        if( message == "centroid" ):
+            self.write_message( dumps({ "centroid" : centroid_array }) );
         else:
-            print "PointCloud Requested: ", cloud
-            # Check if requested cloud is in our "database"
-            if not loaded_clouds.has_key(cloud):
-              print "Error: pointcloud " + cloud + " not available"
-            # Check if we have loaded it into RAM, if not load it
-            if loaded_clouds[cloud] is None:
-              print "Loading ..."
-              data = load(open('data/'+cloud+'.json', 'r'))
-              loaded_clouds[cloud] = data
-              positions = array(data['positions'])
-              centroids[cloud] = (sum(positions)/len(positions)).tolist()
-            # And respond 
-            print "Sending pointcloud"
-            #self.write_message( dumps(loaded_clouds[cloud]) )
-            numberOfPoints = len(loaded_clouds[cloud]['positions'])
+            msg = loads(message)
+            requested_nodes = map(lambda i: dict_lookup(my_octree_dict, i), msg)  
+            requested_nodes = filter(None, requested_nodes); #get rid of Nones
+
+            to_send = jsonpickle.encode( requested_nodes )
+            self.write_message( to_send )
+            sleep(0.1)
+
+        #if cloud == "1337": 
+            #print "Received m3ssage from teh l337 h4x0rZ!"    
+            #self.write_message('{ "power_level": 9000.1 }');
+        #else:
+            #print "PointCloud Requested: ", cloud
+            ## Check if requested cloud is in our "database"
+            #if not loaded_clouds.has_key(cloud):
+              #print "Error: pointcloud " + cloud + " not available"
+            ## Check if we have loaded it into RAM, if not load it
+            #if loaded_clouds[cloud] is None:
+              #print "Loading ..."
+              #data = load(open('data/'+cloud+'.json', 'r'))
+              #loaded_clouds[cloud] = data
+              #positions = array(data['positions'])
+              #centroids[cloud] = (sum(positions)/len(positions)).tolist()
+            ## And respond 
+            #print "Sending pointcloud"
+            ##self.write_message( dumps(loaded_clouds[cloud]) )
+            #numberOfPoints = len(loaded_clouds[cloud]['positions'])
              
-            start = 0
-            fragLen = 10000
-            while start+fragLen < numberOfPoints:
-              self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(fragLen))) )
-              start += fragLen
-              print "sending data:", start
-              sleep(0.1)
-            remainder = numberOfPoints - start
-            self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(remainder))) )
+            #start = 0
+            #fragLen = 10000
+            #while start+fragLen < numberOfPoints:
+              #self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(fragLen))) )
+              #start += fragLen
+              #print "sending data:", start
+              #sleep(0.1)
+            #remainder = numberOfPoints - start
+            #self.write_message( dumps(self.pack_msg(loaded_clouds[cloud], centroids[cloud], start, int(remainder))) )
         
     def pack_msg( self, cloud, centroid, start, fragLen ):
       positions = cloud['positions'][start:start+fragLen]

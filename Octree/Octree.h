@@ -1,5 +1,7 @@
 #ifndef OCTREE_H
 #define OCTREE_H
+#define MAX_PTS_PER_LEAF 50
+//#define MAX_PTS_PER_LEAF 1
 
 #include <glm/glm.hpp>
 #include "Point.h"
@@ -34,7 +36,12 @@ public:
 
     // Populate this node by looking at its children, computing the position and color 
     //   average of their points 
-    void populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color, bool isFirst ); 
+    void populateRecursive( glm::vec3* parent_ave_pos, glm::vec3* parent_ave_color ); 
+
+    // Populate via random sampling of children. Given that a node has k valid children, each
+    // with n samples, we take n/k samples from each child and add it to the parent. These 
+    // serve as the parent's samples/data.
+    void popRandomSample();
 
     //add a child to the correct octant based on the position, then return the child
     //IF there is already a child at that octant, DO NOT create a new child, return
@@ -79,6 +86,10 @@ public:
     //we don't have to spend time building it again
     //.oct is already taken as the RADIANCE octree format... we don't want to pretend to do that
     void serialize(const char* filename);
+
+    //read from a .octopus file and construct the octree from that
+    //OctreeNode* deserialize(const char* filename);
+    int getNumNodes();
     
     ~Octree();
 private:
@@ -86,6 +97,8 @@ private:
     //helper method for serialize
     void writeNodeToFile(const OctreeNode* root, std::ofstream& fileStream); 
     OctreeNode* root;
+    //gets the number of descendants of the root, assuming that count starts out as zero
+    void getNumDescendants(OctreeNode* root, int& count);
 };
 #pragma clang diagnostic pop
 

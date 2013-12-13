@@ -4,6 +4,8 @@
 #include <fstream>
 #include <limits>
 #include "Point.h"
+#include <stdlib.h>
+
 
 using namespace std;
 vector<glm::vec3>* parseJSONPositions(char* filename){
@@ -124,4 +126,9 @@ AABB calcAABB(const std::vector<Point>* pts){
     } 
     AABB toReturn(highCorner, lowCorner);
     return toReturn;
+}
+
+void getNrandom(int* buf, const int buf_len, const int max_val){
+   for(int i = 0; i < buf_len; i++)
+       buf[i] = rand() % (max_val + 1);
 }

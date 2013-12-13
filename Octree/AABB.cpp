@@ -35,7 +35,7 @@ glm::vec3 AABB::getCentroid(){
 //  5       -   +   -
 //  6       -   -   -
 //  7       +   -   -
-bool AABB::getOctant(const glm::vec3 pos, int* outOctNum, AABB* outAABB){
+bool AABB::getOctant(const glm::vec3 pos, unsigned int* outOctNum, AABB* outAABB){
     if( !isInside(pos) )
         return false;
 
