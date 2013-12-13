@@ -1,0 +1,27 @@
+\begin{thebibliography}{2}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\bibAnnoteFile}[1]{%
+  \IfFileExists{#1}{\begin{quotation}\noindent\textsc{Key:} #1\\
+  \textsc{Annotation:}\ \input{#1}\end{quotation}}{}}
+\providecommand{\bibAnnote}[2]{%
+  \begin{quotation}\noindent\textsc{Key:} #1\\
+  \textsc{Annotation:}\ #2\end{quotation}}
+
+\bibitem[{Kavan and Sorkine(2012)}]{EID:2012}
+Kavan, Ladislav and Olga Sorkine (2012), \enquote{Elasticity-inspired deformers
+  for character articulation.} \emph{ACM Transactions on Graphics (proceedings
+  of ACM SIGGRAPH ASIA)}, 31, 196:1--196:8.
+\bibAnnoteFile{EID:2012}
+
+\bibitem[{Sorkine and Alexa(2007)}]{ARAP:2007}
+Sorkine, Olga and Marc Alexa (2007), \enquote{As-rigid-as-possible surface
+  modeling.} In \emph{Proceedings of the fifth Eurographics symposium on
+  Geometry processing}, SGP '07, 109--116, Eurographics Association,
+  Aire-la-Ville, Switzerland, Switzerland,
+  \urlprefix\url{http://dl.acm.org/citation.cfm?id=1281991.1282006}.
+\bibAnnoteFile{ARAP:2007}
+
+\end{thebibliography}
