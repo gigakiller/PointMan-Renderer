@@ -55,6 +55,8 @@
 
     var model = mat4.create();
 
+    var SS_ERROR_THRESH = 100;
+
     //assuming that we are drawing one cube at a time
     var numIndices = 32;
 
@@ -324,13 +326,20 @@
         console.log("LEVEL: ".concat(level));
 
         //screenspace error
-        var ss_error = [];
-        calcFrontScreenSpaceError(lvl_array, ss_error, model, view, persp); 
+        //var ss_error = [];
+        //calcFrontScreenSpaceError(lvl_array, ss_error, model, view, persp); 
 
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
-            console.log(ss_error[i]);
+            //console.log(ss_error[i]);
+            
+            //if(ss_error[i] < SS_ERROR_THRESH){
+                //console.log("Item :".concat(i));
+            //console.log(ss_error[i]);
+                //continue; //we don't need to walk down this path. 
+            //} 
+
             var currIdx = currParent.bfsIdx;
 
             for(var j=0; j < 8; j++){
@@ -393,7 +402,8 @@
 
             octree_positions = [];
             indices = [];
-            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            //drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            drawOctreeGreen( curr_draw_lvl, octree_positions, indices );
 
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
@@ -498,7 +508,7 @@
 
             octree_positions = [];
             indices = [];
-            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            drawOctreeFront( curr_draw_lvl, octree_positions, indices, model, view, persp );
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
             indices = new Uint16Array(indices);
@@ -556,46 +566,49 @@
         }
 
         //user presses J, we go DOWN a level! 
-        if ( currentKeys[74] ) {
-            down_one_level ( curr_draw_lvl );
-            //curr_draw_lvl = down_one_level( curr_draw_lvl ); 
-            // Update octree drawing
-            ////octree_positions = [];
-            ////indices = [];
-            ////drawOctreeFront( curr_draw_lvl, octree_positions, indices );
-            ////numberOfIndices = indices.length;
-            ////octree_positions = new Float32Array(octree_positions);
-            ////indices = new Uint16Array(indices);
-            ////// Update points drawing
-            ////positions = [];
-            ////colors = [];
-            ////pointsCount = drawFront( curr_draw_lvl, positions, colors );
-            ////positions = new Float32Array(positions);
-            ////colors = new Float32Array(colors);
-        } 
+        //if ( currentKeys[74] ) {
+            //down_one_level ( curr_draw_lvl );
+            ////curr_draw_lvl = down_one_level( curr_draw_lvl ); 
+            //// Update octree drawing
+            //////octree_positions = [];
+            //////indices = [];
+            //////drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            //////numberOfIndices = indices.length;
+            //////octree_positions = new Float32Array(octree_positions);
+            //////indices = new Uint16Array(indices);
+            //////// Update points drawing
+            //////positions = [];
+            //////colors = [];
+            //////pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            //////positions = new Float32Array(positions);
+            //////colors = new Float32Array(colors);
+        //} 
 
         //user presses K, we go UP on level!
-        if ( currentKeys[75] ) {
-            curr_draw_lvl = up_one_level( curr_draw_lvl ); 
-            // Update octree drawing
-            octree_positions = [];
-            indices = [];
-            drawOctreeFront( curr_draw_lvl, octree_positions, indices );
-            numberOfIndices = indices.length;
-            octree_positions = new Float32Array(octree_positions);
-            indices = new Uint16Array(indices);
-            // Update points drawing
-            positions = [];
-            colors = [];
-            pointsCount = drawFront( curr_draw_lvl, positions, colors );
-            positions = new Float32Array(positions);
-            colors = new Float32Array(colors);
-        }
+        //if ( currentKeys[75] ) {
+            //curr_draw_lvl = up_one_level( curr_draw_lvl ); 
+            //// Update octree drawing
+            //octree_positions = [];
+            //indices = [];
+            //drawOctreeFront( curr_draw_lvl, octree_positions, indices );
+            //numberOfIndices = indices.length;
+            //octree_positions = new Float32Array(octree_positions);
+            //indices = new Uint16Array(indices);
+            //// Update points drawing
+            //positions = [];
+            //colors = [];
+            //pointsCount = drawFront( curr_draw_lvl, positions, colors );
+            //positions = new Float32Array(positions);
+            //colors = new Float32Array(colors);
+        //}
 
         //user presses X, we RELOAD, but starting from the current camera perspective
         if ( currentKeys[88] ) {
+            level = 0;
             curr_draw_lvl = []; //clear curr_draw_lvl
             var root = octree_dict[0];
+            octree_dict = []; //reset the dictionary
+            octree_dict[0] = root;
             curr_draw_lvl.push(root); //push the parent on 
             finished_growing = false;
             down_one_level( curr_draw_lvl ); 
@@ -798,6 +811,19 @@
             down_one_level( curr_draw_lvl ); //go down one level
         }
 
+        mat4.identity(model);
+        // Invert camera pose to get view matrix
+        view = mat4.create();
+        mat4.inverse( cam, view );
+
+        // Update Transforms
+        var mv = mat4.create();
+        mat4.multiply(view, model, mv);
+
+        var invTrans = mat4.create();
+        mat4.inverse(mv, invTrans);
+        mat4.transpose(invTrans);
+
         var currTime = new Date().getTime();
         var dt = currTime - prevTime;
         elapsedTime += dt;
@@ -827,18 +853,6 @@
         handleUserInput();
         //handleMouseMove();
 
-        mat4.identity(model);
-        // Invert camera pose to get view matrix
-        view = mat4.create();
-        mat4.inverse( cam, view );
-
-        // Update Transforms
-        var mv = mat4.create();
-        mat4.multiply(view, model, mv);
-
-        var invTrans = mat4.create();
-        mat4.inverse(mv, invTrans);
-        mat4.transpose(invTrans);
 
         // Render
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
