@@ -330,7 +330,7 @@
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
             var currParent = lvl_array[i];   
-            //console.log(ss_error[i]);
+            console.log(ss_error[i]);
             var currIdx = currParent.bfsIdx;
 
             for(var j=0; j < 8; j++){
@@ -389,6 +389,7 @@
     function handleMsg() { 
         if(msg[0].bfsIdx == 0){ //we have recieved the root. this only happens once! 
             curr_draw_lvl.push(msg[0]);
+            octree_dict[0] = msg[0];
 
             octree_positions = [];
             indices = [];
@@ -417,7 +418,6 @@
             //I am assuming that we peer down the "+z" axis of camera space. We're going
             //to have to rotate the +z axis onto the desired view direction (i.e. the 
             //direction of the centroid).
-
             var plusZ = [0, 0, -1];
             var centroidDir = centroid;
             var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
@@ -590,6 +590,15 @@
             pointsCount = drawFront( curr_draw_lvl, positions, colors );
             positions = new Float32Array(positions);
             colors = new Float32Array(colors);
+        }
+
+        //user presses X, we RELOAD, but starting from the current camera perspective
+        if ( currentKeys[88] ) {
+            curr_draw_lvl = []; //clear curr_draw_lvl
+            var root = octree_dict[0];
+            curr_draw_lvl.push(root); //push the parent on 
+            finished_growing = false;
+            down_one_level( curr_draw_lvl ); 
         }
 
     }

@@ -44,14 +44,13 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         //centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
         //centroid_pos[3] = 0; 
 
-        calcScreenSpaceError( halfVec, radius, Persp, View, maxErr );
-        screen_space_error[i] = maxErr;
+        screen_space_error[i] = calcScreenSpaceError( halfVec, radius, Persp, View, maxErr );
     }
 }
 
 //For now I'm going to do something REALLY DUMB, and just use the Z-distance of the 
 //projected centroid position
-function calcScreenSpaceError( half_vec, radius, Persp, modelview, maxError ) {
+function calcScreenSpaceError( half_vec, radius, Persp, modelview ) {
     //var centroid_pos = Persp * modelveiw * centroid; 
     var fullTransform = mat4.create();   
     mat4.multiply(Persp, modelview, fullTransform);
@@ -59,7 +58,8 @@ function calcScreenSpaceError( half_vec, radius, Persp, modelview, maxError ) {
     mat4.multiply(fullTransform, half_vec, half_vec_ss);
 
     var hv_length = vec4.length(half_vec_ss); 
-    
+    var maxError;
+
     //do a very simple z-cull: if the circle is behind us, don't draw it
     if(half_vec_ss[2] < 0){ //assuming +z is INTO screen
         maxError = 0; //not on the screen, we don't need to draw
@@ -67,7 +67,8 @@ function calcScreenSpaceError( half_vec, radius, Persp, modelview, maxError ) {
         maxError = Math.PI * hv_length * hv_length; //use the area of the "circle"    
     }
 
-    console.log(maxError);
+    return maxError;
+    //console.log(maxError);
 
     //maxError = centroidScreenspace[2]; //take the z-coordinate 
 }
