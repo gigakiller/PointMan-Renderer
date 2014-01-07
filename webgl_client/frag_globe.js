@@ -1,3 +1,4 @@
+var createWebGLContext;
 (function() {
     "use strict";
     //[>global window,document,Float32Array,Uint16Array,mat4,vec3,snoise<]

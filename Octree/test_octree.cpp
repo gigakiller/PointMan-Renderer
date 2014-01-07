@@ -290,7 +290,6 @@ int main(int argc, char **argv)
     cout << "Serializing octree... " << endl;
     myOctree->serialize("chappes_sml.octopus");
     cout << "Serialization DONE!" << endl; 
-
  
     // set window values
     win.width = 640;
