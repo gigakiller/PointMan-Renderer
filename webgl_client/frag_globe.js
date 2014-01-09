@@ -1,4 +1,6 @@
-var createWebGLContext;
+var createWebGLContext, getShaderSource, createProgram, Octree, drawOctreeGreen, AABB, OctreeNode, drawOctreeFront, drawFront;
+var mat4, vec3, quat4, mat3;
+
 (function() {
     "use strict";
     //[>global window,document,Float32Array,Uint16Array,mat4,vec3,snoise<]
@@ -30,12 +32,9 @@ var createWebGLContext;
 
     var model = mat4.create();
 
-    var SS_ERROR_THRESH = 100;
+    //var SS_ERROR_THRESH = 100;
 
     //assuming that we are drawing one cube at a time
-    var numIndices = 32;
-
-    var SUBSET_SIZE = 65534;
 
     //when we handle message, go DOWN one level
     var listen_down_lvl = false;
@@ -90,7 +89,6 @@ var createWebGLContext;
     var positionLocation;
     var colorLocation;
     var normalLocation;
-    var texCoordLocation;
 
     var octree_dict = {};
 
@@ -105,7 +103,6 @@ var createWebGLContext;
     var u_ModelLocation;
     var u_ViewLocation;
     var u_PerspLocation;
-    var u_timeLocation;
     var u_CentroidLocation;
     var u_drawMode;
     var globe_program;
@@ -170,8 +167,6 @@ var createWebGLContext;
     initializeShader();
 
     // Message passing globals
-    var pointsIndex=0;
-    var numberOfPoints=0;
     var pointsCount=0;
     var positions;
     var indices;
@@ -179,86 +174,17 @@ var createWebGLContext;
     var msg;
     var new_msg=false;
 
-    function loadPointCloud() { 
-        // Unpack message
-        var pointCloud = msg["data"];
-        numberOfPoints = msg["numberOfPoints"];
-        centroid = msg["centroid"];
-
-        var fragLen = pointCloud.positions.length;
-        pointsCount += fragLen;
-
-        // Upon first message allocate memory for entire cloud
-        if ( pointsIndex == 0 ) {
-            // Initialize pointcloud memory
-            positions = new Float32Array(3 * numberOfPoints);
-            colors = new Float32Array(3 * numberOfPoints);
-
-            // Set up camera pointing towareds centroid 
-            gl.uniform3f(u_CentroidLocation, centroid[0], centroid[1], centroid[2]);
-
-            //assuming the camera starts at the origin, the desired view direction is 
-            //the coordinates of the centroid itself
-
-            //I am assuming that we peer down the "+z" axis of camera space. We're going
-            //to have to rotate the +z axis onto the desired view direction (i.e. the 
-            //direction of the centroid).
-
-            var plusZ = [0, 0, -1];
-            var centroidDir = centroid;
-            var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
-            var desiredRotation = vec3.rotationTo(plusZ, centroidDir); 
-            var startingRot3 = quat4.toMat3(desiredRotation);
-            var startingRot4 = mat3.toMat4(startingRot3);
-            mat4.multiply(cam, startingRot4); 
-        }
-
-        for ( var i=0; i<fragLen; i++ ) {
-            //console.log( pointCloud.positions[i] );
-            positions[pointsIndex] = pointCloud.positions[i][0];
-            colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
-            pointsIndex++;
-            positions[pointsIndex] = pointCloud.positions[i][1];
-            colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
-            pointsIndex++;
-            positions[pointsIndex] = pointCloud.positions[i][2];
-            colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
-            pointsIndex++;
-        }
-
-        // Set up Points
-        // Positions
-        var positionsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(positionLocation);
-        // Colors
-        var colorsName = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(colorLocation);
-
-        // Indicate that the message has been handled 
-        new_msg = false;
-    }
-
     // Front Queue
     var root = null;
     var octree = new Octree( root );
-    var front = []; //the current nodes that we're using for rendering
-    var expansion_front = []; //the nodes we want to get the children of 
     //the expansion front is always a subset of the front.
     var curr_draw_lvl = [];
-    var positions = [];
-    var colors = [];
-    var pointsCount = 0;
+    positions = [];
+    colors = [];
+    pointsCount = 0;
 
     var octree_positions = [];
-    var indices = [];
-
-    var expansion_req = new Array();
+    indices = [];
 
     //this takes lvl_array, and replaces its contents with its children
     function down_one_level( lvl_array ){
@@ -294,32 +220,32 @@ var createWebGLContext;
     }
 
     // this takes lvl_array and replaces its contents with the parents
-    function up_one_level( lvl_array ){
-        level--;
-        var new_lvl_array = [];
-        var parents_pushed = {};
-        console.log("LEVEL: ".concat(level));
-        for( var i=0; i < lvl_array.length; i++){
-            var currChild = lvl_array[i];
-            var currIdx = currChild.bfsIdx;
-            var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
-            // If we have already added the parents, then go to the next child
-            if ( parents_pushed.hasOwnProperty(parent_idx) ) {
-                continue;
-            }
-            // If the parent is in the octree_dict then add it to the new_lvl_array
-            if ( octree_dict.hasOwnProperty(parent_idx) ) {
-                parents_pushed[parent_idx] = octree_dict[parent_idx];
-                new_lvl_array.push(octree_dict[parent_idx]); 
-            }
-        }
-        return new_lvl_array;
-    }
+    //function up_one_level( lvl_array ){
+        //level--;
+        //var new_lvl_array = [];
+        //var parents_pushed = {};
+        //console.log("LEVEL: ".concat(level));
+        //for( var i=0; i < lvl_array.length; i++){
+            //var currChild = lvl_array[i];
+            //var currIdx = currChild.bfsIdx;
+            //var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
+            //// If we have already added the parents, then go to the next child
+            //if ( parents_pushed.hasOwnProperty(parent_idx) ) {
+                //continue;
+            //}
+            //// If the parent is in the octree_dict then add it to the new_lvl_array
+            //if ( octree_dict.hasOwnProperty(parent_idx) ) {
+                //parents_pushed[parent_idx] = octree_dict[parent_idx];
+                //new_lvl_array.push(octree_dict[parent_idx]); 
+            //}
+        //}
+        //return new_lvl_array;
+    //}
 
     // ID of root node
     //expansion_req.push(0); 
     function handleMsg() { 
-        if(msg[0].bfsIdx == 0){ //we have recieved the root. this only happens once! 
+        if(msg[0].bfsIdx === 0){ //we have recieved the root. this only happens once! 
             curr_draw_lvl.push(msg[0]);
             octree_dict[0] = msg[0];
 
@@ -352,7 +278,7 @@ var createWebGLContext;
             //direction of the centroid).
             var plusZ = [0, 0, -1];
             var centroidDir = centroid;
-            var centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
+            centroidDir = vec3.normalize(centroid);//normalized vector pointing to centroid
             var desiredRotation = vec3.rotationTo(plusZ, centroidDir); 
             var startingRot3 = quat4.toMat3(desiredRotation);
             var startingRot4 = mat3.toMat4(startingRot3);
@@ -373,7 +299,7 @@ var createWebGLContext;
             }
 
             var num_leaves = 0;
-            for(var i=0; i < old_draw_lvl.length; i++){
+            for(i=0; i < old_draw_lvl.length; i++){
                 var currParent = old_draw_lvl[i];
                 var currIdx = currParent.bfsIdx;
                 var child_cnt = 0;
@@ -383,12 +309,12 @@ var createWebGLContext;
                         child_cnt+=1;
                     }
                 }
-                if( child_cnt == 0){
+                if( child_cnt === 0){
                     num_leaves++;
                     curr_draw_lvl.push(currParent);
                 }
             }
-            if( num_leaves == old_draw_lvl.length ){
+            if( num_leaves === old_draw_lvl.length ){
                 finished_growing = true;  
             }
 
@@ -423,7 +349,7 @@ var createWebGLContext;
         // For events that update once
         // 't' for toggling drawing mode
         if ( currentKeys[84] ) {
-            if ( drawMode == 0 ) {
+            if ( drawMode === 0 ) {
                 drawMode = 1;
             } else {
                 drawMode = 0;
@@ -505,11 +431,11 @@ var createWebGLContext;
         currentKeys[event.keyCode] = false;
     }
 
-    function handleUserInput(event) {
+    function handleUserInput() {
         handleMovement();
     }
 
-    function handleMovement(event) {
+    function handleMovement() {
 
         // 'w'
         if ( currentKeys[87] ) {
@@ -533,7 +459,7 @@ var createWebGLContext;
             //roll camera 
             var camera_roll = 0;
             var roll_vel = 0.025;
-            currentKeys[81] ? camera_roll = roll_vel : camera_roll = -roll_vel;
+            camera_roll = currentKeys[81] ? roll_vel : -roll_vel;
             var identity = mat4.create();
             mat4.identity(identity);
 
@@ -545,7 +471,7 @@ var createWebGLContext;
 
     // Handle Mouse Events
     function handleMouseDown(event) {
-        if( event.button == 2 ) {
+        if( event.button === 2 ) {
             mouseLeftDown = false;
             mouseRightDown = true;
         }
@@ -557,7 +483,7 @@ var createWebGLContext;
         lastMouseY = event.clientY;
     }
 
-    function handleMouseUp(event) {
+    function handleMouseUp() {
         mouseLeftDown = false;
         mouseRightDown = false;
     }
@@ -590,25 +516,24 @@ var createWebGLContext;
             mat4.rotate(identity, camera_pitch, [0,1,0], pitch_mat);
             mat4.multiply(cam, pitch_mat); 
         }
-        else
-        {
-            /*
-               radius += 0.01 * deltaY;
-               radius = Math.min(Math.max(radius, 2.0), 10.0);
-               */
-        }
+        //else
+        //{
+            //[>
+               //radius += 0.01 * deltaY;
+               //radius = Math.min(Math.max(radius, 2.0), 10.0);
+               //*/
+        //}
 
         lastMouseX = newX;
         lastMouseY = newY;
     }
 
     canvas.onmousedown = handleMouseDown;
-    canvas.oncontextmenu = function(ev) {return false;};
+    //canvas.oncontextmenu = function(ev) {return false;};
     document.onmouseup = handleMouseUp;
     document.onmousemove = handleMouseMove;
     document.onkeydown = handleKeyDown;
     document.onkeyup = handleKeyUp;
-
 
     var prevTime = new Date().getTime();
 
@@ -619,8 +544,6 @@ var createWebGLContext;
     //var ws = new WebSocket("ws://54.201.72.50:8888/pointcloud_ws");
 
     ws.onopen = function() {
-        //var req = [2, 18];
-        //ws.send( JSON.stringify(req) );
         ws.send("centroid");
 
         //trigger client-server cascade by requesting root  
@@ -717,8 +640,10 @@ var createWebGLContext;
 
 
         // Render
+        /*jslint bitwise: true */
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        
+        /*jslint bitwise: false */
+
         // Pointcloud Rendering program
         
         gl.useProgram(globe_program);
@@ -728,20 +653,19 @@ var createWebGLContext;
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
        
-        if ( pointsCount > 0 && ( renderMode == 0 || renderMode == 2 )) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
-          gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-          gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
-          gl.enableVertexAttribArray(positionLocation);
-          // Colors
-          //var colorsName = gl.createBuffer();
-          gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
-          gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-          gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-          gl.enableVertexAttribArray(colorLocation);
+        if ( pointsCount > 0 && ( renderMode === 0 || renderMode === 2 )) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+            gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(positionLocation);
+            // Colors
+            //var colorsName = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorsName);
+            gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+            gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(colorLocation);
 
-          //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
-          gl.drawArrays( gl.POINTS, 0, pointsCount );
+            gl.drawArrays( gl.POINTS, 0, pointsCount );
         }
          
         // Octree Rendering program 
@@ -751,7 +675,7 @@ var createWebGLContext;
         gl.uniformMatrix4fv(u_octreeViewLocation, false, view);
         gl.uniformMatrix4fv(u_octreePerspLocation, false, persp);
 
-        if ( indices.length  > 0 && ( renderMode == 1 || renderMode == 2 )){
+        if ( indices.length  > 0 && ( renderMode === 1 || renderMode === 2 )){
             gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
             gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
             gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
@@ -766,5 +690,5 @@ var createWebGLContext;
 
         time += 0.001;
         window.requestAnimFrame(animate);
-    };
+    }
 }());
