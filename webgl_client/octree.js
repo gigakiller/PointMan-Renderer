@@ -1,5 +1,5 @@
-/*global vec3*/
-
+/* exported drawOctreeGreen, drawOctreeFront, drawFront, Octree */
+var vec4, vec3, mat4, str, positionsName, indicesName, positions, positionLocation, indices;
 /*
   Javascript Octree implementation and other such utility functions
 */
@@ -15,6 +15,7 @@
       * https://github.com/farbrausch/fr_public/blob/master/werkkzeug3/engine.cpp#L4265
 */
 function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Persp ) {
+    "use strict";
     // TODO: ....
     // Model,View, Model is identity
     //var mv = mat4.create();
@@ -52,6 +53,7 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
 //For now I'm going to do something REALLY DUMB, and just use the Z-distance of the 
 //projected centroid position
 function calcScreenSpaceError( half_vec, radius, Persp, modelview ) {
+    "use strict";
     //var centroid_pos = Persp * modelveiw * centroid; 
     var fullTransform = mat4.create();   
     mat4.multiply(Persp, modelview, fullTransform);
@@ -75,7 +77,8 @@ function calcScreenSpaceError( half_vec, radius, Persp, modelview ) {
 }
        
 
-function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num, ss_error ) {
+function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
+    "use strict";
     positions.push(
         // z-bottom
         lowCorner.x, lowCorner.y, lowCorner.z,
@@ -113,19 +116,14 @@ function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num, ss_e
 }
 
 function drawOctreeGreen( front, positions, indices ) {
-    var aabb;
-    var highCorner;
-    var lowCorner;
-
+    "use strict";
     for( var i=0; i<front.length; i++ ) {
         drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i, 0 );
     }         
 }
 
 function drawOctreeFront( front, positions, indices, model, view, persp) {
-    var aabb;
-    var highCorner;
-    var lowCorner;
+    "use strict";
 
     var ss_error = [];
     calcFrontScreenSpaceError(front, ss_error, model, view, persp); 
@@ -136,12 +134,13 @@ function drawOctreeFront( front, positions, indices, model, view, persp) {
 }
 
 function drawFront( curr_draw_lvl, positions, colors ){
+    "use strict";
     //positions = [];
     //colors = [];
-    pointsCount = 0;
+    var pointsCount = 0;
     for( var i=0; i<curr_draw_lvl.length; i++ ){
         if ( curr_draw_lvl[i].hasOwnProperty("points") ){
-            curr_draw_lvl_pts = curr_draw_lvl[i].points;
+            var curr_draw_lvl_pts = curr_draw_lvl[i].points;
             for ( var j=0; j<curr_draw_lvl_pts.length; j++ ){
                 positions.push( curr_draw_lvl_pts[j].x );
                 positions.push( curr_draw_lvl_pts[j].y );
@@ -157,6 +156,7 @@ function drawFront( curr_draw_lvl, positions, colors ){
 }
 
 function AABB( highCorner, lowCorner ) {
+    "use strict";
     /* TODO: figure outthe right way to do this
     if ( !(lowCorner instanceof vec3) || !(highCorner instanceof vec3) ) {
       console.log( "Low Corner or High Corner not vec3" );
@@ -174,6 +174,7 @@ function AABB( highCorner, lowCorner ) {
 }
 
 AABB.prototype.draw = function( positions, indices, aabb_num ) {
+    "use strict";
     positions.push(
         // z-bottom
         this.lowCorner[0], this.lowCorner[1], this.lowCorner[2],
@@ -211,6 +212,7 @@ AABB.prototype.draw = function( positions, indices, aabb_num ) {
 };
 
 function OctreeNode( boundingBox, id ) {
+    "use strict";
     /* TODO
     if ( !(boundingBox instanceof AABB) ) {
       alert( "boundingBox not instance of AABB" );
@@ -220,11 +222,11 @@ function OctreeNode( boundingBox, id ) {
     this.aabb = boundingBox;
     this.position = this.aabb.centroid;
     // Some space for data points 
-    this.data = new Array();
+    this.data = [];
     // Initialize all children to null
-    this.children = new Array();
+    this.children = [];
     for ( var i=0; i<8; i++ ) {
-      this.children.push( null );
+        this.children.push( null );
     }
 }
 
@@ -237,18 +239,21 @@ OctreeNode.prototype.getParentId = function(){
 */
 
 OctreeNode.prototype.getChildIdAt = function(i){
+    "use strict";
     return 8*this.id + (i+1);
-}
+};
 
 OctreeNode.prototype.getChildrenIds = function(){
+    "use strict";
     var child_ids = Array();
     for( var i=0; i<8; i++ ){
         child_ids.push( this.getChildIdAt(i) );
     }
     return child_ids;
-}
+};
 
 OctreeNode.prototype.getChildAt = function(i){
+    "use strict";
     if ( i < 0 || i > 7 ) {
         alert( "Accessing OctreeNode at invalid index: " + str(i) );
         return;
@@ -257,12 +262,13 @@ OctreeNode.prototype.getChildAt = function(i){
 };
 
 OctreeNode.prototype.createChildAt = function(i){
+    "use strict";
     if ( i < 0 || i > 7 ) {
         alert( "Accessing OctreeNode at invalid index: " + str(i) );
         return;
     }
     // Check if this node already has a child
-    if ( this.children[i] != null ) {
+    if ( this.children[i] !== null ) {
         console.err( "Node already has a child at index" + str(i) );
         return;
     }
@@ -281,56 +287,56 @@ OctreeNode.prototype.createChildAt = function(i){
             var child_aabb = new AABB( highCorner,centroid );
             var child_id = this.getChildIdAt(0);
             node = new OctreeNode( child_aabb, child_id );
-            this.children[0] = node
+            this.children[0] = node;
             break;
         //octant 1 | - + + 
         case 1:
             console.log( "adding child 1" );
-            var child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1],highCorner[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1],centroid[2]]) );
-            var child_id = this.getChildIdAt(1);
+            child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1],highCorner[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1],centroid[2]]) );
+            child_id = this.getChildIdAt(1);
             node = new OctreeNode( child_aabb, child_id );
             this.children[1] = node;
             break;
         //octant 2 | - - + 
         case 2:
             console.log( "adding child 2" );
-            var child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1]-halfDiagonal[1],highCorner[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1]-halfDiagonal[1],centroid[2]]) );
-            var child_id = this.getChildIdAt(2);
+            child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1]-halfDiagonal[1],highCorner[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1]-halfDiagonal[1],centroid[2]]) );
+            child_id = this.getChildIdAt(2);
             node = new OctreeNode( child_aabb, child_id );
             this.children[2] = node;
             break;
         case 3:
             console.log( "adding child 3" );
-            var child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1]-halfDiagonal[1],highCorner[2]]), vec3.create([centroid[0],centroid[1]-halfDiagonal[1],centroid[2]]) );
-            var child_id = this.getChildIdAt(3);
+            child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1]-halfDiagonal[1],highCorner[2]]), vec3.create([centroid[0],centroid[1]-halfDiagonal[1],centroid[2]]) );
+            child_id = this.getChildIdAt(3);
             node = new OctreeNode( child_aabb, child_id );
             this.children[3] = node;
             break;
         case 4:
             console.log( "adding child 4" );
-            var child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0],centroid[1],centroid[2]-halfDiagonal[2]]) );
-            var child_id = this.getChildIdAt(4);
+            child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0],centroid[1],centroid[2]-halfDiagonal[2]]) );
+            child_id = this.getChildIdAt(4);
             node = new OctreeNode( child_aabb, child_id );
             this.children[4] = node;
             break;
         case 5:
             console.log( "adding child 5" );
-            var child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1],centroid[2]-halfDiagonal[2]]) );
-            var child_id = this.getChildIdAt(5);
+            child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1],centroid[2]-halfDiagonal[2]]) );
+            child_id = this.getChildIdAt(5);
             node = new OctreeNode( child_aabb, child_id );
             this.children[5] = node;
             break;
         case 6:
             console.log( "adding child 6" );
-            var child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1]-halfDiagonal[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1]-halfDiagonal[1],centroid[2]-halfDiagonal[2]]) );
-            var child_id = this.getChildIdAt(6);
+            child_aabb = new AABB( vec3.create([highCorner[0]-halfDiagonal[0],highCorner[1]-halfDiagonal[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0]-halfDiagonal[0],centroid[1]-halfDiagonal[1],centroid[2]-halfDiagonal[2]]) );
+            child_id = this.getChildIdAt(6);
             node = new OctreeNode( child_aabb, child_id );
             this.children[6] = node;
             break;
         case 7:
             console.log( "adding child 7" );
-            var child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1]-halfDiagonal[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0],centroid[1]-halfDiagonal[1],centroid[2]-halfDiagonal[2]]) );
-            var child_id = this.getChildIdAt(7);
+            child_aabb = new AABB( vec3.create([highCorner[0],highCorner[1]-halfDiagonal[1],highCorner[2]-halfDiagonal[2]]), vec3.create([centroid[0],centroid[1]-halfDiagonal[1],centroid[2]-halfDiagonal[2]]) );
+            child_id = this.getChildIdAt(7);
             node = new OctreeNode( child_aabb, child_id );
             this.children[7] = node;
             break;
@@ -345,19 +351,17 @@ OctreeNode.prototype.createChildAt = function(i){
     [ n0 nc0 nc1 nc2 nc3 nc4 nc5 nc6 nc7 nc0c1 nc0c2 ... ]
 */
 function Octree( root ) {
-  this.root = root
+    "use strict";
+    this.root = root;
 }
 
 /*
   Little class for drawing octrees
 */
 function OctreeDrawer( octree, context ) { 
+    "use strict";
     this.octree = octree;
     this.context = context;
-    /*
-    this.positionsName = positionsName;
-    this.indicesName = indicesName;
-    */
     this.positions = [];
     this.indices = [];
 }
@@ -366,9 +370,12 @@ function OctreeDrawer( octree, context ) {
     Walk down octree, drawing as we go
 */
 OctreeDrawer.prototype.drawRecursive = function( node ){
+    "use strict";
     // If node is null then return
-    if ( node == null )
+    if ( node === null ){
         return;
+    }
+
     node.aabb.draw( this.positions, this.indices, this.draw_num );
     this.draw_num += 1;
     for( var i=0; i<8; i++ ){
@@ -381,6 +388,7 @@ OctreeDrawer.prototype.drawRecursive = function( node ){
    Trigger draw recursion
 */
 OctreeDrawer.prototype.draw = function(){
+    "use strict";
     this.draw_num = 0;
     this.drawRecursive( this.octree.root );
 };
@@ -389,6 +397,7 @@ OctreeDrawer.prototype.draw = function(){
     uploadMesh, copied from aabb.js
 */
 OctreeDrawer.prototype.uploadMesh = function(){
+    "use strict";
     //var positionsName = context.createBuffer();
     this.context.bindBuffer(this.context.ARRAY_BUFFER, positionsName);
     this.context.bufferData(this.context.ARRAY_BUFFER, new Float32Array(positions), this.context.STATIC_DRAW);
