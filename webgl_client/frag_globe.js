@@ -21,38 +21,12 @@ var createWebGLContext;
         return;
     }
 
-    //function drawSingleAABB( curr_aabb ){
-        //var curr_root  = new OctreeNode( curr_aabb, 0 );
-        //var curr_octree = new Octree( curr_root ); 
-        //var octDrawer = new OctreeDrawer( curr_octree, gl );
-        //octDrawer.draw();
-        //var positions = octDrawer.positions;
-        //var indices = octDrawer.indices;
-        //numberOfIndices = indices.length; 
-        //console.log(positions);
-        //console.log(indices);
-        //console.log(numberOfIndices);
-
-        //// Positions
-        //var octreePositionsName = gl.createBuffer();
-        //gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
-        //gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-        //gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
-        //gl.enableVertexAttribArray(octreePositionLocation);
-
-        //// Indices
-        //var indicesName = gl.createBuffer();
-        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-        //gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-    //}
-
     ///////////////////////////////////////////////////////////////////////////
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
-    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     var model = mat4.create();
 
@@ -173,8 +147,6 @@ var createWebGLContext;
         u_InvTransLocation = gl.getUniformLocation(globe_program,"u_InvTrans");
         u_CentroidLocation = gl.getUniformLocation(globe_program,"u_Centroid");
         u_drawMode= gl.getUniformLocation(globe_program,"u_drawMode");
-        //gl.useProgram(globe_program);
-        
 
         // Set up octree shaders
         var octree_fs = getShaderSource(document.getElementById("octree-fs"));
@@ -193,7 +165,6 @@ var createWebGLContext;
         u_octreeModelLocation = gl.getUniformLocation(octree_program,"u_Model");
         u_octreeViewLocation = gl.getUniformLocation(octree_program,"u_View");
         u_octreePerspLocation = gl.getUniformLocation(octree_program,"u_Persp");
-        //gl.useProgram(octree_program);
     }
 
     initializeShader();
@@ -209,17 +180,13 @@ var createWebGLContext;
     var new_msg=false;
 
     function loadPointCloud() { 
-        //$.getJSON("data/chappes.json", function( pointCloud ) {
-
         // Unpack message
         var pointCloud = msg["data"];
         numberOfPoints = msg["numberOfPoints"];
         centroid = msg["centroid"];
 
-        //console.log( numberOfPoints );
         var fragLen = pointCloud.positions.length;
         pointsCount += fragLen;
-        //console.log( pointsCount );
 
         // Upon first message allocate memory for entire cloud
         if ( pointsIndex == 0 ) {
@@ -246,27 +213,19 @@ var createWebGLContext;
             mat4.multiply(cam, startingRot4); 
         }
 
-        //console.log( pointCloud.positions.length );
         for ( var i=0; i<fragLen; i++ ) {
             //console.log( pointCloud.positions[i] );
             positions[pointsIndex] = pointCloud.positions[i][0];
-            //  centroid[0] += pointCloud.positions[i][0];
             colors[pointsIndex] = pointCloud.colors[i][0]/255.0;
             pointsIndex++;
             positions[pointsIndex] = pointCloud.positions[i][1];
-            //  centroid[1] += pointCloud.positions[i][1];
             colors[pointsIndex] = pointCloud.colors[i][1]/255.0;
             pointsIndex++;
             positions[pointsIndex] = pointCloud.positions[i][2];
-            //  centroid[2] += pointCloud.positions[i][1];
             colors[pointsIndex] = pointCloud.colors[i][2]/255.0;
             pointsIndex++;
         }
 
-        //centroid = (1.0/numberOfPoints) * centroid;
-        //centroid[0] = centroid[0]/numberOfPoints;
-        //centroid[1] = centroid[1]/numberOfPoints;
-        //centroid[2] = centroid[2]/numberOfPoints;
         // Set up Points
         // Positions
         var positionsName = gl.createBuffer();
@@ -281,24 +240,6 @@ var createWebGLContext;
         gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(colorLocation);
 
-        //centroid = (1.0/numberOfPoints) * centroid;
-        /*
-           centroid[0] = centroid[0]/numberOfPoints;
-           centroid[1] = centroid[1]/numberOfPoints;
-           centroid[2] = centroid[2]/numberOfPoints;
-           */
-
-        //console.log("Centroid position:");
-        //console.log(centroid[0]);
-        //console.log(centroid[1]);
-        //console.log(centroid[2]);
-        //console.log( positions );
-        //console.log( colors );
-
-        // Kickoff animation cycle
-        //animate();
-        //console.log(pointsIndex);
-
         // Indicate that the message has been handled 
         new_msg = false;
     }
@@ -306,7 +247,6 @@ var createWebGLContext;
     // Front Queue
     var root = null;
     var octree = new Octree( root );
-    //var front = new Queue(); //the current nodes that we're using for rendering
     var front = []; //the current nodes that we're using for rendering
     var expansion_front = []; //the nodes we want to get the children of 
     //the expansion front is always a subset of the front.
@@ -348,21 +288,6 @@ var createWebGLContext;
             } 
             //the thing is, we shouldn't proceed until we get the message BACK
             //down_one_level should be SYNCHRONOUS
-
-            //var child_cnt = 0;
-            //for(var j=0; j < 8; j++){
-                //var child_idx = 8*currIdx + j + 1; 
-                ////if( child_idx in octree_dict ) { // I think this is like a linear search
-                //if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
-                    //child_cnt+=1;
-                    //new_lvl_array.push(octree_dict[child_idx]); 
-                //}
-            //}
-            //// If we don't have any children then add ourselves
-            //if ( child_cnt == 0 ) {
-                //new_lvl_array.push(currParent); 
-            //}
-                
         }
         ws.send( JSON.stringify(requested_children) );
         listen_down_lvl = true;
@@ -375,17 +300,14 @@ var createWebGLContext;
         var parents_pushed = {};
         console.log("LEVEL: ".concat(level));
         for( var i=0; i < lvl_array.length; i++){
-            //console.log("At lvl_array item:".concat(i));
             var currChild = lvl_array[i];
             var currIdx = currChild.bfsIdx;
             var parent_idx = Math.floor((currIdx - ((currIdx-1)%8)-1)/8)
             // If we have already added the parents, then go to the next child
-            //if ( parent_idx in parents_pushed ) {
             if ( parents_pushed.hasOwnProperty(parent_idx) ) {
                 continue;
             }
             // If the parent is in the octree_dict then add it to the new_lvl_array
-            //if ( parent_idx in octree_dict ) {
             if ( octree_dict.hasOwnProperty(parent_idx) ) {
                 parents_pushed[parent_idx] = octree_dict[parent_idx];
                 new_lvl_array.push(octree_dict[parent_idx]); 
@@ -403,7 +325,6 @@ var createWebGLContext;
 
             octree_positions = [];
             indices = [];
-            //drawOctreeFront( curr_draw_lvl, octree_positions, indices );
             drawOctreeGreen( curr_draw_lvl, octree_positions, indices );
 
             numberOfIndices = indices.length;
@@ -440,46 +361,11 @@ var createWebGLContext;
             finished_growing = false;
         }
 
-        //put the children into the current front
-        //also put them into the tree.
-    
-        //for( var i=0; i < msg.length; i++ ){
-            ////front.enqueue( msg[i] );
-            //front.push( msg[i] );
-            //expansion_front.push( msg[i] );
-            //octree_dict[msg[i].bfsIdx] = msg[i]; 
-        //}
-        
-        //initialize our 2D arrays that partition octree_positions and indices
-        //pos_subsets.length = Math.ceil(indices.length / SUBSET_SIZE);
-        //for( i=0; i < pos_subsets.length; i++){
-            //pos_subsets[i] = [];
-            //ind_subsets[i] = [];
-        //}
-
-        //numberOfIndices = indices.length;
-        //octree_positions = new Float32Array(octree_positions);
-        //indices = new Uint16Array(indices);
-
-        //make a request based on the children of everything in the current expansion front
-        //var requested_children = [];
-        //while( expansion_front.length > 0 ){
-            //var currParent = expansion_front.pop(); 
-            //var currIdx = currParent.bfsIdx;
-            //for(i=0; i < 8; i++){
-                //requested_children.push( 8*currIdx + i + 1 );
-            //}
-        //} 
-
-        //ws.send( JSON.stringify(requested_children) );
-        // Indicate that the message has been handled 
-
         if(listen_down_lvl){
             listen_down_lvl = false; //put flag back down
 
             var old_draw_lvl = curr_draw_lvl;
             curr_draw_lvl = [];
-            //console.log("curr_draw_lvl length: ".concat(curr_draw_lvl.length);
             for(var i=0; i < msg.length; i++){
                 //put into octree and the curr_draw_lvl
                 octree_dict[msg[i].bfsIdx] = msg[i]; 
@@ -493,7 +379,6 @@ var createWebGLContext;
                 var child_cnt = 0;
                 for(var j=0; j < 8; j++){
                     var child_idx = 8*currIdx + j + 1; 
-                    //if( child_idx in octree_dict ) { // I think this is like a linear search
                     if ( octree_dict.hasOwnProperty(child_idx) ) { // while this is a lookup
                         child_cnt+=1;
                     }
@@ -533,7 +418,6 @@ var createWebGLContext;
     var currentKeys = {};
     // Handle Keyboard Events
     function handleKeyDown(event) {
-        //console.log( "keycode: " + event.keyCode + "\n" );
         currentKeys[event.keyCode] = true; 
 
         // For events that update once
@@ -629,26 +513,20 @@ var createWebGLContext;
 
         // 'w'
         if ( currentKeys[87] ) {
-            //console.log("moving forward\n");
             mat4.translate( cam, [0,0,-cam_vel] );
-            //console.log(cam);
         }
         // 's'
         if ( currentKeys[83] ) {
-            //console.log("moving backwards\n");
             mat4.translate( cam, [0,0,cam_vel] );
-            //console.log(cam);
         }
 
         // 'a'
         if ( currentKeys[65] ) {
             mat4.translate( cam, [-cam_vel,0,0] );
-            //console.log(cam);
         }
         // 'd'
         if ( currentKeys[68] ) {
             mat4.translate( cam, [cam_vel,0,0] );
-            //console.log(cam);
         }
         //'q' OR 'e' 
         if( currentKeys[81] || currentKeys[69] ) {
@@ -656,14 +534,12 @@ var createWebGLContext;
             var camera_roll = 0;
             var roll_vel = 0.025;
             currentKeys[81] ? camera_roll = roll_vel : camera_roll = -roll_vel;
-            //mat4.identity(cam);
             var identity = mat4.create();
             mat4.identity(identity);
 
             var roll_mat = mat4.create(); 
             mat4.rotate(identity, camera_roll, [0,0,1], roll_mat);
             mat4.multiply(cam, roll_mat); 
-            //console.log(cam);
         }
     }
 
@@ -801,11 +677,7 @@ var createWebGLContext;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([]), gl.STATIC_DRAW);
 
-    //initializeShader();
     animate();
-
-    //loadPointCloud();
-    //animate();
 
     function animate(){
         if( !listen_down_lvl && !finished_growing ){ //flag is down
@@ -839,17 +711,6 @@ var createWebGLContext;
             handleMsg(); 
         }
 
-        // Request pending nodes from server
-        //if ( ws.readyState == ws.OPEN ) {
-          //if ( expansion_req.length > 0 ) {
-            //console.log( "Sending expansion req" + String(expansion_req) );
-            //console.log( expansion_req );
-            //console.log(JSON.stringify( expansion_req ))
-            //ws.send( JSON.stringify( expansion_req ) );
-            //expansion_req = [];
-          //}
-        //}
-
         // Handle user keyboard inputs
         handleUserInput();
         //handleMouseMove();
@@ -867,7 +728,6 @@ var createWebGLContext;
         gl.uniformMatrix4fv(u_InvTransLocation, false, invTrans);
 
        
-        //var positionsName = gl.createBuffer();
         if ( pointsCount > 0 && ( renderMode == 0 || renderMode == 2 )) {
           gl.bindBuffer(gl.ARRAY_BUFFER, positionsName);
           gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
@@ -883,10 +743,6 @@ var createWebGLContext;
           //gl.drawArrays( gl.POINTS, 0, pointsIndex/3);
           gl.drawArrays( gl.POINTS, 0, pointsCount );
         }
-        //gl.drawElements( gl.LINES, numIndices, gl.UNSIGNED_SHORT, 0 );
-        //gl.drawArrays( gl.LINES, 0, pointsCount );
-        
-      
          
         // Octree Rendering program 
         gl.useProgram(octree_program);
@@ -906,39 +762,6 @@ var createWebGLContext;
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
             gl.drawElements(gl.LINES, numberOfIndices, gl.UNSIGNED_SHORT,0);
-            
-            //*********************************************************************
-            
-            //first, populate pos_subsets and ind_subsets
-            //for(var i=0; i < indices.length; i++){
-                //var curr_idx = indices[i];
-                //var curr_subset = Math.floor(i / SUBSET_SIZE); //integer division
-                //var subset_idx = i % SUBSET_SIZE;
-                //pos_subsets[curr_subset][3*subset_idx] = octree_positions[curr_idx];
-                //pos_subsets[curr_subset][3*subset_idx + 1] = octree_positions[curr_idx + 1];
-                //pos_subsets[curr_subset][3*subset_idx + 2] = octree_positions[curr_idx + 2];
-                //ind_subsets[curr_subset][subset_idx] = subset_idx;
-            //}
-
-            ////loop through each subset, and make a draw call for each
-            //for(i=0; i < pos_subsets.length; i++){
-                //var curr_positions = new Float32Array(pos_subsets[i]);  
-                //var curr_idxs = new Uint16Array(ind_subsets[i]);  
-
-                //gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
-                //gl.bufferData(gl.ARRAY_BUFFER, curr_positions, gl.STATIC_DRAW);
-                ////gl.bufferData(gl.ARRAY_BUFFER, octree_positions, gl.STATIC_DRAW);
-                //gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
-                //gl.enableVertexAttribArray(octreePositionLocation);
-
-                ////Indices
-                ////gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
-                ////gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, curr_idxs, gl.STATIC_DRAW);
-                ////gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-                ////gl.drawElements(gl.LINES, curr_idxs.length, gl.UNSIGNED_SHORT,0);
-                //gl.drawArrays( gl.POINTS, 0, curr_idxs.length );
-            //}
         }
 
         time += 0.001;
