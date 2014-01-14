@@ -1,0 +1,6 @@
+Some convenient utility scripts are in here, just because.
+
+1) strip_console_output.py. 
+    a) Usage: python strip_console_output file.txt
+    b) Output: stripped_file.txt
+    b) file.txt should contain lines copy and pasted from the Firefox JavaScript console. Values from the console indicate the time printed and the line number that console.log() was called at. Clearly we don't want these in our output, so this script strips the first and last token, assuming that what we printed was delimited by spaces.
