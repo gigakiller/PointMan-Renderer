@@ -40,9 +40,9 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         //var maxErr;
 
         var centroid_pos = vec4.create();
-        centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
-        centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
-        centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
+        centroid_pos[0] = front[i].lowCorner.x + halfVec[0];
+        centroid_pos[1] = front[i].lowCorner.y + halfVec[1];
+        centroid_pos[2] = front[i].lowCorner.z + halfVec[2];
         centroid_pos[3] = 0; 
 
         //screen_space_error[i] = calcScreenSpaceError( halfVec, radius, Persp, View );
