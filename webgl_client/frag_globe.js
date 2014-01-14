@@ -1,5 +1,6 @@
 var createWebGLContext, getShaderSource, createProgram, Octree, drawOctreeGreen, AABB, OctreeNode, drawOctreeFront, drawFront, calcFrontScreenSpaceError;
 var mat4, vec3, quat4, mat3;
+var SS_ERROR_THRESH = 15;
 
 (function() {
     "use strict";
@@ -201,10 +202,13 @@ var mat4, vec3, quat4, mat3;
             var currParent = lvl_array[i];   
             //console.log(ss_error[i]);
             
+            console.log(ss_error[i]);
             //if(ss_error[i] < SS_ERROR_THRESH){
-                //console.log("Item :".concat(i));
-            //console.log(ss_error[i]);
-                //continue; //we don't need to walk down this path. 
+                ////console.log("Item :".concat(i));
+                ////console.log(ss_error[i]);
+                ////continue; //we don't need to walk down this path. 
+                ////var leet = 1337;
+                ////leet++;
             //} 
 
             var currIdx = currParent.bfsIdx;

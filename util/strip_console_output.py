@@ -15,8 +15,9 @@ out_f = open(outfile_name, 'w')
 
 for line in in_f:
         tokens = line.split()
-        #data = float(tokens[1])  # assume that the middle token is the value
-        out_f.write(tokens[1])
+        data = tokens[1:-1]
+        for item in data:
+            out_f.write(item)  # strip the first and last tokens
         out_f.write('\n')
 
 in_f.close()
