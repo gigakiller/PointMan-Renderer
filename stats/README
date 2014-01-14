@@ -1,0 +1,8 @@
+This folder contains some useful statistics that we use to evaluate PointMan.
+
+1) histogram_one_over_z_error:
+	a) Shows distribution of screen space errors for each OctreeNode
+		starting from the default view. Used 40 bins, generated
+		with hist(data, 40) in MATLAB. 
+	b) Error metric is 1 / z, where z is the z-distance in SCREEN SPACE of the
+		centroid of the octree node.
