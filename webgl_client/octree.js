@@ -20,7 +20,6 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
     // Model,View, Model is identity
     //var mv = mat4.create();
     //mat4.multiply(View, Model, mv); //is the correct order? it matches what we have elsewhere...
-    //BOLD ASSUMPTION: assume model is identity! 
 
     for ( var i=0; i<front.length; i++ ) {
         console.log(i);
@@ -37,37 +36,40 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
         //var radius = vec4.length(halfVec)/2; //radius in camera space
         
         //I don't **think** we divide by 2 because we already do so above
-        var radius = vec4.length(halfVec); //radius in camera space
+        //var radius = vec4.length(halfVec); //radius in camera space
         //var maxErr;
 
-        //var centroid_pos = vec4.create();
-        //centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
-        //centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
-        //centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
-        //centroid_pos[3] = 0; 
+        var centroid_pos = vec4.create();
+        centroid_pos[0] = front[i].lowCorner[0] + halfVec[0];
+        centroid_pos[1] = front[i].lowCorner[1] + halfVec[1];
+        centroid_pos[2] = front[i].lowCorner[2] + halfVec[2];
+        centroid_pos[3] = 0; 
 
-        screen_space_error[i] = calcScreenSpaceError( halfVec, radius, Persp, View);
+        //screen_space_error[i] = calcScreenSpaceError( halfVec, radius, Persp, View );
+        //WARNING, BOLD ASSUMPTION: assume model is identity! 
+        screen_space_error[i] = calcScreenSpaceError( centroid_pos, Persp, View );
     }
 }
 
 //For now I'm going to do something REALLY DUMB, and just use the Z-distance of the 
 //projected centroid position
-function calcScreenSpaceError( half_vec, radius, Persp, modelview ) {
+function calcScreenSpaceError( centroid_pos, Persp, modelview ) {
     "use strict";
     //var centroid_pos = Persp * modelveiw * centroid; 
     var fullTransform = mat4.create();   
     mat4.multiply(Persp, modelview, fullTransform);
-    var half_vec_ss = vec4.create(); //half_vec in screenspace
-    mat4.multiply(fullTransform, half_vec, half_vec_ss);
+    var centroid_ss = vec4.create(); 
+    mat4.multiply(fullTransform, centroid_pos, centroid_ss);
 
-    var hv_length = vec4.length(half_vec_ss); 
+    //var hv_length = vec4.length(centroid_ss); 
     var maxError;
 
     //do a very simple z-cull: if the circle is behind us, don't draw it
-    if(half_vec_ss[2] > 0){ //assuming +z is INTO screen
+    if(centroid_ss[2] < 0){ //assuming +z is INTO screen
         maxError = 0; //not on the screen, we don't need to draw
     } else {
-        maxError = Math.PI * hv_length * hv_length; //use the area of the "circle"    
+        //maxError = Math.PI * hv_length * hv_length; //use the area of the "circle"    
+        maxError = 1 / centroid_ss[2];
     }
 
     return maxError;
