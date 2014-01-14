@@ -22,7 +22,7 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
     //mat4.multiply(View, Model, mv); //is the correct order? it matches what we have elsewhere...
 
     for ( var i=0; i<front.length; i++ ) {
-        console.log(i);
+        //console.log(i);
         // Transform
 
         //"Centroid" refers to the vector from one corner of the AABB to the other!
@@ -64,6 +64,7 @@ function calcScreenSpaceError( centroid_pos, Persp, modelview ) {
     //var hv_length = vec4.length(centroid_ss); 
     var maxError;
 
+    console.log( centroid_ss[2] );
     //do a very simple z-cull: if the circle is behind us, don't draw it
     if(centroid_ss[2] < 0){ //assuming +z is INTO screen
         maxError = 0; //not on the screen, we don't need to draw
@@ -73,9 +74,6 @@ function calcScreenSpaceError( centroid_pos, Persp, modelview ) {
     }
 
     return maxError;
-    //console.log(maxError);
-
-    //maxError = centroidScreenspace[2]; //take the z-coordinate 
 }
        
 
