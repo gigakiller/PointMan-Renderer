@@ -12,8 +12,9 @@ Below, a low-res render of the church as seen from the client:
 Below, the octree as seen from the server (the church is sideways in this picture):
 ![client_lowres](screenshots/church_octree.png)
 
-TODO: We need to integrate octrees / LOD into the client!
+[See slides about PointMan on Google Docs.](https://docs.google.com/presentation/d/1toQ5c5Mw_8D_hWouQqrb1SKOvAJjrxdFCHs503GID20/edit?usp=sharing)
 
+TODO: While octrees have been integrated, we still need LoD. Integrate LoD into client.
 ##Usage:
 
 In terminal:
