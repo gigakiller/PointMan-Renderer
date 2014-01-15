@@ -139,7 +139,6 @@ function drawNodeAABB( highCorner, lowCorner, positions, colors, indices, aabb_n
 
 function drawOctreeFront( front, positions, colors, indices, model, view, persp) {
     "use strict";
-
     var ss_error = [];
     calcFrontScreenSpaceError(front, ss_error, model, view, persp); 
     for( var i=0; i<front.length; i++ ) {

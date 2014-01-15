@@ -116,7 +116,9 @@ hardware because we do not discard fragments, allowing for early-z optimizations
 
 <!-- Shaders for drawing the octree -->
 <script id="octree-vs" type="x-shader/x-vertex">
+
     attribute vec3 position;
+    attribute vec3 color;
 
     uniform mat4 u_Model;
     uniform mat4 u_View;
@@ -127,7 +129,8 @@ hardware because we do not discard fragments, allowing for early-z optimizations
     
     void main(void)
     {
-        v_color = vec3(0.0,1.0,1.0);
+        v_color = color;
+        //v_color = vec3(0.0,1.0,1.0);
 		gl_Position = u_Persp * u_View * u_Model * vec4(position, 1.0);
     }
 </script>

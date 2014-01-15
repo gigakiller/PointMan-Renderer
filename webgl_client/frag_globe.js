@@ -1,6 +1,6 @@
 var createWebGLContext, getShaderSource, createProgram, Octree, AABB, OctreeNode, drawOctreeFront, drawFront, calcFrontScreenSpaceError;
 var mat4, vec3, quat4, mat3;
-var SS_ERROR_THRESH = 0.01;
+//var SS_ERROR_THRESH = 0.01;
 
 (function() {
     "use strict";
@@ -96,6 +96,7 @@ var SS_ERROR_THRESH = 0.01;
 
     // For octree
     var octreePositionLocation;
+    var octreeColorLocation;
     var u_octreeModelLocation;
     var u_octreeViewLocation;
     var u_octreePerspLocation;
@@ -160,6 +161,7 @@ var SS_ERROR_THRESH = 0.01;
             return;
         } 
 
+        octreeColorLocation = gl.getAttribLocation(octree_program, "color");
         octreePositionLocation = gl.getAttribLocation(octree_program, "position");
         u_octreeModelLocation = gl.getUniformLocation(octree_program,"u_Model");
         u_octreeViewLocation = gl.getUniformLocation(octree_program,"u_View");
@@ -175,6 +177,9 @@ var SS_ERROR_THRESH = 0.01;
     var colors;
     var msg;
     var new_msg=false;
+    
+    //used for visualizing the screenspace error of the octree
+    var octree_colors = [];
 
     // Front Queue
     var root = null;
@@ -338,10 +343,11 @@ var SS_ERROR_THRESH = 0.01;
 
             octree_positions = [];
             indices = [];
-            var octree_colors = [];
+            octree_colors = [];
             drawOctreeFront( curr_draw_lvl, octree_positions, octree_colors, indices, model, view, persp );
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
+            octree_colors = new Float32Array(octree_colors);
             indices = new Uint16Array(indices);
             // Update points drawing
             positions = [];
@@ -621,12 +627,18 @@ var SS_ERROR_THRESH = 0.01;
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(colorLocation);
 
-    // Positions
+    // OCTREE Positions
     var octreePositionsName = gl.createBuffer(); //screen space error
     gl.bindBuffer(gl.ARRAY_BUFFER, octreePositionsName);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([]), gl.STATIC_DRAW);
     gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(octreePositionLocation);
+    //OCTREE colors
+    var octreeColorsName = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, octreeColorsName);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([]), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(octreeColorLocation, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(octreeColorLocation);
 
     // Indices
     var indicesName = gl.createBuffer();
@@ -714,7 +726,10 @@ var SS_ERROR_THRESH = 0.01;
             gl.vertexAttribPointer(octreePositionLocation, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(octreePositionLocation);
 
-            //TODO: add COLOR data
+            gl.bindBuffer(gl.ARRAY_BUFFER, octreeColorsName);
+            gl.bufferData(gl.ARRAY_BUFFER, octree_colors, gl.STATIC_DRAW);
+            gl.vertexAttribPointer(octreeColorLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(octreeColorLocation);
 
             //Indices
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesName);
