@@ -1,6 +1,6 @@
 var createWebGLContext, getShaderSource, createProgram, Octree, AABB, OctreeNode, drawOctreeFront, drawFront, calcFrontScreenSpaceError;
 var mat4, vec3, quat4, mat3;
-//var SS_ERROR_THRESH = 0.01;
+var SS_ERROR_THRESH = 0.01;
 
 (function() {
     "use strict";

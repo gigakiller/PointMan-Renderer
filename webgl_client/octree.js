@@ -1,7 +1,7 @@
 /* exported drawOctreeGreen, drawOctreeFront, drawFront, Octree */
-var vec4, vec3, mat4, str, positionsName, indicesName, positions, positionLocation, indices;
+var vec4, vec3, mat4, str, positionsName, indicesName, positions, positionLocation, indices, SS_ERROR_THRESH;
 /*
-  Javascript Octree implementation and other such utility functions
+  javascript Octree implementation and other such utility functions
 */
 
 /*
@@ -95,16 +95,22 @@ function drawNodeAABB( highCorner, lowCorner, positions, colors, indices, aabb_n
         highCorner.x, highCorner.y, highCorner.z,
         highCorner.x, lowCorner.y, highCorner.z
     );
-    var curr_color = [0.0, 1.0, 0.0];
+    var zero_color = [1.0, 1.0, 1.0]; //denoting zero screen space error
+    var max_color = [1.0, 0.0, 0.0]; //denoting MAX screen space error 
+    var t = 0.5; //amount to LERP by. If t = 0, we are at zero_color. If t = 1, we are at max_color
+    var lerp_color = [ zero_color[0] * (1 - t) + max_color[0] * t,
+                        zero_color[1] * (1 - t) + max_color[1] * t,
+                        zero_color[2] * (1 - t) + max_color[2] * t];
+
     colors.push(
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2],
-        curr_color[0], curr_color[1], curr_color[2]
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2],
+        lerp_color[0], lerp_color[1], lerp_color[2]
     );
     indices.push(
         // z-bottom
