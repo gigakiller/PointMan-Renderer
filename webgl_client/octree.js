@@ -14,7 +14,7 @@ var vec4, vec3, mat4, str, positionsName, indicesName, positions, positionLocati
       * http://article.gmane.org/gmane.games.devel.algorithms/21697
       * https://github.com/farbrausch/fr_public/blob/master/werkkzeug3/engine.cpp#L4265
 */
-function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Persp ) {
+function calcFrontScreenSpaceError( front, Model, View, Persp ) {
     "use strict";
     // TODO: ....
     // Model,View, Model is identity
@@ -47,7 +47,7 @@ function calcFrontScreenSpaceError( front, screen_space_error, Model, View, Pers
 
         //screen_space_error[i] = calcScreenSpaceError( halfVec, radius, Persp, View );
         //WARNING, BOLD ASSUMPTION: assume model is identity! 
-        screen_space_error[i] = calcScreenSpaceError( centroid_pos, Persp, View );
+        front[i].sse = calcScreenSpaceError( centroid_pos, Persp, View );
     }
 }
 

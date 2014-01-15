@@ -200,8 +200,8 @@ var mat4, vec3, quat4, mat3;
         console.log("LEVEL: ".concat(level));
 
         //screenspace error
-        var ss_error = [];
-        calcFrontScreenSpaceError(lvl_array, ss_error, model, view, persp); 
+        //var ss_error = [];
+        calcFrontScreenSpaceError(lvl_array, model, view, persp); 
 
         for(var i=0; i < lvl_array.length; i++){
             //console.log("At lvl_array item:".concat(i));
