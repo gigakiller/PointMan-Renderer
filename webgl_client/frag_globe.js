@@ -1,6 +1,6 @@
 var createWebGLContext, getShaderSource, createProgram, Octree, drawOctreeGreen, AABB, OctreeNode, drawOctreeFront, drawFront, calcFrontScreenSpaceError;
 var mat4, vec3, quat4, mat3;
-var SS_ERROR_THRESH = 15;
+var SS_ERROR_THRESH = 0.06;
 
 (function() {
     "use strict";
@@ -33,7 +33,8 @@ var SS_ERROR_THRESH = 15;
 
     var model = mat4.create();
 
-    //var SS_ERROR_THRESH = 100;
+    //When the user presses 'X', we initiate a clear request.
+    var clear_request = false;
 
     //assuming that we are drawing one cube at a time
 
@@ -202,13 +203,13 @@ var SS_ERROR_THRESH = 15;
             var currParent = lvl_array[i];   
             //console.log(ss_error[i]);
             
-            console.log(ss_error[i]);
+            //console.log(ss_error[i]);
             //if(ss_error[i] < SS_ERROR_THRESH){
                 ////console.log("Item :".concat(i));
                 ////console.log(ss_error[i]);
-                ////continue; //we don't need to walk down this path. 
                 ////var leet = 1337;
                 ////leet++;
+                //continue; //we don't need to walk down this path. 
             //} 
 
             var currIdx = currParent.bfsIdx;
@@ -219,8 +220,20 @@ var SS_ERROR_THRESH = 15;
             //the thing is, we shouldn't proceed until we get the message BACK
             //down_one_level should be SYNCHRONOUS
         }
-        ws.send( JSON.stringify(requested_children) );
-        listen_down_lvl = true;
+        if(clear_request){ 
+            //we hit this if our keypress callback occurs while INSIDE the down_one_level function
+            level = 0;
+            curr_draw_lvl = []; //clear curr_draw_lvl
+            var root = octree_dict[0];
+            octree_dict = []; //reset the dictionary
+            octree_dict[0] = root;
+            curr_draw_lvl.push(root); //push the parent on 
+            finished_growing = false;
+            clear_request = false;
+        } else {
+            ws.send( JSON.stringify(requested_children) );
+            listen_down_lvl = true;
+        }
     }
 
     // this takes lvl_array and replaces its contents with the parents
@@ -249,6 +262,7 @@ var SS_ERROR_THRESH = 15;
     // ID of root node
     //expansion_req.push(0); 
     function handleMsg() { 
+
         if(msg[0].bfsIdx === 0){ //we have recieved the root. this only happens once! 
             curr_draw_lvl.push(msg[0]);
             octree_dict[0] = msg[0];
@@ -336,6 +350,20 @@ var SS_ERROR_THRESH = 15;
             colors = new Float32Array(colors);
         }
         new_msg = false;
+
+        //what if the user makes a clear request, and the callback occurs inside handle_message?
+        //or what if the user makes a clear request, but there's still an old message coming in the pipe?
+        //The answer is to flush what we have now, and start anew! 
+        if( clear_request ){
+            level = 0;
+            curr_draw_lvl = []; //clear curr_draw_lvl
+            var root = octree_dict[0];
+            octree_dict = []; //reset the dictionary
+            octree_dict[0] = root;
+            curr_draw_lvl.push(root); //push the parent on 
+            finished_growing = false;
+            clear_request = false;
+        }
     }
 
     var time = 0;
@@ -426,7 +454,8 @@ var SS_ERROR_THRESH = 15;
             octree_dict[0] = root;
             curr_draw_lvl.push(root); //push the parent on 
             finished_growing = false;
-            down_one_level( curr_draw_lvl ); 
+            clear_request = true;
+            //down_one_level( curr_draw_lvl ); 
         }
 
     }
