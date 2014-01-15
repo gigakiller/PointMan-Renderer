@@ -81,8 +81,7 @@ function calcScreenSpaceError( centroid_pos, Persp, modelview ) {
     return maxError;
 }
        
-
-function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
+function drawNodeAABB( highCorner, lowCorner, positions, colors, indices, aabb_num ) {
     "use strict";
     positions.push(
         // z-bottom
@@ -95,6 +94,17 @@ function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
         lowCorner.x, highCorner.y, highCorner.z,
         highCorner.x, highCorner.y, highCorner.z,
         highCorner.x, lowCorner.y, highCorner.z
+    );
+    var curr_color = [0.0, 1.0, 0.0];
+    colors.push(
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2],
+        curr_color[0], curr_color[1], curr_color[2]
     );
     indices.push(
         // z-bottom
@@ -120,21 +130,21 @@ function drawNodeAABB( highCorner, lowCorner, positions, indices, aabb_num ) {
     );
 }
 
-function drawOctreeGreen( front, positions, indices ) {
-    "use strict";
-    for( var i=0; i<front.length; i++ ) {
-        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i, 0 );
-    }         
-}
+//function drawOctreeGreen( front, positions, indices ) {
+    //"use strict";
+    //for( var i=0; i<front.length; i++ ) {
+        //drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i, 0 );
+    //}         
+//}
 
-function drawOctreeFront( front, positions, indices, model, view, persp) {
+function drawOctreeFront( front, positions, colors, indices, model, view, persp) {
     "use strict";
 
     var ss_error = [];
     calcFrontScreenSpaceError(front, ss_error, model, view, persp); 
     for( var i=0; i<front.length; i++ ) {
         //console.log("Drawing front at position: ".concat(i));
-        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, indices, i, ss_error[i] );
+        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, colors, indices, i, ss_error[i] );
     }         
 }
 
@@ -171,6 +181,7 @@ function AABB( highCorner, lowCorner ) {
     this.highCorner = highCorner;
     var aabbDiagonal = vec3.create();
     this.centroid = vec3.create();
+    this.sse = 0; //screen space error
 
     // Compute centroid given low and high corners
     vec3.subtract( this.highCorner, this.lowCorner, aabbDiagonal );
