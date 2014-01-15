@@ -344,7 +344,7 @@ var mat4, vec3, quat4, mat3;
             octree_positions = [];
             indices = [];
             octree_colors = [];
-            drawOctreeFront( curr_draw_lvl, octree_positions, octree_colors, indices, model, view, persp );
+            drawOctreeFront( curr_draw_lvl, octree_positions, octree_colors, indices);
             numberOfIndices = indices.length;
             octree_positions = new Float32Array(octree_positions);
             octree_colors = new Float32Array(octree_colors);

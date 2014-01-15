@@ -137,13 +137,13 @@ function drawNodeAABB( highCorner, lowCorner, positions, colors, indices, aabb_n
     //}         
 //}
 
-function drawOctreeFront( front, positions, colors, indices, model, view, persp) {
+function drawOctreeFront( front, positions, colors, indices) {
     "use strict";
-    var ss_error = [];
-    calcFrontScreenSpaceError(front, ss_error, model, view, persp); 
+    //var ss_error = [];
+    //calcFrontScreenSpaceError(front, ss_error, model, view, persp); 
     for( var i=0; i<front.length; i++ ) {
         //console.log("Drawing front at position: ".concat(i));
-        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, colors, indices, i, ss_error[i] );
+        drawNodeAABB( front[i].highCorner, front[i].lowCorner, positions, colors, indices, i);
     }         
 }
 
