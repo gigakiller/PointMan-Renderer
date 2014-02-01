@@ -14,7 +14,7 @@ Below, a low-res render of the church as seen from the client:
 Below, the octree as seen from the server (the church is sideways in this picture):
 ![client_lowres](screenshots/church_octree.png)
 
-TODO: Traverse the octree in a "smart" way that takes the view into account, rather than just pulling it "progressively". 
+FUTURE WORK: Traverse the octree in a "smart" way that takes the view into account, rather than just pulling it "progressively". 
 
 ##Usage:
 
