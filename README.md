@@ -1,7 +1,7 @@
 PointMan-Renderer
 =================
 
-A WebGL point cloud renderer (with Octree construction and traversal) by Nathan Marshak and Uriah Baalke. 
+A WebGL point cloud renderer (with Octree construction and traversal) by Nathan Marshak and Uriah Baalke. Includes preprocessing on server with C++, a server in Python, and client in JavaScript.
 
 [See slides about PointMan on Google Docs, for more info.](https://docs.google.com/presentation/d/1toQ5c5Mw_8D_hWouQqrb1SKOvAJjrxdFCHs503GID20/edit?usp=sharing)
 
